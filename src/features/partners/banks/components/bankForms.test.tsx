@@ -32,11 +32,11 @@ it("creates a bank from the redesigned form with the original payload and redire
     "MY"
   );
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Bank Code" }),
+    screen.getByRole("textbox", { name: "Bank code" }),
     " MBB "
   );
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Bank Name" }),
+    screen.getByRole("textbox", { name: "Bank name" }),
     " Maybank {Enter}"
   );
   expect(mockCreate).toHaveBeenCalledWith({
@@ -60,11 +60,11 @@ it("keeps the create form open and identifies duplicate bank codes", async () =>
     "MY"
   );
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Bank Code" }),
+    screen.getByRole("textbox", { name: "Bank code" }),
     "MBB"
   );
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Bank Name" }),
+    screen.getByRole("textbox", { name: "Bank name" }),
     "Maybank"
   );
   await userEvent.click(screen.getByRole("button", { name: "Add bank" }));

@@ -98,7 +98,7 @@ const partnerRoutes: IRoute[] = [
   ...(FEATURES.partnerPublicProfile
     ? [
         {
-          name: "My Public Profile",
+          name: "My public profile",
           layout: "/partner",
           path: "/public-profile",
           icon: Globe2,

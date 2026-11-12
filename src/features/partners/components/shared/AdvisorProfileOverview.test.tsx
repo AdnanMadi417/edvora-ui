@@ -44,7 +44,7 @@ it("groups company details, documents, contact links and manager controls", () =
   ).toBeInTheDocument();
   expect(screen.getByText("Study Agency")).toBeInTheDocument();
   expect(renderDocument).toHaveBeenCalledWith(
-    "Company Registration Document",
+    "Company registration document",
     "registration.pdf"
   );
   expect(
@@ -80,7 +80,7 @@ it("preserves individual document visibility and personal details", () => {
     screen.getByRole("heading", { name: "Personal information" })
   ).toBeInTheDocument();
   expect(screen.getByText("Education consultant")).toBeInTheDocument();
-  expect(renderDocument).toHaveBeenCalledWith("Profile Photo", "profile.jpg");
-  expect(renderDocument).toHaveBeenCalledWith("Passport Photo", "passport.jpg");
+  expect(renderDocument).toHaveBeenCalledWith("Profile photo", "profile.jpg");
+  expect(renderDocument).toHaveBeenCalledWith("Passport photo", "passport.jpg");
   expect(screen.queryByText("Manager controls")).not.toBeInTheDocument();
 });

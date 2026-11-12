@@ -26,14 +26,14 @@ it("validates and preserves university details across steps, then submits the co
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
   expect(screen.getByText("University name is required")).toBeInTheDocument();
   expect(
-    screen.queryByRole("textbox", { name: "Branch Name" })
+    screen.queryByRole("textbox", { name: "Branch name" })
   ).not.toBeInTheDocument();
   await userEvent.type(
-    screen.getByRole("textbox", { name: "University Name" }),
+    screen.getByRole("textbox", { name: "University name" }),
     "Sunway University"
   );
   await userEvent.selectOptions(
-    screen.getByRole("combobox", { name: "University Type" }),
+    screen.getByRole("combobox", { name: "University type" }),
     "type-1"
   );
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
@@ -42,7 +42,7 @@ it("validates and preserves university details across steps, then submits the co
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
   expect(screen.getByText("Branch name is required")).toBeInTheDocument();
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Branch Name" }),
+    screen.getByRole("textbox", { name: "Branch name" }),
     "Main Campus"
   );
   await userEvent.type(
@@ -56,7 +56,7 @@ it("validates and preserves university details across steps, then submits the co
   expect(screen.getByText("January")).toBeInTheDocument();
   expect(mockCreate).not.toHaveBeenCalled();
   await userEvent.click(screen.getByRole("button", { name: "Back" }));
-  expect(screen.getByRole("textbox", { name: "Branch Name" })).toHaveValue(
+  expect(screen.getByRole("textbox", { name: "Branch name" })).toHaveValue(
     "Main Campus"
   );
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));

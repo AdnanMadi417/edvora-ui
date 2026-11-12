@@ -124,13 +124,13 @@ export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordP
             </Card>
 
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <Input label="Payment Date" type="date" value={String(formData.payment_date ?? "")} onChange={(v) => updateFormData("payment_date", v)} error={formErrors.payment_date || undefined} />
+              <Input label="Payment date" type="date" value={String(formData.payment_date ?? "")} onChange={(v) => updateFormData("payment_date", v)} error={formErrors.payment_date || undefined} />
               <Input label="Amount" placeholder="Enter amount" type="number" value={String(formData.amount ?? "")} onChange={(v) => updateFormData("amount", v)} error={formErrors.amount || undefined} />
               <Combobox label="Currency" options={[
                   { value: "RM", label: "RM" },
                   { value: "USD", label: "USD" },
                 ]} value={formData.currency ? String(formData.currency) : null} onChange={(v) => updateFormData("currency", v ?? "")} error={formErrors.currency || undefined} />
-              <Input label="Payment Reference" placeholder="e.g. UNI-REF-001" value={String(formData.payment_reference ?? "")} onChange={(v) => updateFormData("payment_reference", v)} error={formErrors.payment_reference || undefined} />
+              <Input label="Payment reference" placeholder="e.g. UNI-REF-001" value={String(formData.payment_reference ?? "")} onChange={(v) => updateFormData("payment_reference", v)} error={formErrors.payment_reference || undefined} />
             </div>
           </div>
       </div>

@@ -115,7 +115,7 @@ export default function AgentPartnerChat({
           </div>
         ) : messages.length === 0 ? (
           <NoMessagesFound
-            title="No Messages Yet"
+            title="No messages yet"
             subtitle="You can contact us anytime if you have questions or need assistance."
           />
         ) : (

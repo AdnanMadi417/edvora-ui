@@ -62,7 +62,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
       <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bank Account History"
+            title="Bank account history"
             description="Every bank account this advisor has used. Editing an account keeps the old details here and makes the new ones current."
             icon={HistoryIcon}
             iconBg="bg-ub-tone-brand-bg"

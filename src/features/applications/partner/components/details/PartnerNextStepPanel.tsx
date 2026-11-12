@@ -83,7 +83,7 @@ export default function PartnerNextStepPanel({ mode, ownerName, visaFeeAmount, v
           <Alert tone="info" title="Download your eval" action={{ label: "View EMGS app instructions", href: "https://www.youtube.com/shorts/fT4Wmm4eWwI" }}>
             Your eval is ready. Download it directly from the EMGS app.
           </Alert>
-          <Alert tone="warning" title="Check entry requirements" action={{ label: "Visit Education Malaysia", href: "https://educationmalaysia.gov.my/" }}>
+          <Alert tone="warning" title="Check entry requirements" action={{ label: "Visit education Malaysia", href: "https://educationmalaysia.gov.my/" }}>
             Check whether the student needs an eVISA or Visa on Arrival before travelling to Malaysia.
           </Alert>
         </div>

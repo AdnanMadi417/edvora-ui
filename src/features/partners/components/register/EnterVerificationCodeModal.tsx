@@ -67,7 +67,7 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Enter Verification Code"
+            title="Enter verification code"
             description="Continue an application you already started"
             icon={KeyRound}
             iconBg="bg-ub-tone-brand-bg"

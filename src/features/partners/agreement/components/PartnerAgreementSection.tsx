@@ -94,7 +94,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
       <div className="flex items-center gap-3">
         <SectionIconBadge icon={FileSignature} color="violet" />
         <div className="flex-1">
-          <p className="text-p3 font-semibold text-ub-text-primary">Advisor Agreement</p>
+          <p className="text-p3 font-semibold text-ub-text-primary">Advisor agreement</p>
           {agreement && (
             <span className="text-sm text-ub-text-secondary">
               Sent <AppDate value={agreement.sent_at} format="short" />
@@ -129,7 +129,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
             Signed <AppDate value={agreement.completed_at} format="short" />
           </span>
           <div className="flex items-center gap-2">
-            <DocumentActions fileKey={agreement.file_key} label="Advisor Agreement" personName={partnerName} />
+            <DocumentActions fileKey={agreement.file_key} label="Advisor agreement" personName={partnerName} />
           </div>
         </div>
       )}

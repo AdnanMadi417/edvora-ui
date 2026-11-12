@@ -18,7 +18,7 @@ describe("DeleteAccountManagerModal", () => {
       />
     );
 
-    expect(screen.getByText("Confirm Deletion")).toBeInTheDocument();
+    expect(screen.getByText("Confirm deletion")).toBeInTheDocument();
     expect(screen.getByText("Sarah Lim")).toBeInTheDocument();
 
     const deleteButton = screen.getByRole("button", { name: /Delete Manager/ });
@@ -47,7 +47,7 @@ describe("DeleteAccountManagerModal", () => {
     expect(
       screen.getByText(/still has 3 assigned advisors\. Transfer them before deleting\./)
     ).toBeInTheDocument();
-    expect(screen.queryByText("Confirm Deletion")).not.toBeInTheDocument();
+    expect(screen.queryByText("Confirm deletion")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Delete Manager/ })).toBeDisabled();
 
     await user.click(screen.getByRole("button", { name: /Transfer advisors/ }));

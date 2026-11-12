@@ -50,13 +50,13 @@ const AdminRoutes: IRoute[] = [
     // unlinked for now; the page still exists. Banks moved to Settings.
   },
   {
-    name: "Account Managers",
+    name: "Account managers",
     layout: "/admin",
     path: "/account-managers",
     icon: UserCog,
   },
   {
-    name: "Staff Users",
+    name: "Staff users",
     layout: "/admin",
     path: "/staff-users",
     icon: Users,
@@ -94,7 +94,7 @@ const AdminRoutes: IRoute[] = [
         icon: Building2,
       },
       {
-        name: "Service Types",
+        name: "Service types",
         layout: "/admin/logistics-marketplace",
         path: "/services",
         icon: Tag,
@@ -109,10 +109,10 @@ const AdminRoutes: IRoute[] = [
     path: "/settings",
     icon: Settings,
     children: [
-      { name: "University Types", layout: "/admin/config-universities", path: "", icon: SlidersHorizontal },
-      { name: "Fields of Study", layout: "/admin/config-universities", path: "/fields-of-study", icon: Layers },
-      { name: "Payment Methods", layout: "/admin/config-universities", path: "/payment-methods", icon: CreditCard },
-      { name: "Document Templates", layout: "/admin", path: "/document-types", icon: FileText },
+      { name: "University types", layout: "/admin/config-universities", path: "", icon: SlidersHorizontal },
+      { name: "Fields of study", layout: "/admin/config-universities", path: "/fields-of-study", icon: Layers },
+      { name: "Payment methods", layout: "/admin/config-universities", path: "/payment-methods", icon: CreditCard },
+      { name: "Document templates", layout: "/admin", path: "/document-types", icon: FileText },
       { name: "Banks", layout: "/admin/advisors", path: "/banks", icon: Banknote },
     ],
   },

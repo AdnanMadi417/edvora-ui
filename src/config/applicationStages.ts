@@ -32,11 +32,11 @@ export interface ApplicationStage {
 export const APPLICATION_STAGES = [
   { id: "enquiry", label: "Enquiry", hue: "grey" },
   { id: "documents-pending", label: "Documents pending", hue: "amber" },
-  { id: "submitted", label: "Submitted to Institution", hue: "indigo" },
+  { id: "submitted", label: "Submitted to institution", hue: "indigo" },
   { id: "institution-review", label: "In Institution review", hue: "sky" },
   { id: "offer-received", label: "Offer received", hue: "teal" },
   { id: "visa-in-progress", label: "Visa in progress", hue: "plum" },
-  { id: "arrival-logistics", label: "Arrival and Logistics", hue: "pink" },
+  { id: "arrival-logistics", label: "Arrival and logistics", hue: "pink" },
   { id: "enrolled", label: "Enrolled", hue: "success" },
   { id: "commission-paid", label: "Commission paid", hue: "success" },
   { id: "withdrawn", label: "Withdrawn", hue: "grey" },

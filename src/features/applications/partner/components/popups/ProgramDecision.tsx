@@ -58,7 +58,7 @@ export default function ProgramDecisionModal({
       onClose={onClose}
       size="md"
       icon={RefreshCcw}
-      title="Select Program"
+      title="Select program"
       description="Choose the new program and provide a reason."
       onSubmit={handleSubmit}
       submitLabel="Confirm"

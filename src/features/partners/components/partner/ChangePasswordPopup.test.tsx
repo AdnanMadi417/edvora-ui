@@ -17,10 +17,10 @@ it("preserves the password-change endpoint and payload", async () => {
   const user = userEvent.setup();
   const close = jest.fn();
   render(<ChangePasswordPopup isOpen onClose={close} />);
-  await user.type(screen.getByLabelText("Current Password"), "CurrentPass123!");
-  await user.type(screen.getByLabelText("New Password"), "Replacement123!");
+  await user.type(screen.getByLabelText("Current password"), "CurrentPass123!");
+  await user.type(screen.getByLabelText("New password"), "Replacement123!");
   await user.type(
-    screen.getByLabelText("Confirm New Password"),
+    screen.getByLabelText("Confirm new password"),
     "Replacement123!"
   );
   await user.click(screen.getByRole("button", { name: "Update password" }));
@@ -34,9 +34,9 @@ it("rejects using the current password as the new password", async () => {
   const user = userEvent.setup();
   render(<ChangePasswordPopup isOpen onClose={jest.fn()} />);
   for (const label of [
-    "Current Password",
-    "New Password",
-    "Confirm New Password",
+    "Current password",
+    "New password",
+    "Confirm new password",
   ])
     await user.type(screen.getByLabelText(label), "CurrentPass123!");
   await user.click(screen.getByRole("button", { name: "Update password" }));

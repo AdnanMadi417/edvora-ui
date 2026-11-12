@@ -59,7 +59,7 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
 
         <div className="mt-6">
           <OtpInputField
-            label="Verification Code"
+            label="Verification code"
             field="otp"
             formData={{ otp }}
             errors={{ otp: otpError || "" }}

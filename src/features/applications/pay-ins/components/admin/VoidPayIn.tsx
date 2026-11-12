@@ -112,7 +112,7 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
       title="Void & Correct Pay-In"
       description="Enter the corrected payment to replace this one. The application stays at Commission Ready while you do."
       onSubmit={handleSubmit}
-      submitLabel="Void & Correct"
+      submitLabel="Void & correct"
       submitTone="destructive"
       submitting={loading}
       submitDisabled={!isFormValid}
@@ -127,20 +127,20 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
               </p>
             </Card>
 
-            <Textarea label="Void Reason" placeholder="Explain why this pay-in is being voided..." value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
+            <Textarea label="Void reason" placeholder="Explain why this pay-in is being voided..." value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
 
             <div className="space-y-2">
               <FieldLabel as="span">
                 Corrected Pay-In
               </FieldLabel>
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <Input label="Payment Date" type="date" value={String(formData.new_payment_date ?? "")} onChange={(v) => updateFormData("new_payment_date", v)} error={formErrors.new_payment_date || undefined} />
+                <Input label="Payment date" type="date" value={String(formData.new_payment_date ?? "")} onChange={(v) => updateFormData("new_payment_date", v)} error={formErrors.new_payment_date || undefined} />
                 <Input label="Amount" placeholder="Enter amount" type="number" value={String(formData.new_amount ?? "")} onChange={(v) => updateFormData("new_amount", v)} error={formErrors.new_amount || undefined} />
                 <Combobox label="Currency" options={[
                     { value: "RM", label: "RM" },
                     { value: "USD", label: "USD" },
                   ]} value={formData.new_currency ? String(formData.new_currency) : null} onChange={(v) => updateFormData("new_currency", v ?? "")} error={formErrors.new_currency || undefined} />
-                <Input label="Payment Reference" placeholder="e.g. UNI-REF-CORRECTED" value={String(formData.new_payment_reference ?? "")} onChange={(v) => updateFormData("new_payment_reference", v)} error={formErrors.new_payment_reference || undefined} />
+                <Input label="Payment reference" placeholder="e.g. UNI-REF-CORRECTED" value={String(formData.new_payment_reference ?? "")} onChange={(v) => updateFormData("new_payment_reference", v)} error={formErrors.new_payment_reference || undefined} />
               </div>
             </div>
 

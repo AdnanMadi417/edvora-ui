@@ -71,7 +71,7 @@ beforeEach(() => {
 
 async function fillProgramme(container: HTMLElement) {
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Program Name" }),
+    screen.getByRole("textbox", { name: "Program name" }),
     "BSc Computing"
   );
   for (const [field, name] of [
@@ -94,9 +94,9 @@ it("validates programme details and preserves the dependent branch through revie
   expect(screen.getByText("Program name is required")).toBeInTheDocument();
   await fillProgramme(container);
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
-  expect(screen.getByText("Yearly Fees")).toBeInTheDocument();
+  expect(screen.getByText("Yearly fees")).toBeInTheDocument();
   await userEvent.click(screen.getByRole("button", { name: "Back" }));
-  expect(screen.getByRole("textbox", { name: "Program Name" })).toHaveValue(
+  expect(screen.getByRole("textbox", { name: "Program name" })).toHaveValue(
     "BSc Computing"
   );
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
@@ -145,7 +145,7 @@ it("blocks invalid fees and scholarship details on their own steps", async () =>
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
   expect(screen.getByText("Scholarship name is required")).toBeInTheDocument();
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Scholarship Name" }),
+    screen.getByRole("textbox", { name: "Scholarship name" }),
     "Excellence Award"
   );
   await userEvent.type(

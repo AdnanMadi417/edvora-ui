@@ -64,7 +64,7 @@ export default function DocumentActions({ fileKey, label, personName }: Document
         size="sm"
         onClick={handleView}
         disabled={disabled}
-        title="View Document"
+        title="View document"
         aria-label={`View ${label}`}
         icon={<Eye className={loading === "view" ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
       />
@@ -73,7 +73,7 @@ export default function DocumentActions({ fileKey, label, personName }: Document
         size="sm"
         onClick={handleDownload}
         disabled={disabled}
-        title="Download Document"
+        title="Download document"
         aria-label={`Download ${label}`}
         icon={<Download className={loading === "download" ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
       />

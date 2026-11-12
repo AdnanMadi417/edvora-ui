@@ -55,7 +55,7 @@ type ReviewerPartnersTab = "partners" | "pending-otps";
 
 const TABS: TabItem<ReviewerPartnersTab>[] = [
   { key: "partners", label: "Advisors" },
-  { key: "pending-otps", label: "Pending Registrations" },
+  { key: "pending-otps", label: "Pending registrations" },
 ];
 
 type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
@@ -303,7 +303,7 @@ export default function ReviewerPartnersTable() {
                 variant="warning"
                 icon={<Clock className="h-3 w-3" />}
               >
-                Pending Review
+                Pending review
               </StatusBadge>
             ) : partner.is_active ? (
               <StatusBadge

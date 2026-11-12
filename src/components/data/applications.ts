@@ -111,7 +111,7 @@ export const applications: Application[] = [
       currentAddress: "12 Jalan Ampang, Kuala Lumpur, Malaysia",
       emergencyContact: {
         email: "sarah.chen@gmail.com",
-        name: "Chen Wei Ming",
+        name: "Chen wei ming",
         relation: "Father",
         phone: "+60-12-9876543",
       },
@@ -142,7 +142,7 @@ export const applications: Application[] = [
       },
       {
         id: "doc-2",
-        name: "Bachelor Transcript",
+        name: "Bachelor transcript",
         fileName: "Emma_Thompson_Bachelor_Transcript.pdf",
         type: "pdf",
         status: "pending",
@@ -201,7 +201,7 @@ export const applications: Application[] = [
       currentAddress: "23 Jalan Sultan Azlan Shah, Penang, Malaysia",
       emergencyContact: {
         email: "sarah.chen@gmail.com",
-        name: "Lee Siew Ling",
+        name: "Lee siew ling",
         relation: "Mother",
         phone: "+60-16-5555555",
       },
@@ -232,7 +232,7 @@ export const applications: Application[] = [
       },
       {
         id: "doc-2",
-        name: "Bachelor Transcript",
+        name: "Bachelor transcript",
         fileName: "Emma_Thompson_Bachelor_Transcript.pdf",
         type: "pdf",
         status: "pending",
@@ -296,7 +296,7 @@ export const applications: Application[] = [
       currentAddress: "45 Jalan Tun Razak, Kuala Lumpur, Malaysia",
       emergencyContact: {
         email: "lina.wong@gmail.com",
-        name: "Wong Teck Seng",
+        name: "Wong teck seng",
         relation: "Father",
         phone: "+60-17-3334455",
       },
@@ -327,7 +327,7 @@ export const applications: Application[] = [
       },
       {
         id: "doc-2",
-        name: "Bachelor Transcript",
+        name: "Bachelor transcript",
         fileName: "Lina_Wong_Bachelor_Transcript.pdf",
         type: "pdf",
         status: "pending",
@@ -386,7 +386,7 @@ export const applications: Application[] = [
       currentAddress: "88 Jalan Kuching, Kuala Lumpur, Malaysia",
       emergencyContact: {
         email: "jason.tan@hotmail.com",
-        name: "Tan Lee Kiat",
+        name: "Tan lee kiat",
         relation: "Father",
         phone: "+60-19-5566778",
       },
@@ -417,7 +417,7 @@ export const applications: Application[] = [
       },
       {
         id: "doc-2",
-        name: "Bachelor Transcript",
+        name: "Bachelor transcript",
         fileName: "Jason_Tan_Bachelor_Transcript.pdf",
         type: "pdf",
         status: "approved",
@@ -478,7 +478,7 @@ export const applications: Application[] = [
       currentAddress: "12 Jalan Bangsar, Kuala Lumpur, Malaysia",
       emergencyContact: {
         email: "aisha.rahman@gmail.com",
-        name: "Rahman Bin Ahmad",
+        name: "Rahman bin ahmad",
         relation: "Father",
         phone: "+60-18-8899001",
       },
@@ -507,7 +507,7 @@ export const applications: Application[] = [
       },
       {
         id: "doc-2",
-        name: "Bachelor Transcript",
+        name: "Bachelor transcript",
         fileName: "Aisha_Rahman_Bachelor_Transcript.pdf",
         type: "pdf",
         status: "pending",

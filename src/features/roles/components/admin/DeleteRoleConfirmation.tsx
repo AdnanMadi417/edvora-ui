@@ -48,7 +48,7 @@ export default function DeleteRoleConfirmation({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Delete Role"
+            title="Delete role"
             description="This action will permanently delete this role and revoke all of its permissions."
             icon={Trash2}
             iconBg="bg-ub-tone-danger-bg"
@@ -60,7 +60,7 @@ export default function DeleteRoleConfirmation({
 
           <div className="px-7 py-6 space-y-2 text-sm">
             <div>
-              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Deletion</h3>
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm deletion</h3>
               <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to permanently delete this role?
               </p>

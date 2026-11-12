@@ -23,7 +23,7 @@ type Lifecycle = "active" | "hold" | "cancel" | "all";
 
 const LIFECYCLE_OPTIONS = [
   { value: "active", label: "Active" },
-  { value: "hold", label: "On Hold" },
+  { value: "hold", label: "On hold" },
   { value: "cancel", label: "Cancelled" },
   { value: "all", label: "All" },
 ];

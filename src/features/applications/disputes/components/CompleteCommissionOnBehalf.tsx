@@ -72,10 +72,10 @@ export default function CompleteCommissionOnBehalf({
       onClose={onClose}
       size="md"
       icon={CheckCircle}
-      title="Complete on Advisor's Behalf"
+      title="Complete on Advisor's behalf"
       description="Marks the application complete when the advisor hasn't confirmed receipt. The payout stays as recorded."
       onSubmit={handleSubmit}
-      submitLabel="Mark Complete"
+      submitLabel="Mark complete"
       submitTone="positive"
       submitting={loading}
       submitDisabled={!formData.reason.trim()}

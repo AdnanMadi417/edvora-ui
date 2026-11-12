@@ -23,8 +23,8 @@ export default function SuspendActivatePartner({
       title={isActive ? "Suspend advisor" : "Activate advisor"}
       description={
         isActive
-          ? "Suspend access for this adviser account."
-          : "Restore access for this adviser account."
+          ? "Suspend access for this advisor account."
+          : "Restore access for this advisor account."
       }
       icon={isActive ? Ban : Power}
       onSubmit={onConfirm}

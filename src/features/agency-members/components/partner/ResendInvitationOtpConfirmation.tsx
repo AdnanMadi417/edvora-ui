@@ -50,7 +50,7 @@ export default function ResendInvitationOtpConfirmation({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Resend Verification Code"
+            title="Resend verification code"
             description="Send a fresh 6-digit OTP to this invitee."
             icon={KeyRound}
             iconBg="bg-ub-tone-brand-bg"
@@ -62,7 +62,7 @@ export default function ResendInvitationOtpConfirmation({
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Resend</h3>
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm resend</h3>
               <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to resend the verification code to{" "}
                 <strong>{invitationName}</strong>?

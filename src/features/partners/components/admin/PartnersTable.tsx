@@ -66,7 +66,7 @@ type PartnersTab = "partners" | "pending-otps";
 
 const TABS: TabItem<PartnersTab>[] = [
   { key: "partners", label: "Advisors" },
-  { key: "pending-otps", label: "Pending Registrations" },
+  { key: "pending-otps", label: "Pending registrations" },
 ];
 
 type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;

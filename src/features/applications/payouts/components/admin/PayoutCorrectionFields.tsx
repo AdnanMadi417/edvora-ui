@@ -81,9 +81,9 @@ export default function PayoutCorrectionFields({
       </Card>
 
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-        <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={formData.new_payment_method_id ? String(formData.new_payment_method_id) : null} onChange={(v) => updateFormData("new_payment_method_id", v ?? "")} error={formErrors.new_payment_method_id || undefined} />
-        <Input label="Bank Reference" placeholder="e.g. BANK-REF-CORRECTED" value={String(formData.new_bank_reference ?? "")} onChange={(v) => updateFormData("new_bank_reference", v)} error={formErrors.new_bank_reference || undefined} />
-        <Input label="Payment Date" type="date" value={String(formData.new_paid_at ?? "")} onChange={(v) => updateFormData("new_paid_at", v)} error={formErrors.new_paid_at || undefined} />
+        <Combobox label="Payment method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={formData.new_payment_method_id ? String(formData.new_payment_method_id) : null} onChange={(v) => updateFormData("new_payment_method_id", v ?? "")} error={formErrors.new_payment_method_id || undefined} />
+        <Input label="Bank reference" placeholder="e.g. BANK-REF-CORRECTED" value={String(formData.new_bank_reference ?? "")} onChange={(v) => updateFormData("new_bank_reference", v)} error={formErrors.new_bank_reference || undefined} />
+        <Input label="Payment date" type="date" value={String(formData.new_paid_at ?? "")} onChange={(v) => updateFormData("new_paid_at", v)} error={formErrors.new_paid_at || undefined} />
         <Combobox label="Currency" options={[
             { value: "RM", label: "RM" },
             { value: "USD", label: "USD" },
@@ -92,7 +92,7 @@ export default function PayoutCorrectionFields({
 
       <div className="space-y-2">
         <FieldLabel as="span">
-          Corrected Amounts
+          Corrected amounts
         </FieldLabel>
         <div className="space-y-2">
           {payout.items.map((item) => (
@@ -109,7 +109,7 @@ export default function PayoutCorrectionFields({
 
       <DocumentUpload
         id="payout-correction-receipt"
-        label="Corrected Receipt"
+        label="Corrected receipt"
         description="Upload the corrected proof of payment"
         file={receiptFile}
         onFileChange={setReceiptFile}

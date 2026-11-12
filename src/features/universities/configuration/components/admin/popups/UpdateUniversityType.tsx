@@ -125,7 +125,7 @@ export default function AssignUniversityTypeModal({
     >
       <fieldset disabled={loading} className="min-w-0 space-y-4">
         <SelectField
-          label="University Type"
+          label="University type"
           field="university_type_id"
           required
           options={universityTypes.map((type) => ({

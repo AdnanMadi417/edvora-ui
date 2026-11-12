@@ -63,8 +63,8 @@ const WAITING_ON_LABEL: Record<WaitingOn, string> = {
 };
 
 const WAITING_ON_OPTIONS = [
-  { value: "university", label: "Waiting on University" },
-  { value: "us", label: "Waiting on Us" },
+  { value: "university", label: "Waiting on university" },
+  { value: "us", label: "Waiting on us" },
   { value: "disputed", label: "Disputed" },
   { value: "nobody", label: "Settled" },
 ];
@@ -368,8 +368,8 @@ export default function FinanceQueuePage() {
         <div>
           <p className="text-ub-label-md">Manage commission payments</p>
           <p className="mt-1 text-ub-body-sm text-ub-text-secondary">
-            Review incoming university payments and settle adviser commissions.
-            Batch payouts are limited to one adviser and currency.
+            Review incoming university payments and settle advisor commissions.
+            Batch payouts are limited to one advisor and currency.
           </p>
         </div>
       </header>
@@ -433,7 +433,7 @@ export default function FinanceQueuePage() {
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         title="Filter finance queue"
-        description="Choose an adviser, payment status, and settled visibility."
+        description="Choose an advisor, payment status, and settled visibility."
         footer={
           <>
             <Button

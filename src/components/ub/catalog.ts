@@ -28,7 +28,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
     category: "data",
     imports: [imp("LogisticsProviderCard", "data/cards/LogisticsProviderCard")],
     useFor: "Compare logistics providers, service pricing, and contact options with a restricted-access state.",
-    usedIn: ["Adviser logistics marketplace", "Account-manager logistics marketplace"],
+    usedIn: ["Advisor logistics marketplace", "Account-manager logistics marketplace"],
   },
   "University type create & edit": {
     category: "forms",
@@ -46,14 +46,14 @@ export const CATALOG: Record<string, CatalogEntry> = {
     category: "data",
     imports: ['import PipelineCard from "features/applications/partner/components/PipelineCard";', 'import ApplicationStatistics from "features/applications/components/ApplicationStatistics";'],
     useFor: "Show role-scoped application totals and filter the list by stage.",
-    usedIn: ["Adviser applications", "Admin applications", "Account-manager applications"],
+    usedIn: ["Advisor applications", "Admin applications", "Account-manager applications"],
     avoid: "Showing a single student’s progress: use ApplicationTrackerCard.",
   },
   UniversityCard: {
     category: "data",
     imports: [imp("UniversityCard", "data/cards/UniversityCard")],
     useFor: "Browse institutions and open their profiles or filtered programs.",
-    usedIn: ["Adviser Universities directory"],
+    usedIn: ["Advisor Universities directory"],
     avoid: "Editing institutional records: use the management directory and university forms.",
   },
   "University table & filters": {

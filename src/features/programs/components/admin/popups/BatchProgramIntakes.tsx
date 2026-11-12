@@ -119,7 +119,7 @@ export default function BatchProgramIntakes({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Intake Update"
+            title="Bulk intake update"
             description="Update intake dates for multiple programs at once."
             icon={CalendarDays}
             iconBg="bg-ub-tone-brand-bg"
@@ -131,12 +131,12 @@ export default function BatchProgramIntakes({
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-ub-text-secondary">
-              Intake Schedule
+              Intake schedule
             </h3>
 
             <IntakeMonthsField
               field="intake_months"
-              label="Intake Months"
+              label="Intake months"
               required
               formData={formData}
               errors={errors}

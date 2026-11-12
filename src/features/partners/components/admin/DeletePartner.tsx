@@ -53,7 +53,7 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Deletion</h3>
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm deletion</h3>
               <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to remove this advisor from the system?
               </p>

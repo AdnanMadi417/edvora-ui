@@ -21,7 +21,7 @@ export default function ResendApprovalEmailConfirmation({
       open={isOpen}
       onClose={onClose}
       title="Resend approval email"
-      description="Send the approval email again to this adviser."
+      description="Send the approval email again to this advisor."
       icon={Mail}
       onSubmit={onConfirm}
       submitLabel={

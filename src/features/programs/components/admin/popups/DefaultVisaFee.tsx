@@ -95,7 +95,7 @@ export default function DefaultVisaFee({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Default Visa Fee"
+            title="Default visa fee"
             description="Set the global default visa fee amount used during visa setup."
             icon={Landmark}
             iconBg="bg-ub-tone-brand-bg"

@@ -501,7 +501,7 @@ const EditLogisticsMarketplaceDetails = ({
         />
         <div className="grid grid-cols-1 gap-x-3">
           <InputField
-            label="Provider Name"
+            label="Provider name"
             field="name"
             placeholder={service?.name}
             required
@@ -522,7 +522,7 @@ const EditLogisticsMarketplaceDetails = ({
             updateFormData={updateFormData}
           />
           <SelectField
-            label="Current Residence"
+            label="Current residence"
             field="main_location"
             options={states.map((u) => ({ value: u.name, label: u.name }))}
             formData={formData}
@@ -530,7 +530,7 @@ const EditLogisticsMarketplaceDetails = ({
             updateFormData={updateFormData}
           />
           <InputField
-            label="Primary Contact Number"
+            label="Primary contact number"
             field="phone_number"
             placeholder="e.g. +60 12 345 6789"
             required
@@ -579,7 +579,7 @@ const EditLogisticsMarketplaceDetails = ({
             </p>
             <Button
               icon={<Plus className="h-5 w-5" />}
-              text="Add Package"
+              text="Add package"
               variant="secondary"
               onClick={addPackage}
             />
@@ -612,7 +612,7 @@ const EditLogisticsMarketplaceDetails = ({
               </div>
               <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
                 <InputField
-                  label="Package Name"
+                  label="Package name"
                   field="name"
                   required
                   formData={{ name: pkg.name }}
@@ -694,7 +694,7 @@ const EditLogisticsMarketplaceDetails = ({
                 <div className="mt-3 flex justify-end">
                   <Button
                     icon={<Plus className="h-4 w-4" />}
-                    text="Add Item"
+                    text="Add item"
                     variant="secondary"
                     onClick={() =>
                       updatePackage(index, "includes", [...pkg.includes, ""])
@@ -720,7 +720,7 @@ const EditLogisticsMarketplaceDetails = ({
           <div className="mb-3 flex items-center justify-between">
             <div>
               <label className="text-sm font-semibold text-ub-text-primary">
-                Logistic Services <span className="text-ub-tone-danger-text">*</span>
+                Logistic services <span className="text-ub-tone-danger-text">*</span>
               </label>
               <p className="mt-0.5 text-xs text-ub-text-secondary">
                 Select services, set prices, and rename types

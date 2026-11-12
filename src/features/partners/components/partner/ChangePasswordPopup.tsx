@@ -127,7 +127,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
     >
       <fieldset disabled={loading} className="min-w-0 space-y-4">
         <PasswordField
-          label="Current Password"
+          label="Current password"
           field="current_password"
           placeholder="Enter your current password"
           formData={formData}
@@ -136,7 +136,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
           onBlur={() => validateField("current_password")}
         />
         <PasswordField
-          label="New Password"
+          label="New password"
           field="new_password"
           placeholder="Min. 12 characters, 1 letter & 1 number"
           formData={formData}
@@ -146,7 +146,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
         />
         <PasswordRequirementsChecklist password={formData.new_password} />
         <PasswordField
-          label="Confirm New Password"
+          label="Confirm new password"
           field="confirm_password"
           placeholder="Re-enter new password"
           formData={formData}

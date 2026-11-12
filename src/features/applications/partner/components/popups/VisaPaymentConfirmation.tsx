@@ -108,7 +108,7 @@ export default function VisaPaymentConfirmation({
       onClose={handleClose}
       size="md"
       icon={CreditCard}
-      title="Visa Application Fee Payment"
+      title="Visa application fee payment"
       onSubmit={handleConfirmUpload}
       submitting={isUploading}
       submitLabel={isUploading ? "Submitting..." : paymentLoading ? "Loading..." : "Proceed to Payment"}
@@ -131,7 +131,7 @@ export default function VisaPaymentConfirmation({
             )}
 
             <DocumentUpload
-              label="Payment Receipt"
+              label="Payment receipt"
               description="Upload your proof of visa fee payment (bank transfer slip, receipt, etc.)"
               id="payment_reference"
               file={paymentReference}
@@ -144,7 +144,7 @@ export default function VisaPaymentConfirmation({
 
             {hasAppFormTemplate && (
               <DocumentUpload
-                label="Application Form"
+                label="Application form"
                 description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="app_form_document"
                 file={appFormFile}
@@ -180,7 +180,7 @@ export default function VisaPaymentConfirmation({
                   {downloadingHealthDeclarationForm ? "Opening..." : "Download blank Health Declaration Form template"}
                 </TextButton>
                 <DocumentUpload
-                  label="Health Declaration Form"
+                  label="Health declaration form"
                   description="Download the blank template above, complete it, and upload the filled form here."
                   id="health_declaration_document"
                   file={healthDeclarationFile}
@@ -195,7 +195,7 @@ export default function VisaPaymentConfirmation({
 
             {signedOfferLetterRequired && (
               <DocumentUpload
-                label="Signed Offer Letter"
+                label="Signed offer letter"
                 description="Download your offer letter above, sign it, and upload the signed copy here."
                 id="signed_offer_letter_document"
                 file={signedOfferLetterFile}
@@ -209,7 +209,7 @@ export default function VisaPaymentConfirmation({
 
             {hasEnglishFormTemplate && (
               <DocumentUpload
-                label="English Form"
+                label="English form"
                 description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="english_form_document"
                 file={englishFormFile}

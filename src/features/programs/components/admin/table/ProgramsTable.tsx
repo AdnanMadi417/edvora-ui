@@ -277,11 +277,11 @@ const ProgramsTable = () => {
                         { label: "IELTS Scores", icon: ClipboardCheck, onClick: () => setActiveModal("ielts") },
                         { label: "Intakes", icon: CalendarDays, onClick: () => setActiveModal("intakes") },
                         { label: "Scholarship", icon: Sliders, onClick: () => setActiveModal("scholarship") },
-                        { label: "Delete Scholarships", icon: Trash2, onClick: () => setActiveModal("deleteScholarships") },
-                        { label: "Tuition Fees", icon: DollarSign, onClick: () => setActiveModal("fees") },
-                        { label: "Visa Fee", icon: DollarSign, onClick: () => setActiveModal("visaFee") },
+                        { label: "Delete scholarships", icon: Trash2, onClick: () => setActiveModal("deleteScholarships") },
+                        { label: "Tuition fees", icon: DollarSign, onClick: () => setActiveModal("fees") },
+                        { label: "Visa fee", icon: DollarSign, onClick: () => setActiveModal("visaFee") },
                         ...(sharedUniversityId ? [{ label: "Branch", icon: GitBranch, onClick: () => setActiveModal("branch") }] : []),
-                        { label: "Course Type", icon: Layers, onClick: () => setActiveModal("courseType") },
+                        { label: "Course type", icon: Layers, onClick: () => setActiveModal("courseType") },
                       ].map(({ label, icon: Icon, onClick }) => <Button key={label} variant="secondary" text={label} icon={<Icon className="h-4 w-4" />} onClick={() => { onClick(); setIsBulkMenuOpen(false); }} className="min-h-[44px] justify-start" />)}</div>
             </Drawer>
           </div>);

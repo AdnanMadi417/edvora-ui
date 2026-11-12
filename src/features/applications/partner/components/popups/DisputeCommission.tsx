@@ -72,10 +72,10 @@ export default function DisputeCommission({ isOpen, onClose, applicationId, onSu
       onClose={onClose}
       size="md"
       icon={AlertCircle}
-      title="Dispute Commission"
+      title="Dispute commission"
       description="Raise a dispute against this paid commission."
       onSubmit={handleSubmit}
-      submitLabel="Submit Dispute"
+      submitLabel="Submit dispute"
       submitting={loading}
       submitDisabled={!isFormValid}
     >

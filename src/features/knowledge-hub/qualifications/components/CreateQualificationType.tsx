@@ -66,7 +66,7 @@ export default function CreateQualificationType({
       submitDisabled={!formData.name.trim()}
     >
       <InputField
-        label="Qualification Type"
+        label="Qualification type"
         field="name"
         placeholder="e.g. Foundation"
         required

@@ -133,7 +133,7 @@ export default function BatchCommissionPrograms({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Commission Update"
+            title="Bulk commission update"
             description="Update commission values for multiple programs at once."
             icon={Percent}
             iconBg="bg-ub-tone-brand-bg"
@@ -148,7 +148,7 @@ export default function BatchCommissionPrograms({
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
                 <label className="block text-p2 font-medium text-ub-text-primary">
-                  Commission Amount <span className="text-ub-tone-danger-text">*</span>
+                  Commission amount <span className="text-ub-tone-danger-text">*</span>
                 </label>
                 <div
                   className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-ub-border-focus ${
@@ -184,7 +184,7 @@ export default function BatchCommissionPrograms({
 
             <div className="grid grid-cols-2 gap-4">
               <SelectField
-                label="Expected From"
+                label="Expected from"
                 field="expected_commission_from"
                 required
                 options={MONTHS.map((m) => ({
@@ -197,7 +197,7 @@ export default function BatchCommissionPrograms({
               />
 
               <SelectField
-                label="Expected To"
+                label="Expected to"
                 field="expected_commission_to"
                 required
                 options={MONTHS.map((m) => ({
@@ -211,7 +211,7 @@ export default function BatchCommissionPrograms({
             </div>
 
             <InputField
-              label="Commission Notes"
+              label="Commission notes"
               field="commission_notes"
               placeholder="Optional notes..."
               formData={formData}

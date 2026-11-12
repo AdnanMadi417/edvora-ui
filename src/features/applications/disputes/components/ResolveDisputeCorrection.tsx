@@ -171,7 +171,7 @@ export default function ResolveDisputeCorrection({
       title="Resolve Dispute: Correction"
       description="Voids the current payout and records a corrected one — resolves the dispute atomically."
       onSubmit={handleSubmit}
-      submitLabel="Resolve & Correct"
+      submitLabel="Resolve & correct"
       submitting={isSubmitting}
       submitDisabled={!payout || !formData.void_reason.trim()}
     >

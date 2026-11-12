@@ -56,7 +56,7 @@ const dataEntryRoutes: IRoute[] = [
         icon: Building2,
       },
       {
-        name: "Service Types",
+        name: "Service types",
         layout: "/data-entry/logistics-marketplace",
         path: "/services",
         icon: Tag,
@@ -70,9 +70,9 @@ const dataEntryRoutes: IRoute[] = [
     path: "/settings",
     icon: Settings,
     children: [
-      { name: "University Types", layout: "/data-entry/university-configuration", path: "", icon: SlidersHorizontal },
-      { name: "Fields of Study", layout: "/data-entry/university-configuration", path: "/fields-of-study", icon: Layers },
-      { name: "Payment Methods", layout: "/data-entry", path: "/payment-methods", icon: CreditCard },
+      { name: "University types", layout: "/data-entry/university-configuration", path: "", icon: SlidersHorizontal },
+      { name: "Fields of study", layout: "/data-entry/university-configuration", path: "/fields-of-study", icon: Layers },
+      { name: "Payment methods", layout: "/data-entry", path: "/payment-methods", icon: CreditCard },
       { name: "Banks", layout: "/data-entry", path: "/banks", icon: Banknote },
     ],
   },

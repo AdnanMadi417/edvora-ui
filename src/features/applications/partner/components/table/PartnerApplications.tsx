@@ -252,7 +252,7 @@ const PartnerApplications = () => {
       <DashboardHeader
         hideTitle
         as="h2"
-        title="Applications Dashboard"
+        title="Applications dashboard"
         subtitle="Manage and track student applications"
         primaryAction={
           <Button

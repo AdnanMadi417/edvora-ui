@@ -188,7 +188,7 @@ export default function BatchProgramScholarships({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Scholarship Update"
+            title="Bulk scholarship update"
             description="Update scholarship details for multiple programs at once."
             icon={GraduationCap}
             iconBg="bg-ub-tone-brand-bg"
@@ -248,7 +248,7 @@ export default function BatchProgramScholarships({
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div className="md:col-span-2">
                       <InputField
-                        label="Scholarship Name"
+                        label="Scholarship name"
                         field={`scholarships[${index}].name`}
                         placeholder="e.g. Excellence Award"
                         type="text"
@@ -260,7 +260,7 @@ export default function BatchProgramScholarships({
                     </div>
 
                     <InputField
-                      label="Coverage Percentage"
+                      label="Coverage percentage"
                       field={`scholarships[${index}].coverage_percent`}
                       type="number"
                       placeholder="e.g. 50"
@@ -272,7 +272,7 @@ export default function BatchProgramScholarships({
                     />
 
                     <InputField
-                      label="Maximum Amount"
+                      label="Maximum amount"
                       field={`scholarships[${index}].max_amount`}
                       type="number"
                       placeholder="e.g. 10000"

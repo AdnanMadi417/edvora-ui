@@ -43,7 +43,7 @@ type RoleFilter = "admin" | "reviewer" | "data_entry" | "all";
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
   { value: "reviewer", label: "Reviewer" },
-  { value: "data_entry", label: "Data Entry" },
+  { value: "data_entry", label: "Data entry" },
 ];
 
 const STATUS_OPTIONS = [

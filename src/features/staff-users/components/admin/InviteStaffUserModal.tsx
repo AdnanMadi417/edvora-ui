@@ -20,7 +20,7 @@ interface InviteStaffUserModalProps {
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
   { value: "reviewer", label: "Reviewer" },
-  { value: "data_entry", label: "Data Entry" },
+  { value: "data_entry", label: "Data entry" },
 ];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,7 +87,7 @@ export default function InviteStaffUserModal({
     <FormModal
       open={isOpen}
       onClose={onClose}
-      title="Invite Staff User"
+      title="Invite staff user"
       description="Send an email invitation with a one-time verification code."
       icon={UserPlus}
       size="md"

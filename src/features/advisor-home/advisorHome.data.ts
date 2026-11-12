@@ -49,7 +49,7 @@ export const ONBOARDING = [
   { label: "Add your bank account", done: true },
   { label: "Sign the Non-Compete Covenant", done: true, required: true },
   { label: "Add your first student", done: false },
-  { label: "Join the Earners Circle", done: false },
+  { label: "Join the earners circle", done: false },
 ];
 
 export const ACTIVITY = [

@@ -21,8 +21,8 @@ const PUBLIC_OPTIONS: Option[] = [
 ];
 
 const LANGUAGE_CENTER_OPTIONS: Option[] = [
-  { label: "Has Language Center", value: "true" },
-  { label: "No Language Center", value: "false" },
+  { label: "Has language center", value: "true" },
+  { label: "No language center", value: "false" },
 ];
 
 const HIDDEN_OPTIONS: Option[] = [

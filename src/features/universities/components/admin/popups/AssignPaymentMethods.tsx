@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
@@ -130,7 +130,7 @@ export default function AssignPaymentUniversity({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Assign Payment Method"
+            title="Assign payment method"
             description="Assign a payment method to the selected university."
             icon={CreditCard}
             iconBg="bg-ub-tone-brand-bg"
@@ -142,7 +142,7 @@ export default function AssignPaymentUniversity({
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             <SearchableDropdown
-              label="Payment Method"
+              label="Payment method"
               field="payment_method_id"
               required
               options={paymentMethods.map((p) => ({ value: String(p.id), label: p.name }))}

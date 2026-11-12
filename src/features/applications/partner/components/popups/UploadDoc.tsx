@@ -41,10 +41,10 @@ export default function UploadDoc({
       onClose={handleClose}
       size="md"
       icon={RotateCcw}
-      title="Request Document Upload"
+      title="Request document upload"
       description="Ask the applicant to upload the required document."
       onSubmit={handleConfirm}
-      submitLabel="Confirm Upload"
+      submitLabel="Confirm upload"
       submitDisabled={!selectedFile}
     >
       <div className="grid gap-4">
@@ -55,7 +55,7 @@ export default function UploadDoc({
 
         <DocumentUpload
           id="resubmitFile"
-          label="Upload Document"
+          label="Upload document"
           file={selectedFile}
           onFileChange={setSelectedFile}
           onRemove={() => setSelectedFile(null)}

@@ -151,7 +151,7 @@ export default function UpdateFieldOfStudy({
     >
       <fieldset disabled={fieldLoading} className="min-w-0 space-y-4">
         <InputField
-          label="Field Of Study Name"
+          label="Field of study name"
           field="name"
           required
           formData={formData}

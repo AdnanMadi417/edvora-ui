@@ -128,7 +128,7 @@ export default function BatchUniversities({
     >
       <fieldset disabled={loading} className="min-w-0 space-y-6">
         <MultiSelect
-          label="Payment Method"
+          label="Payment method"
           field="payment_method_ids"
           required
           options={paymentMethods.map((p) => ({

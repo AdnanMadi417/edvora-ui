@@ -103,7 +103,7 @@ export default function DocumentUploadList({
       {required.length > 0 && (
         <Card extra="p-4">
           <ProgressBar
-            label="Required Documents"
+            label="Required documents"
             value={uploadedRequired}
             max={required.length}
             valueText={`${uploadedRequired} of ${required.length}`}
@@ -121,7 +121,7 @@ export default function DocumentUploadList({
           <Toggle
             checked={showOptional}
             onChange={setShowOptional}
-            label="Optional Documents"
+            label="Optional documents"
             description={`${optional.length} document${optional.length !== 1 ? "s" : ""} available`}
             switchPosition="end"
           />

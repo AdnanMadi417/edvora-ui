@@ -205,7 +205,7 @@ export default function EditBankDetails({
           <Button
             onClick={handleBack}
             icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back to Banks"
+            text="Back to banks"
             variant="secondary"
           />
         }
@@ -228,7 +228,7 @@ export default function EditBankDetails({
             }}
           />
           <InputField
-            label="Bank Code"
+            label="Bank code"
             field="code"
             required
             formData={formData}
@@ -248,7 +248,7 @@ export default function EditBankDetails({
             updateFormData={updateFormData}
           />
           <InputField
-            label="Bank Name"
+            label="Bank name"
             field="name"
             required
             formData={formData}

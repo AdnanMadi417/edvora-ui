@@ -88,7 +88,7 @@ export default function AdvisorHome({ headingLevel = 1 }: { headingLevel?: 1 | 2
           </List>
         </Panel>
 
-        <Panel title="Pipeline" className="xl:col-span-2" action={<TextButton size="sm" href="/partner/applications">Open Application Tracker</TextButton>}>
+        <Panel title="Pipeline" className="xl:col-span-2" action={<TextButton size="sm" href="/partner/applications">Open application tracker</TextButton>}>
           <PipelineBar counts={PIPELINE} label="Your applications by stage" />
         </Panel>
 

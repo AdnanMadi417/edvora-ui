@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
@@ -333,7 +333,7 @@ export default function PartnerRegisterPage() {
           </p>
           <Link href="/"
             className="mt-6 block w-full rounded-lg bg-ub-action-primary py-3 text-center text-sm font-semibold text-white transition hover:bg-ub-action-primary-hover">
-            Back to Home
+            Back to home
           </Link>
         </div>
       </div>
@@ -438,9 +438,9 @@ export default function PartnerRegisterPage() {
 
               {partnerType === "individual" ? (
                 <>
-                  <SectionCard title="Basic Information">
+                  <SectionCard title="Basic information">
                     <ImageUpload
-                      label="Profile Photo"
+                      label="Profile photo"
                       id="ind_profile_photo"
                       required
                       file={indProfilePhoto.file}
@@ -450,11 +450,11 @@ export default function PartnerRegisterPage() {
                       progress={indProfilePhoto.progress}
                       error={indProfilePhoto.error || errors.ind_profile_photo}
                     />
-                    <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed Ali"
+                    <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
                       onBlur={() => validateIndField("name")} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Email Address" field="email" type="email" placeholder="name@mail.com"
+                      <InputField label="Email address" field="email" type="email" placeholder="name@mail.com"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("email")} />
                       <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
@@ -462,7 +462,7 @@ export default function PartnerRegisterPage() {
                         onBlur={() => validateIndField("phone_number")} />
                     </div>
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
+                      <SelectField label="Country of residence" field="country" options={COUNTRY_OPTIONS}
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("country")} />
                       <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
@@ -470,10 +470,10 @@ export default function PartnerRegisterPage() {
                         onBlur={() => validateIndField("nationality")} />
                     </div>
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Date of Birth" field="date_of_birth" type="date"
+                      <InputField label="Date of birth" field="date_of_birth" type="date"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("date_of_birth")} />
-                      <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
+                      <InputField label="Passport number" field="passport_number" placeholder="A12345678"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("passport_number")} />
                     </div>
@@ -497,10 +497,10 @@ export default function PartnerRegisterPage() {
                     </div>
                   </SectionCard>
 
-                  <SectionCard title="Identity Verification"
+                  <SectionCard title="Identity verification"
                     subtitle="To ensure trust and authenticity, all advisors must verify their identity.">
                     <PublicFileUploadField
-                      label="Passport Photo"
+                      label="Passport photo"
                       fieldId="ind-passport-photo"
                       field="ind_passport_photo"
                       required
@@ -511,7 +511,7 @@ export default function PartnerRegisterPage() {
                       error={errors.ind_passport_photo}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Social Media Account" field="social_media_url" type="url"
+                      <InputField label="Social media account" field="social_media_url" type="url"
                         placeholder="https://..."
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("social_media_url")} />
@@ -524,9 +524,9 @@ export default function PartnerRegisterPage() {
                 </>
               ) : (
                 <>
-                  <SectionCard title="Agency Information">
+                  <SectionCard title="Agency information">
                     <ImageUpload
-                      label="Agency Logo"
+                      label="Agency logo"
                       id="comp_logo"
                       required
                       file={compLogo.file}
@@ -536,21 +536,21 @@ export default function PartnerRegisterPage() {
                       progress={compLogo.progress}
                       error={compLogo.error || errors.comp_logo}
                     />
-                    <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
+                    <InputField label="Agency name" field="company_name" placeholder="Enter agency name."
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("company_name")} />
-                    <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
+                    <SelectField label="Country of registration" field="country" options={COUNTRY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("country")} />
-                    <InputField label="Website or Social Media Page" field="website_url" type="url"
+                    <InputField label="Website or social media page" field="website_url" type="url"
                       placeholder="https://..."
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("website_url")} />
                   </SectionCard>
 
-                  <SectionCard title="Agency Documents">
+                  <SectionCard title="Agency documents">
                     <PublicFileUploadField
-                      label="Agency Registration Document"
+                      label="Agency registration document"
                       fieldId="comp-reg-doc"
                       field="comp_reg_doc"
                       required
@@ -562,12 +562,12 @@ export default function PartnerRegisterPage() {
                     />
                   </SectionCard>
 
-                  <SectionCard title="Person in Charge">
+                  <SectionCard title="Person in charge">
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Full Name" field="contact_full_name" placeholder="Enter full name."
+                      <InputField label="Full name" field="contact_full_name" placeholder="Enter full name."
                         formData={compForm} errors={errors} updateFormData={updateComp}
                         onBlur={() => validateCompField("contact_full_name")} />
-                      <InputField label="Email Address" field="contact_email" type="email"
+                      <InputField label="Email address" field="contact_email" type="email"
                         placeholder="contact@agency.com"
                         formData={compForm} errors={errors} updateFormData={updateComp}
                         onBlur={() => validateCompField("contact_email")} />
@@ -579,15 +579,15 @@ export default function PartnerRegisterPage() {
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("nationality")} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Date of Birth" field="date_of_birth" type="date"
+                      <InputField label="Date of birth" field="date_of_birth" type="date"
                         formData={compForm} errors={errors} updateFormData={updateComp}
                         onBlur={() => validateCompField("date_of_birth")} />
-                      <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
+                      <InputField label="Passport number" field="passport_number" placeholder="A12345678"
                         formData={compForm} errors={errors} updateFormData={updateComp}
                         onBlur={() => validateCompField("passport_number")} />
                     </div>
                     <PublicFileUploadField
-                      label="Passport Photo"
+                      label="Passport photo"
                       fieldId="comp-passport-photo"
                       field="comp_passport_photo"
                       required
@@ -616,7 +616,7 @@ export default function PartnerRegisterPage() {
                     I have read and agree to the{" "}
                     <a href="https://www.unibexs.com/terms-of-service" target="_blank" rel="noopener noreferrer"
                       className="font-medium text-ub-text-link underline">
-                      Terms and Conditions
+                      Terms and conditions
                     </a>
                   </span>
                 </label>

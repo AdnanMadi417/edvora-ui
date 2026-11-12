@@ -46,11 +46,11 @@ it("requires each section, preserves service pricing, and creates only after rev
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));
   expect(screen.getByText("Name is required")).toBeInTheDocument();
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Provider Name" }),
+    screen.getByRole("textbox", { name: "Provider name" }),
     "FastTrack Logistics"
   );
   await userEvent.type(
-    screen.getByRole("textbox", { name: "Primary Contact Number" }),
+    screen.getByRole("textbox", { name: "Primary contact number" }),
     "+60123456789"
   );
   await userEvent.click(

@@ -88,7 +88,7 @@ function InfoRow({
             onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
             className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-ub-text-link hover:underline"
           >
-            Visit Link <ExternalLink className="h-3 w-3" />
+            Visit link <ExternalLink className="h-3 w-3" />
           </button>
         ) : (
           <p className="mt-0.5 break-words text-sm font-medium text-ub-text-primary [overflow-wrap:anywhere]">
@@ -297,16 +297,16 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
         {/* Account Overview */}
         <div className="border-b border-ub-border p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-            Account Overview
+            Account overview
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country" value={member.country} />
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={member.nationality} />
-            <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={member.phone} />
+            <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone number" value={member.phone} />
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={member.email} />
             <InfoRow
               icon={<Percent className="h-4 w-4" />}
-              label="Commission Visibility"
+              label="Commission visibility"
               value={member.commission_visible ? `Visible (${member.commission_display_percentage}%)` : "Hidden"}
             />
             <InfoRow
@@ -316,7 +316,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
             />
             <InfoRow
               icon={<Clock className="h-4 w-4" />}
-              label="Last Login"
+              label="Last login"
               value={formatDateTime(member.last_login) || "Never"}
             />
           </div>
@@ -327,18 +327,18 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
           <div className="mb-4 flex items-center gap-2">
             <Briefcase className="h-4 w-4 text-ub-text-secondary" />
             <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-              Individual Details
+              Individual details
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <InfoRow
               icon={<MdCake className="h-4 w-4" />}
-              label="Date of Birth"
+              label="Date of birth"
               value={formatDateOfBirth(member.individual_details?.date_of_birth)}
             />
             <InfoRow
               icon={<MdCategory className="h-4 w-4" />}
-              label="Passport Number"
+              label="Passport number"
               value={member.individual_details?.passport_number}
             />
             <InfoRow
@@ -354,19 +354,19 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
             />
             <InfoRow
               icon={<Link2 className="h-4 w-4" />}
-              label="Social Media"
+              label="Social media"
               value={member.individual_details?.social_media_url}
               href={member.individual_details?.social_media_url || undefined}
             />
           </div>
           <div className="mt-3 space-y-2">
             <DocRow
-              label="Profile Photo"
+              label="Profile photo"
               fileKey={member.individual_details?.profile_photo_file_key}
               personName={member.name}
             />
             <DocRow
-              label="Passport Photo"
+              label="Passport photo"
               fileKey={member.individual_details?.passport_photo_file_key}
               personName={member.name}
             />
@@ -379,7 +379,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
             <Button
               onClick={() => setIsResendWelcomeOpen(true)}
               icon={<Mail className="h-4 w-4" />}
-              text="Resend Welcome Email"
+              text="Resend welcome email"
               variant="secondary"
             />
           )}

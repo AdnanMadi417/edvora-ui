@@ -146,7 +146,7 @@ export default function FieldsOfStudyDirectory({
         <div className="flex items-center gap-3">
           <BookOpen className="h-6 w-6 shrink-0 text-ub-primary" />
           <p className="text-ub-body-md text-ub-text-secondary">
-            Manage study areas used to organise programs and help advisers find
+            Manage study areas used to organise programs and help advisors find
             the right courses.
           </p>
         </div>

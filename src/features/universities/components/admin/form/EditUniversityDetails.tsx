@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -600,7 +600,7 @@ const UniversityEdit = ({
         <div className="block">
           <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
             <InputField
-              label="University Name"
+              label="University name"
               field="name"
               required
               formData={formData}
@@ -632,7 +632,7 @@ const UniversityEdit = ({
 
           <IntakeMonthsField
             field="intake_months"
-            label="Intake Months"
+            label="Intake months"
             required={false}
             formData={formData}
             errors={errors}
@@ -641,7 +641,7 @@ const UniversityEdit = ({
 
           <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
             <SelectField
-              label="University Type"
+              label="University type"
               field="university_type_id"
               required
               options={universityTypes.map((type) => ({
@@ -656,7 +656,7 @@ const UniversityEdit = ({
           </div>
 
           <ToggleInput
-            label="University Status"
+            label="University status"
             field="is_active"
             formData={formData}
             errors={{}}
@@ -673,7 +673,7 @@ const UniversityEdit = ({
           />
 
           <ToggleInput
-            label="Language Center"
+            label="Language center"
             field="has_language_center"
             formData={formData}
             errors={{}}
@@ -737,7 +737,7 @@ const UniversityEdit = ({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
-                  label="Branch Name"
+                  label="Branch name"
                   placeholder="e.g Branch Name"
                   field="name"
                   dataField={`branches[${index}].name`}
@@ -799,7 +799,7 @@ const UniversityEdit = ({
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="mb-4 text-ub-heading-md text-ub-text-primary">
-            Payment Methods
+            Payment methods
           </h3>
           <IconButton
             title="Assign payment method"
@@ -831,7 +831,7 @@ const UniversityEdit = ({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <SelectField
-                  label="Payment Method"
+                  label="Payment method"
                   field="payment_method_id"
                   required
                   options={paymentMethods.map((m) => ({
@@ -873,7 +873,7 @@ const UniversityEdit = ({
               </div>
 
               <ToggleInput
-                label="Payment Method Status"
+                label="Payment method status"
                 field="is_active"
                 formData={method}
                 errors={{}}
@@ -901,7 +901,7 @@ const UniversityEdit = ({
           <div className="space-y-5 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-sm">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SearchableDropdown
-                label="Payment Method"
+                label="Payment method"
                 field="payment_method_id"
                 required
                 options={paymentMethods.map((p) => ({

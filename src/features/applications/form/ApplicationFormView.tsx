@@ -125,7 +125,7 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
                 update("program_id", "");
               }}
               error={errors.university_id}
-              placeholder="Search Institutions"
+              placeholder="Search institutions"
               required
             />
             <Combobox

@@ -48,7 +48,7 @@ const LINK_COLUMNS: FooterColumn[] = [
     heading: "Solutions",
     links: [
       { label: "Knowledge Hub", href: `${SITE_URL}/solution/knowledge-hub` },
-      { label: "Application Tracker", href: `${SITE_URL}/solution/application-tracker` },
+      { label: "Application tracker", href: `${SITE_URL}/solution/application-tracker` },
       { label: "Logistics Marketplace", href: `${SITE_URL}/solution/logistics-marketplace` },
     ],
   },
@@ -64,11 +64,11 @@ const LINK_COLUMNS: FooterColumn[] = [
     heading: "Resources",
     links: [
       { label: "Blog and news", href: `${SITE_URL}/blog` },
-      { label: "Resource Library", href: `${SITE_URL}/resource-library` },
-      { label: "Advisor Academy", href: `${SITE_URL}/advisor-academy` },
-      { label: "Proven Journeys", href: `${SITE_URL}/success-stories` },
-      { label: "Partner Success", href: `${SITE_URL}/partner-success` },
-      { label: "Support Hub", href: `${SITE_URL}/support-hub` },
+      { label: "Resource library", href: `${SITE_URL}/resource-library` },
+      { label: "Advisor academy", href: `${SITE_URL}/advisor-academy` },
+      { label: "Proven journeys", href: `${SITE_URL}/success-stories` },
+      { label: "Partner success", href: `${SITE_URL}/partner-success` },
+      { label: "Support hub", href: `${SITE_URL}/support-hub` },
     ],
   },
 ];

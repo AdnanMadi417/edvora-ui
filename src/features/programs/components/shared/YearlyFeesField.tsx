@@ -74,7 +74,7 @@ export default function YearlyFeesField({
             id={`${id}-title`}
             className="text-ub-heading-sm text-ub-text-primary"
           >
-            Yearly Fees
+            Yearly fees
           </h3>
           <p className="mt-1 text-ub-body-sm text-ub-text-secondary">
             Enter tuition for each study year. Leave empty if fees are not

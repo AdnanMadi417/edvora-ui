@@ -9,7 +9,7 @@ export default function UniversityCards() {
     <Demo
       name="UniversityCard"
       path="components/ub/data/cards/UniversityCard.tsx"
-      description="Adviser university directory card. Shows the institution, country, public/private status, intake months and language support, with links to its profile and programs."
+      description="Advisor university directory card. Shows the institution, country, public/private status, intake months and language support, with links to its profile and programs."
       code={
         "<UniversityCard university={university} href={`/partner/universities/${university.id}`} programsHref={`/partner/knowledge-hub?university_id=${university.id}`} />"
       }

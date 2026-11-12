@@ -382,7 +382,7 @@ export default function RegisterProgram({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="md:col-span-2">
                     <InputField
-                      label="Program Name"
+                      label="Program name"
                       field="name"
                       placeholder="e.g. BSc Data Science"
                       required
@@ -398,7 +398,7 @@ export default function RegisterProgram({
                   </div>
 
                   <SearchableDropdown
-                    label="Qualification Level"
+                    label="Qualification level"
                     field="qualification_id"
                     required
                     options={qualifications.map((f) => ({
@@ -415,7 +415,7 @@ export default function RegisterProgram({
 
                   {isMasterOrPhd(selectedQualification?.name) && (
                     <SelectField
-                      label="Course Type"
+                      label="Course type"
                       field="course_type"
                       required={false}
                       options={COURSE_TYPE_OPTIONS}
@@ -428,7 +428,7 @@ export default function RegisterProgram({
                   )}
 
                   <SearchableDropdown
-                    label="Field of Study"
+                    label="Field of study"
                     field="field_of_study_id"
                     required
                     options={fields.map((f) => ({
@@ -457,7 +457,7 @@ export default function RegisterProgram({
 
                   <div className="md:col-span-2">
                     <ToggleInput
-                      label="Delivery Mode"
+                      label="Delivery mode"
                       field="is_on_campus"
                       formData={formData}
                       errors={errors}
@@ -546,7 +546,7 @@ export default function RegisterProgram({
               <div className="space-y-6">
                 <IntakeMonthsField
                   field="intake_months"
-                  label="Intake Months"
+                  label="Intake months"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -647,7 +647,7 @@ export default function RegisterProgram({
                         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                           <div className="md:col-span-2">
                             <InputField
-                              label="Scholarship Name"
+                              label="Scholarship name"
                               field={`scholarships[${index}].name`}
                               placeholder="e.g. Excellence Award"
                               type="text"
@@ -661,7 +661,7 @@ export default function RegisterProgram({
                           </div>
 
                           <InputField
-                            label="Coverage Percentage"
+                            label="Coverage percentage"
                             field={`scholarships[${index}].coverage_percent`}
                             type="number"
                             placeholder="e.g. 50"
@@ -672,7 +672,7 @@ export default function RegisterProgram({
                           />
 
                           <InputField
-                            label="Maximum Amount"
+                            label="Maximum amount"
                             field={`scholarships[${index}].max_amount`}
                             type="number"
                             placeholder="e.g. 10000"

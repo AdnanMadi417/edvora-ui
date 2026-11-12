@@ -41,12 +41,12 @@ export default function AdvisorProfileOverview({
   const documents = company
     ? [
         {
-          label: "Company Registration Document",
+          label: "Company registration document",
           key: partner.company_details?.company_registration_doc_file_key,
         },
-        { label: "Agency Logo", key: partner.company_details?.logo_file_key },
+        { label: "Agency logo", key: partner.company_details?.logo_file_key },
         {
-          label: "Passport Photo",
+          label: "Passport photo",
           key: partner.company_details?.passport_photo_file_key,
         },
       ]
@@ -54,13 +54,13 @@ export default function AdvisorProfileOverview({
         ...(showProfilePhoto
           ? [
               {
-                label: "Profile Photo",
+                label: "Profile photo",
                 key: partner.individual_details?.profile_photo_file_key,
               },
             ]
           : []),
         {
-          label: "Passport Photo",
+          label: "Passport photo",
           key: partner.individual_details?.passport_photo_file_key,
         },
       ];
@@ -157,7 +157,7 @@ export default function AdvisorProfileOverview({
         <SectionCard
           title="Contact details"
           as="h2"
-          description="Reach the adviser or primary contact."
+          description="Reach the advisor or primary contact."
         >
           <div className="space-y-5">
             <div>

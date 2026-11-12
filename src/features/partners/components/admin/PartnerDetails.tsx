@@ -239,13 +239,13 @@ export default function PartnerDetails({ id }: Props) {
     ? [
         { key: "profile", label: "Profile" },
         { key: "team", label: "Team" },
-        { key: "bank-account", label: "Bank Account" },
+        { key: "bank-account", label: "Bank account" },
         { key: "applications", label: "Applications" },
         { key: "statement", label: "Commission Tracker" },
       ]
     : [
         { key: "profile", label: "Profile" },
-        { key: "bank-account", label: "Bank Account" },
+        { key: "bank-account", label: "Bank account" },
         { key: "applications", label: "Applications" },
         { key: "statement", label: "Commission Tracker" },
       ];
@@ -332,7 +332,7 @@ export default function PartnerDetails({ id }: Props) {
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-ub-text-secondary" />
                       <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-                        Team Members
+                        Team members
                       </p>
                     </div>
                     {!partner.agency_members?.length ? (

@@ -111,7 +111,7 @@ export default function AdditionalManagersSection({
       <div className="mb-1 flex items-center gap-2">
         <Share2 className="h-4 w-4 text-ub-text-secondary" />
         <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-          Additional Managers
+          Additional managers
         </p>
       </div>
       <p className="mb-4 text-xs text-ub-text-secondary">

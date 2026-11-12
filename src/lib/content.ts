@@ -173,11 +173,11 @@ export const testimonials = {
   eyebrow: "Testimonials",
   heading: "Teams that ship with us, stay with us",
   items: [
-    { quote: "They took us from a Figma file to a live product in ten weeks. The weekly demos meant we were never surprised.", name: "Sarah Chen", role: "CEO", company: "Northwind Health", avatar: "/placeholders/avatar-1.svg", logo: "/placeholders/logos/northwind.svg", rating: 5 },
-    { quote: "The most senior team we've worked with. They challenged our assumptions and the product is better for it.", name: "Marcus Okafor", role: "VP Engineering", company: "Globex Logistics", avatar: "/placeholders/avatar-2.svg", logo: "/placeholders/logos/globex.svg", rating: 5 },
-    { quote: "Our AI underwriting feature went from prototype to production with proper evals and guardrails. Rock solid.", name: "Priya Raman", role: "Head of Product", company: "Initech Finance", avatar: "/placeholders/avatar-3.svg", logo: "/placeholders/logos/initech.svg", rating: 5 },
-    { quote: "Transparent pricing, clear communication and code we actually own. Exactly what a development partner should be.", name: "Daniel Novak", role: "Founder", company: "Hooli Learn", avatar: "/placeholders/avatar-4.svg", logo: "/placeholders/logos/hooli.svg", rating: 5 },
-    { quote: "They plugged into our team seamlessly and doubled our release velocity within a quarter.", name: "Amina Yusuf", role: "CTO", company: "Umbrella Retail", avatar: "/placeholders/avatar-5.svg", logo: "/placeholders/logos/umbrella.svg", rating: 4 },
+    { quote: "They took us from a Figma file to a live product in ten weeks. The weekly demos meant we were never surprised.", name: "Sarah chen", role: "CEO", company: "Northwind Health", avatar: "/placeholders/avatar-1.svg", logo: "/placeholders/logos/northwind.svg", rating: 5 },
+    { quote: "The most senior team we've worked with. They challenged our assumptions and the product is better for it.", name: "Marcus okafor", role: "VP Engineering", company: "Globex Logistics", avatar: "/placeholders/avatar-2.svg", logo: "/placeholders/logos/globex.svg", rating: 5 },
+    { quote: "Our AI underwriting feature went from prototype to production with proper evals and guardrails. Rock solid.", name: "Priya raman", role: "Head of Product", company: "Initech Finance", avatar: "/placeholders/avatar-3.svg", logo: "/placeholders/logos/initech.svg", rating: 5 },
+    { quote: "Transparent pricing, clear communication and code we actually own. Exactly what a development partner should be.", name: "Daniel novak", role: "Founder", company: "Hooli Learn", avatar: "/placeholders/avatar-4.svg", logo: "/placeholders/logos/hooli.svg", rating: 5 },
+    { quote: "They plugged into our team seamlessly and doubled our release velocity within a quarter.", name: "Amina yusuf", role: "CTO", company: "Umbrella Retail", avatar: "/placeholders/avatar-5.svg", logo: "/placeholders/logos/umbrella.svg", rating: 4 },
   ],
 };
 

@@ -86,7 +86,7 @@ export default function CreateRoleModal({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Create New Role"
+            title="Create new role"
             description="Add a new custom role that can be granted permissions."
             icon={ShieldPlus}
             iconBg="bg-ub-tone-brand-bg"
@@ -98,7 +98,7 @@ export default function CreateRoleModal({
 
           <div className="max-h-[60vh] space-y-2 overflow-y-auto px-6 py-6">
             <InputField
-              label="Role Code"
+              label="Role code"
               field="code"
               placeholder="e.g. finance_reviewer"
               required
@@ -108,7 +108,7 @@ export default function CreateRoleModal({
               helperText="A unique, unchangeable identifier for this role."
             />
             <InputField
-              label="Role Name"
+              label="Role name"
               field="name"
               placeholder="e.g. Finance Reviewer"
               required

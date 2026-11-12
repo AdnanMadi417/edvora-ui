@@ -152,7 +152,7 @@ export default function CreateBankPage({
           }}
         />
         <InputField
-          label="Bank Code"
+          label="Bank code"
           field="code"
           placeholder="e.g. MBB0228"
           required
@@ -174,7 +174,7 @@ export default function CreateBankPage({
           updateFormData={updateFormData}
         />
         <InputField
-          label="Bank Name"
+          label="Bank name"
           field="name"
           placeholder="e.g. Malayan Banking Berhad (Maybank)"
           required

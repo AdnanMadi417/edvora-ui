@@ -224,7 +224,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
                   { icon: Users,      label: "Advisor",      minW: "min-w-[220px]" },
-                  { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
+                  { icon: Mail,       label: "Contact info", minW: "min-w-[200px]" },
                   { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}>

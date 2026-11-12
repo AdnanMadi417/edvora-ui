@@ -99,7 +99,7 @@ export default function RolesTable() {
         <Button
           onClick={() => setIsCreateOpen(true)}
           icon={<Plus className="h-4 w-4" />}
-          text="Create Role"
+          text="Create role"
           variant="primary"
         />
       </div>

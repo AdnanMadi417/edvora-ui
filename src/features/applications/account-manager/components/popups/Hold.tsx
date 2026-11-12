@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CheckCircle, Pause } from "lucide-react";
@@ -77,7 +77,7 @@ export default function HoldPopup({
       onClose={handleClose}
       size="md"
       icon={Pause}
-      title="Update Application Status"
+      title="Update application status"
       description="Keep the application active, put it on hold, or cancel it."
       onSubmit={handleConfirm}
       submitLabel="Confirm"
@@ -93,7 +93,7 @@ export default function HoldPopup({
           {currentStatus === "3" && <XCircle className="h-4 w-4" aria-hidden="true" />}
           <span>Application status: {statusMap[currentStatus || "1"]}</span>
         </p>
-        <Combobox label="Lifecycle Status" options={statusOptions} value={status ?? null} onChange={(v) => setStatus(v ?? "")} required />
+        <Combobox label="Lifecycle status" options={statusOptions} value={status ?? null} onChange={(v) => setStatus(v ?? "")} required />
       </div>
     </FormModal>
   );

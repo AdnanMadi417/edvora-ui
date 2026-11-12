@@ -50,10 +50,10 @@ export default function ConfirmReceived({ isOpen, onClose, applicationId, onSucc
       onClose={onClose}
       size="md"
       icon={CheckCircle}
-      title="Confirm Commission Received"
+      title="Confirm commission received"
       description="This completes the application — make sure the payment has actually arrived first."
       onSubmit={handleConfirm}
-      submitLabel="Confirm Received"
+      submitLabel="Confirm received"
       submitTone="positive"
       submitting={loading}
     >

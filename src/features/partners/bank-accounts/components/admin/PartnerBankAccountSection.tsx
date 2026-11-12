@@ -321,7 +321,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
     <div className="" data-testid="partner-bank-account">
       <div className="mb-1 flex items-center gap-2 px-6 pt-6">
         <Landmark className="h-4 w-4 text-ub-text-secondary" />
-        <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Bank Account</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Bank account</p>
       </div>
 
       {memberSelfView && (
@@ -348,7 +348,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
               <Button
                 onClick={openAdd}
                 icon={<Plus className="h-4 w-4" />}
-                text="Add Bank Account"
+                text="Add bank account"
                 variant="secondary"
               />
             )
@@ -358,18 +358,18 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
             <DetailRow label="Bank" value={bankDisplayName} />
             <DetailRow label="SWIFT Code" value={bankDisplaySwift} />
             {!account?.bank_id && account?.intl_bank_country && (
-              <DetailRow label="Bank Country" value={getCountryName(account.intl_bank_country)} />
+              <DetailRow label="Bank country" value={getCountryName(account.intl_bank_country)} />
             )}
-            <DetailRow label="Account Holder" value={account?.account_holder_name} />
-            <DetailRow label="Account Number" value={account?.account_number} />
+            <DetailRow label="Account holder" value={account?.account_holder_name} />
+            <DetailRow label="Account number" value={account?.account_number} />
             <DetailRow label="IBAN" value={account?.iban} />
             <DetailRow label="Currency" value={account?.currency} />
             {!isMalaysia && account && (
               <>
-                <DetailRow label="Beneficiary Address" value={account.beneficiary_address} />
-                <DetailRow label="Beneficiary Phone" value={account.beneficiary_phone} />
-                <DetailRow label="Bank Branch Address" value={account.bank_branch_address} />
-                <DetailRow label="Bank Branch Code" value={account.bank_branch_code} />
+                <DetailRow label="Beneficiary address" value={account.beneficiary_address} />
+                <DetailRow label="Beneficiary phone" value={account.beneficiary_phone} />
+                <DetailRow label="Bank branch address" value={account.bank_branch_address} />
+                <DetailRow label="Bank branch code" value={account.bank_branch_code} />
               </>
             )}
           </div>
@@ -427,7 +427,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
                 </div>
               )}
               <InputField
-                label="Bank Name"
+                label="Bank name"
                 field="intl_bank_name"
                 placeholder="e.g. Standard Chartered Bank"
                 formData={formData}
@@ -435,7 +435,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
                 updateFormData={updateFormData}
               />
               <SelectField
-                label="Bank Country"
+                label="Bank country"
                 field="intl_bank_country"
                 options={COUNTRY_OPTIONS}
                 formData={formData}
@@ -465,9 +465,9 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
             </div>
           )}
 
-          <InputField label="Account Holder Name" field="account_holder_name" placeholder="Name as it appears on the account" formData={formData} errors={errors} updateFormData={updateFormData} />
+          <InputField label="Account holder name" field="account_holder_name" placeholder="Name as it appears on the account" formData={formData} errors={errors} updateFormData={updateFormData} />
           <div>
-            <InputField label="Account Number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Account number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
             {!errors.account_number && accountNumberCheck.warning && (
               <p className="-mt-3 mb-4 text-xs text-ub-tone-warning-text">{accountNumberCheck.warning}</p>
             )}
@@ -485,10 +485,10 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
 
           {!isMalaysia && (
             <>
-              <InputField label="Beneficiary Address" field="beneficiary_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
-              <InputField label="Beneficiary Phone" field="beneficiary_phone" placeholder="e.g. +60 12-345 6789" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Beneficiary address" field="beneficiary_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Beneficiary phone" field="beneficiary_phone" placeholder="e.g. +60 12-345 6789" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField
-                label="Beneficiary ID Number"
+                label="Beneficiary ID number"
                 field="beneficiary_id_number"
                 required={false}
                 placeholder="Passport or national ID number"
@@ -496,10 +496,10 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <InputField label="Bank Branch Address" field="bank_branch_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
-              <InputField label="Bank Branch Code" field="bank_branch_code" placeholder="e.g. 001" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Bank branch address" field="bank_branch_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Bank branch code" field="bank_branch_code" placeholder="e.g. 001" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField
-                label="Intermediary Bank Name"
+                label="Intermediary bank name"
                 field="intermediary_bank_name"
                 required={false}
                 placeholder="Only if your bank requires one"
@@ -508,7 +508,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
                 updateFormData={updateFormData}
               />
               <InputField
-                label="Intermediary Bank SWIFT"
+                label="Intermediary bank SWIFT"
                 field="intermediary_bank_swift"
                 required={false}
                 placeholder="e.g. SCBLMYKX"

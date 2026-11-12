@@ -218,7 +218,7 @@ const ModernApplicationsTable = () => {
       <DashboardHeader
         hideTitle
         as="h2"
-        title="Applications Dashboard"
+        title="Applications dashboard"
         subtitle="Manage and track student applications"
         className="border-b border-ub-border p-4 sm:p-6"
       />
@@ -251,7 +251,7 @@ const ModernApplicationsTable = () => {
                 : "All applications"
             }
             totalCount={grandTotal}
-            title="Applications Pipeline"
+            title="Applications pipeline"
             onViewCommission={() => {
               const commStage = stages.find((s) =>
                 s.name.toLowerCase().includes("commission")

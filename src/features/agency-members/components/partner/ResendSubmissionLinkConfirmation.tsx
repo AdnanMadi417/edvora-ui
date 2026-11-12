@@ -50,7 +50,7 @@ export default function ResendSubmissionLinkConfirmation({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Resend Submission Link"
+            title="Resend submission link"
             description="Send a fresh profile-completion link to this invitee."
             icon={Send}
             iconBg="bg-ub-tone-brand-bg"
@@ -62,7 +62,7 @@ export default function ResendSubmissionLinkConfirmation({
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Resend</h3>
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm resend</h3>
               <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to resend the profile-completion link to{" "}
                 <strong>{invitationName}</strong>?

@@ -121,7 +121,7 @@ export default function BatchPrograms({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
         <ModalHeader
-          title="Bulk IELTS Update"
+          title="Bulk IELTS update"
           description="Update IELTS requirements for multiple programs at once."
           icon={GraduationCap}
           iconBg="bg-ub-tone-brand-bg"

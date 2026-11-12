@@ -125,7 +125,7 @@ export default function InviteAgencyMemberModal({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Invite Team Member"
+            title="Invite team member"
             description="Send an email invitation with a one-time verification code."
             icon={UserPlus}
             iconBg="bg-ub-tone-brand-bg"
@@ -160,7 +160,7 @@ export default function InviteAgencyMemberModal({
               onBlur={() => validateField("email")}
             />
             <ToggleInput
-              label="Show Commission to This Member"
+              label="Show commission to this member"
               field="commission_visible"
               formData={formData}
               errors={errors}

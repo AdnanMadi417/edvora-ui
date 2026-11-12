@@ -45,7 +45,7 @@ type ProfileTab = "overview" | "language-center";
 // which would make `active`/`onChange` below a type error.
 const PROFILE_TABS: TabItem<ProfileTab>[] = [
   { key: "overview", label: "Overview" },
-  { key: "language-center", label: "Language Center" },
+  { key: "language-center", label: "Language center" },
 ];
 
 export interface UniversityProgram {
@@ -399,7 +399,7 @@ export default function UniversityPublicProfile({ university }: Props) {
 
       <div className="mx-auto max-w-4xl pt-16 text-center">
         <h2 className="text-3xl font-bold text-ub-text-primary sm:text-4xl">
-          Frequently Asked <span className="text-ub-text-link">Questions</span>
+          Frequently asked <span className="text-ub-text-link">Questions</span>
         </h2>
         <div className="mt-8 text-left">
           <Faq items={faqItems} />

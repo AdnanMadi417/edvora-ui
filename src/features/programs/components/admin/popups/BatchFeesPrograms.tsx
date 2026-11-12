@@ -126,7 +126,7 @@ export default function CreateFees({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Tuition Fee Update"
+            title="Bulk tuition fee update"
             description="Update Tuition Fee values for multiple programs at once."
             icon={DollarSign}
             iconBg="bg-ub-tone-brand-bg"

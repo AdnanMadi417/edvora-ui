@@ -273,7 +273,7 @@ export default function RegisterUniversity({
                 error={errors.logo}
               />{" "}
               <InputField
-                label="University Name"
+                label="University name"
                 field="name"
                 placeholder="e.g. Universiti Malaya"
                 required
@@ -292,7 +292,7 @@ export default function RegisterUniversity({
                 required={false}
               />
               <SelectField
-                label="University Type"
+                label="University type"
                 field="university_type_id"
                 required
                 options={universities.map((type) => ({
@@ -315,7 +315,7 @@ export default function RegisterUniversity({
             <div className="space-y-4">
               <IntakeMonthsField
                 field="intake_months"
-                label="Intake Months"
+                label="Intake months"
                 required={false}
                 formData={formData}
                 errors={errors}
@@ -325,7 +325,7 @@ export default function RegisterUniversity({
               <InstitutionTypeField value={formData.is_public} onChange={(value) => updateFormData("is_public", value)} />
 
               <ToggleInput
-                label="Language Center"
+                label="Language center"
                 field="has_language_center"
                 formData={formData}
                 errors={{}}
@@ -402,7 +402,7 @@ export default function RegisterUniversity({
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <InputField
-                        label="Branch Name"
+                        label="Branch name"
                         placeholder="e.g Branch Name"
                         field="name"
                         dataField={`branches[${index}].name`}

@@ -143,10 +143,10 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
           {item.receipt_file_url && (
             <>
               <Tooltip content="View Receipt" position="left">
-                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "view")} disabled={loadingProof?.id === item.payout_id} aria-label="View Receipt" title="View Receipt" icon={<Eye className={busy(item, "view") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
+                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "view")} disabled={loadingProof?.id === item.payout_id} aria-label="View receipt" title="View receipt" icon={<Eye className={busy(item, "view") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
               </Tooltip>
               <Tooltip content="Download Receipt" position="left">
-                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "download")} disabled={loadingProof?.id === item.payout_id} aria-label="Download Receipt" title="Download Receipt" icon={<Download className={busy(item, "download") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
+                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "download")} disabled={loadingProof?.id === item.payout_id} aria-label="Download receipt" title="Download receipt" icon={<Download className={busy(item, "download") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
               </Tooltip>
             </>
           )}

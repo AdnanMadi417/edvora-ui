@@ -96,7 +96,7 @@ export default function BatchCourseTypePrograms({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Course Type Update"
+            title="Bulk course type update"
             description={`Set the course type for ${selectedPrograms.length} selected program${selectedPrograms.length !== 1 ? "s" : ""}.`}
             icon={Layers}
             iconBg="bg-ub-tone-brand-bg"
@@ -118,7 +118,7 @@ export default function BatchCourseTypePrograms({
             )}
 
             <SelectField
-              label="Course Type"
+              label="Course type"
               field="course_type"
               required
               options={COURSE_TYPE_OPTIONS}

@@ -168,7 +168,7 @@ export default function CreateAccountManager() {
 
         <div>
           <PasswordField
-            label="Confirm Password"
+            label="Confirm password"
             field="confirm_password"
             placeholder="Repeat your password"
             required

@@ -144,10 +144,10 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
       onClose={onClose}
       size="lg"
       icon={Ban}
-      title="Void & Correct Payout"
+      title="Void & correct payout"
       description="Enter the corrected payout to replace this one. The applications stay at Commission Paid while you do."
       onSubmit={handleSubmit}
-      submitLabel="Void & Correct"
+      submitLabel="Void & correct"
       submitTone="destructive"
       submitting={isSubmitting}
       submitDisabled={!formData.void_reason.trim()}

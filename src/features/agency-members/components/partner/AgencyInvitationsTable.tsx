@@ -49,8 +49,8 @@ const ITEMS_PER_PAGE = 20;
 const PROGRESS_OPTIONS = [
   { value: "otp_pending", label: "OTP Pending" },
   { value: "otp_expired", label: "OTP Expired" },
-  { value: "pending_profile", label: "Pending Profile" },
-  { value: "link_expired", label: "Link Expired" },
+  { value: "pending_profile", label: "Pending profile" },
+  { value: "link_expired", label: "Link expired" },
   { value: "completed", label: "Completed" },
   { value: "superseded", label: "Superseded" },
 ];

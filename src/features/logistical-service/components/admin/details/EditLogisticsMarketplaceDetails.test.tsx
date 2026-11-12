@@ -70,7 +70,7 @@ it("preserves service prices and selection IDs when saving provider details", as
   mockEdit.mockResolvedValue(undefined);
   const user = userEvent.setup();
   render(<EditLogisticsMarketplaceDetails id="provider" />);
-  const name = screen.getByRole("textbox", { name: "Provider Name" });
+  const name = screen.getByRole("textbox", { name: "Provider name" });
   await user.clear(name);
   await user.type(name, "Updated provider");
   await user.click(screen.getByRole("button", { name: "Save changes" }));

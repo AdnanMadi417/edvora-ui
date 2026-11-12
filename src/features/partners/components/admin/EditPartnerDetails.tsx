@@ -697,11 +697,11 @@ export default function EditPartnerDetails({
       {/* Partner Details */}
       <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
         <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-          Advisor Details
+          Advisor details
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <InputField
-            label="Advisor Name"
+            label="Advisor name"
             field="name"
             required
             formData={formData}
@@ -710,7 +710,7 @@ export default function EditPartnerDetails({
             onBlur={() => validateField("name")}
           />
           <InputField
-            label="Email Address"
+            label="Email address"
             field="email"
             type="email"
             required
@@ -720,7 +720,7 @@ export default function EditPartnerDetails({
             onBlur={() => validateField("email")}
           />
           <SearchableDropdown
-            label="Country of Residence"
+            label="Country of residence"
             field="country"
             options={COUNTRY_OPTIONS}
             formData={formData}
@@ -738,7 +738,7 @@ export default function EditPartnerDetails({
           />
           <div>
             <SelectField
-              label="Advisor Type"
+              label="Advisor type"
               field="type"
               options={PARTNER_TYPE.map((p) => ({
                 value: p.value,
@@ -775,7 +775,7 @@ export default function EditPartnerDetails({
             onBlur={() => validateField("phone_number")}
           />
           <SelectField
-            label="Assigned Manager"
+            label="Assigned manager"
             field="manager_id"
             required={false}
             options={accountManagers.map((m) => ({
@@ -792,10 +792,10 @@ export default function EditPartnerDetails({
       {/* Account Settings */}
       <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
         <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-          Account Settings
+          Account settings
         </p>
         <ToggleInput
-          label="Account Active"
+          label="Account active"
           field="is_active"
           formData={formData}
           errors={{}}
@@ -811,7 +811,7 @@ export default function EditPartnerDetails({
       {isIndividual && (
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-            Individual Details
+            Individual details
           </p>
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <SelectField
@@ -835,7 +835,7 @@ export default function EditPartnerDetails({
               onBlur={() => validateField("linkedin_url")}
             />
             <InputField
-              label="Social Media URL"
+              label="Social media URL"
               field="social_media_url"
               type="url"
               required={false}
@@ -846,7 +846,7 @@ export default function EditPartnerDetails({
               onBlur={() => validateField("social_media_url")}
             />
             <InputField
-              label="Date of Birth"
+              label="Date of birth"
               field="date_of_birth"
               type="date"
               required={false}
@@ -855,7 +855,7 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
             <InputField
-              label="Passport Number"
+              label="Passport number"
               field="passport_number"
               required={false}
               placeholder="A12345678"
@@ -865,7 +865,7 @@ export default function EditPartnerDetails({
             />
           </div>
           <StoredDocumentUpload
-            label="Passport Photo"
+            label="Passport photo"
             document={passportPhoto}
             id="passport-photo"
             onUpload={(f) => handleUpload(f, setPassportPhoto)}
@@ -878,7 +878,7 @@ export default function EditPartnerDetails({
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
           <p className="mb-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
             <Globe2 className="h-3.5 w-3.5" />
-            Public Profile
+            Public profile
           </p>
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField
@@ -891,16 +891,16 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
             <InputField
-              label="Public Display Name"
+              label="Public display name"
               field="pp_display_name"
               required={false}
-              placeholder="Jane Doe"
+              placeholder="Jane doe"
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
             />
             <PhoneInputField
-              label="Public WhatsApp Number"
+              label="Public WhatsApp number"
               dialCodeField="pp_whatsapp_code"
               numberField="pp_whatsapp_number"
               required={false}
@@ -910,7 +910,7 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
             <MultiSelect
-              label="Countries Supported"
+              label="Countries supported"
               field="pp_countries_supported"
               required={false}
               placeholder="Select countries..."
@@ -930,7 +930,7 @@ export default function EditPartnerDetails({
             updateFormData={updateFormData}
           />
           <ToggleInput
-            label="Publish Status"
+            label="Publish status"
             field="pp_is_published"
             formData={formData}
             errors={{}}
@@ -952,11 +952,11 @@ export default function EditPartnerDetails({
       {isCompany && (
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-            Company Details
+            Company details
           </p>
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField
-              label="Company Name"
+              label="Company name"
               field="company_name"
               required
               formData={formData}
@@ -975,7 +975,7 @@ export default function EditPartnerDetails({
               onBlur={() => validateField("website_url")}
             />
             <InputField
-              label="Date of Birth"
+              label="Date of birth"
               field="date_of_birth"
               type="date"
               required={false}
@@ -984,7 +984,7 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
             <InputField
-              label="Passport Number"
+              label="Passport number"
               field="passport_number"
               required={false}
               placeholder="A12345678"
@@ -994,13 +994,13 @@ export default function EditPartnerDetails({
             />
           </div>
           <StoredDocumentUpload
-            label="Company Registration Document"
+            label="Company registration document"
             document={companyRegDoc}
             id="company-reg-doc"
             onUpload={(f) => handleUpload(f, setCompanyRegDoc)}
           />
           <StoredDocumentUpload
-            label="Passport Photo"
+            label="Passport photo"
             document={passportPhoto}
             id="comp-passport-photo"
             onUpload={(f) => handleUpload(f, setPassportPhoto)}

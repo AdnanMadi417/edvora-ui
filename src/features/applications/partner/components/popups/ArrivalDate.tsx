@@ -77,10 +77,10 @@ export default function ArrivalDateConfirmation({
       onClose={handleClose}
       size="md"
       icon={Plane}
-      title="Confirm Arrival Date"
+      title="Confirm arrival date"
       description="Select your planned arrival date and upload your travel ticket."
       onSubmit={handleConfirm}
-      submitLabel="Confirm Arrival"
+      submitLabel="Confirm arrival"
       submitting={isSubmitting}
       submitDisabled={!formData.arrival_date || !ticketFile || !!fileError || !!eVisaError}
     >
@@ -93,7 +93,7 @@ export default function ArrivalDateConfirmation({
             )}
 
             <div className="space-y-2">
-              <Input label="Arrival Date" type="date" onBlur={() => {
+              <Input label="Arrival date" type="date" onBlur={() => {
                   const val = formData.arrival_date;
                   if (!val) return;
                   const selected = new Date(val);
@@ -105,7 +105,7 @@ export default function ArrivalDateConfirmation({
             </div>
 
             <DocumentUpload
-              label="Travel Ticket"
+              label="Travel ticket"
               description="Upload your flight ticket or booking confirmation"
               id="ticket_file"
               file={ticketFile}

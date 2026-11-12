@@ -186,7 +186,7 @@ export default function ApplicationDetailsScreen({
       <div className="grid gap-4 md:gap-6">
         <DocumentChecklist documents={studentDocs} title="Student documents" onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
         {offerVisaDocs.length > 0 && <DocumentChecklist documents={offerVisaDocs} title="Offer and visa" onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />}
-        {templates.length > 0 && <DocumentChecklist documents={templates} title="From the Unibexs System" description="Templates and invoices to download." onDownload={download} downloadingId={downloadingId} readOnly />}
+        {templates.length > 0 && <DocumentChecklist documents={templates} title="From the Unibexs system" description="Templates and invoices to download." onDownload={download} downloadingId={downloadingId} readOnly />}
         <StudentBackgroundCard education={view.student.education} englishTests={view.student.englishTests} emergencyContacts={view.student.emergencyContacts} />
         {documentsExtra}
       </div>

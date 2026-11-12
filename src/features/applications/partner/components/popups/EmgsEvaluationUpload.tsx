@@ -54,10 +54,10 @@ export default function EmgsEvalUpload({
       onClose={handleClose}
       size="md"
       icon={FileText}
-      title="Upload EMGS Eval Document"
+      title="Upload EMGS eval document"
       description="Upload the eval document to proceed"
       onSubmit={handleConfirmUpload}
-      submitLabel="Submit Document"
+      submitLabel="Submit document"
       submitting={isUploading}
       submitDisabled={!file || !!fileError || !!uploadError}
     >

@@ -35,7 +35,7 @@ export default function DeleteAccountManagerModal({
     <FormModal
       open={isOpen}
       onClose={onClose}
-      title="Delete Account Manager"
+      title="Delete account manager"
       description="Confirm removal of this account manager."
       icon={Trash2}
       size="md"
@@ -71,7 +71,7 @@ export default function DeleteAccountManagerModal({
         ) : (
           <div>
             <h3 className="text-lg font-semibold text-ub-text-primary">
-              Confirm Deletion
+              Confirm deletion
             </h3>
             <p className="text-sm text-ub-text-secondary">
               Are you sure you want to remove this account manager from the

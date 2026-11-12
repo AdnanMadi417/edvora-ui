@@ -102,7 +102,7 @@ export default function DocumentTypesDirectory() {
         <div className="flex items-center gap-3">
           <FileText className="h-6 w-6 shrink-0 text-ub-primary" />
           <p className="text-ub-body-md text-ub-text-secondary">
-            Review document requirements and manage the blank templates advisers
+            Review document requirements and manage the blank templates advisors
             download.
           </p>
         </div>

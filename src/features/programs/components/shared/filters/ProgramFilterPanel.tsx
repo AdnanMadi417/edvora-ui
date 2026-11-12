@@ -18,8 +18,8 @@ interface Option {
 }
 
 const SCHOLARSHIP_OPTIONS: Option[] = [
-  { label: "Has Scholarship", value: "true" },
-  { label: "No Scholarship", value: "false" },
+  { label: "Has scholarship", value: "true" },
+  { label: "No scholarship", value: "false" },
 ];
 
 const COURSE_TYPE_FILTER_OPTIONS: Option[] = COURSE_TYPE_OPTIONS;

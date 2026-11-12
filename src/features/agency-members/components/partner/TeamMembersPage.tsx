@@ -70,7 +70,7 @@ export default function TeamMembersPage() {
           <Button
             onClick={() => setIsInviteOpen(true)}
             icon={<UserPlus className="h-4 w-4" />}
-            text="Invite Member"
+            text="Invite member"
             variant="primary"
           />
         </div>

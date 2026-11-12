@@ -17,7 +17,7 @@ const reviewerRoutes: IRoute[] = [
         icon: Handshake,
     },
     {
-        name: "Account Managers",
+        name: "Account managers",
         layout: "/reviewer",
         path: "/account-managers",
         icon: UserCog,

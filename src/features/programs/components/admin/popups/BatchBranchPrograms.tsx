@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
@@ -90,7 +90,7 @@ export default function BatchBranchPrograms({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Bulk Branch Update"
+            title="Bulk branch update"
             description={`Assign a branch to ${selectedProgramIds.length} selected program${selectedProgramIds.length !== 1 ? "s" : ""}.`}
             icon={GitBranch}
             iconBg="bg-ub-tone-plum-bg"

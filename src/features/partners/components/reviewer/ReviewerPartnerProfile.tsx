@@ -211,7 +211,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-ub-text-secondary" />
                 <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-                  Team Members
+                  Team members
                 </p>
               </div>
               {!partner.agency_members?.length ? (

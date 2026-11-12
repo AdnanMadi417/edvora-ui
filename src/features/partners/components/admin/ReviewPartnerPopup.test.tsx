@@ -12,7 +12,7 @@ jest.mock("components/ub/feedback/notifications/ToastContext", () => ({ useToast
 
 const flush = () => act(() => new Promise((r) => requestAnimationFrame(() => r(undefined))));
 const renderPopup = (currentManagerId?: string) =>
-  render(<ReviewPartnerPopup isOpen onClose={jest.fn()} partnerId="ptn_002" partnerName="Global Pathways Education" managerOptions={[{ value: "am_001", label: "Farid Hakimi" }]} currentManagerId={currentManagerId} />);
+  render(<ReviewPartnerPopup isOpen onClose={jest.fn()} partnerId="ptn_002" partnerName="Global pathways education" managerOptions={[{ value: "am_001", label: "Farid Hakimi" }]} currentManagerId={currentManagerId} />);
 
 describe("ReviewPartnerPopup", () => {
   beforeEach(() => jest.clearAllMocks());

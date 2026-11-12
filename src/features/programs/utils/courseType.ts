@@ -7,7 +7,7 @@ import type { CourseType } from "features/programs/types";
 export const COURSE_TYPE_OPTIONS: { value: CourseType; label: string }[] = [
   { value: "course_work", label: "Coursework" },
   { value: "research", label: "Research" },
-  { value: "mixed_mode", label: "Mixed Mode" },
+  { value: "mixed_mode", label: "Mixed mode" },
 ];
 
 export function courseTypeLabel(value: string | null | undefined): string | null {

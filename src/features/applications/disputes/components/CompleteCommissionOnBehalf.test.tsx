@@ -29,14 +29,14 @@ describe("CompleteCommissionOnBehalf", () => {
 
   it("cannot be submitted without a reason", () => {
     const { completeOnBehalf } = setup();
-    expect(screen.getByRole("button", { name: /Mark Complete/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Mark complete/ })).toBeDisabled();
     expect(completeOnBehalf).not.toHaveBeenCalled();
   });
 
   it("sends the trimmed reason, then closes and refreshes", async () => {
     const { completeOnBehalf, onClose, onSuccess } = setup();
     await userEvent.type(screen.getByRole("textbox"), "  Advisor confirmed by email  ");
-    await userEvent.click(screen.getByRole("button", { name: /Mark Complete/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Mark complete/ }));
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalled());
     expect(completeOnBehalf).toHaveBeenCalledWith("app-1", { reason: "Advisor confirmed by email" });
@@ -48,7 +48,7 @@ describe("CompleteCommissionOnBehalf", () => {
     const err = { isAxiosError: true, response: { data: { code: "invalid_status_for_confirm", message: "x" } } };
     const { onClose } = setup(jest.fn().mockRejectedValue(err));
     await userEvent.type(screen.getByRole("textbox"), "reason");
-    await userEvent.click(screen.getByRole("button", { name: /Mark Complete/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Mark complete/ }));
 
     await waitFor(() =>
       expect(mockShowToast).toHaveBeenCalledWith(expect.stringMatching(/isn't at Commission Paid/), "error")

@@ -87,14 +87,14 @@ it("opens password controls and the self-service bank tab", async () => {
   expect(
     screen.getByRole("dialog", { name: "Change password" })
   ).toBeInTheDocument();
-  await user.click(screen.getByRole("tab", { name: "Bank Account" }));
+  await user.click(screen.getByRole("tab", { name: "Bank account" }));
   expect(screen.getByText("Bank accounts: self")).toBeInTheDocument();
 });
 it("keeps agency members' bank tab hidden", () => {
   mockPartner = { ...basePartner, agency_role: "member" };
   render(<PartnerProfile id="user" />);
   expect(
-    screen.queryByRole("tab", { name: "Bank Account" })
+    screen.queryByRole("tab", { name: "Bank account" })
   ).not.toBeInTheDocument();
 });
 it("keeps company team management available", async () => {

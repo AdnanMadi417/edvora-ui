@@ -43,12 +43,12 @@ describe("ApproveRejectToggle", () => {
 
   it("disabled keeps the recorded decision readable and blocks changes", async () => {
     const onChange = jest.fn();
-    render(<ApproveRejectToggle value="approved" onChange={onChange} disabled companyName="Global Pathways Education" />);
+    render(<ApproveRejectToggle value="approved" onChange={onChange} disabled companyName="Global pathways education" />);
     expect(screen.getByRole("radio", { name: /Approve/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("radio", { name: /Reject/ })).toBeDisabled();
     await userEvent.click(screen.getByRole("radio", { name: /Reject/ }));
     expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByText("Global Pathways Education")).toBeInTheDocument();
+    expect(screen.getByText("Global pathways education")).toBeInTheDocument();
   });
 
   it("compact variant renders the same group", () => {

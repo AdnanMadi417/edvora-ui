@@ -103,7 +103,7 @@ export default function BatchDeleteScholarships({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Delete Scholarships"
+            title="Delete scholarships"
             description={`Select scholarships to remove from ${selectedProgramIds.length} selected program${selectedProgramIds.length !== 1 ? "s" : ""}.`}
             icon={GraduationCap}
             iconBg="bg-ub-tone-danger-bg"

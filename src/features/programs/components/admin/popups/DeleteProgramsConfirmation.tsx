@@ -50,7 +50,7 @@ export default function DeleteProgramsConfirmation({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Delete Program"
+            title="Delete program"
             description="This action will permanently delete this program and all related data."
             icon={Trash2}
             iconBg="bg-ub-tone-danger-bg"
@@ -65,7 +65,7 @@ export default function DeleteProgramsConfirmation({
 
               <div>
                 <h3 className="text-lg font-semibold text-ub-text-primary">
-                  Confirm Deletion
+                  Confirm deletion
                 </h3>
                 <p className="text-sm text-ub-text-secondary">
                   Are you sure you want to permanently delete the selected program(s) from the system?

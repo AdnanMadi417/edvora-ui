@@ -76,7 +76,7 @@ export default function SetStaticTemplatePage({ id }: { id?: string }) {
   return (
     <FormPage
       title={id ? "Update document template" : "Upload document template"}
-      description="Upload the blank file advisers download, complete, and attach to applications."
+      description="Upload the blank file advisors download, complete, and attach to applications."
       icon={Upload}
       onSubmit={submit}
       onCancel={() => router.push(id ? `${base}/${id}` : base)}
@@ -150,7 +150,7 @@ export default function SetStaticTemplatePage({ id }: { id?: string }) {
           {selectedType?.has_static_template && (
             <StatusFileUpload
               label="Template file"
-              description="Choose the blank document advisers should use."
+              description="Choose the blank document advisors should use."
               id="static_template_file"
               file={file}
               onFileChange={(value) => {

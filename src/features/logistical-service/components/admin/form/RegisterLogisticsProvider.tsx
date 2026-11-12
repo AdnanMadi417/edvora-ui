@@ -394,7 +394,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                 />{" "}
                 <div className="grid gap-x-4 sm:grid-cols-2">
                   <InputField
-                    label="Provider Name"
+                    label="Provider name"
                     field="name"
                     placeholder="e.g. FastTrack Logistics"
                     required
@@ -415,7 +415,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                     updateFormData={updateFormData}
                   />
                   <SearchableDropdown
-                    label="State of Residence"
+                    label="State of residence"
                     field="main_location"
                     options={states.map((u) => ({
                       value: u.name,
@@ -426,7 +426,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                     updateFormData={updateFormData}
                   />
                   <InputField
-                    label="Primary Contact Number"
+                    label="Primary contact number"
                     field="phone_number"
                     placeholder="e.g. +60 12 345 6789"
                     required
@@ -464,7 +464,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                   </label>
                   <Button
                     icon={<Plus className="h-4 w-4" />}
-                    text="New Service"
+                    text="New service"
                     variant="secondary"
                     onClick={() => setIsCreateServiceOpen(true)}
                   />
@@ -541,11 +541,11 @@ export default function RegisterLogisticsMarketplaceProvider({
               <div className="space-y-4">
                 <div className="mb-4 flex items-center justify-between">
                   <h4 className="text-lg font-semibold text-ub-text-primary">
-                    Packages Offered
+                    Packages offered
                   </h4>
                   <Button
                     icon={<Plus className="h-5 w-5" />}
-                    text="Add Package"
+                    text="Add package"
                     variant="secondary"
                     onClick={addPackage}
                   />
@@ -582,7 +582,7 @@ export default function RegisterLogisticsMarketplaceProvider({
 
                     <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
                       <InputField
-                        label="Package Name"
+                        label="Package name"
                         field="name"
                         placeholder="e.g. Basic Package"
                         required
@@ -668,7 +668,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                       <div className="mt-3 flex justify-end">
                         <Button
                           icon={<Plus className="h-4 w-4" />}
-                          text="Add Item"
+                          text="Add item"
                           variant="secondary"
                           onClick={() =>
                             updatePackage(index, "includes", [

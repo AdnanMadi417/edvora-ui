@@ -109,7 +109,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
               <ActionsDropdown
                 items={[
                   {
-                    label: "Void & Correct Payout",
+                    label: "Void & correct payout",
                     icon: Ban,
                     color: "red",
                     onClick: () => setShowVoidModal(true),
@@ -123,11 +123,11 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             <DescriptionList
               columns={2}
               items={[
-                { label: "Payment Method", value: paymentMethodName },
-                { label: "Paid At", value: <AppDate value={payout?.paid_at} format="short" /> },
-                { label: "Amount Sent", value: payout ? <span className="ub-tabular">{formatCommissionAmount(amountSent, payout.currency)}</span> : "—" },
+                { label: "Payment method", value: paymentMethodName },
+                { label: "Paid at", value: <AppDate value={payout?.paid_at} format="short" /> },
+                { label: "Amount sent", value: payout ? <span className="ub-tabular">{formatCommissionAmount(amountSent, payout.currency)}</span> : "—" },
                 {
-                  label: "Agreed Total",
+                  label: "Agreed total",
                   value:
                     Object.entries(agreedTotals).length > 0 ? (
                       <span className="ub-tabular">{Object.entries(agreedTotals).map(([currency, amount]) => formatCommissionAmount(amount, currency)).join(" + ")}</span>
@@ -135,14 +135,14 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
                       "—"
                     ),
                 },
-                ...(isVoided ? [{ label: "Void Reason", value: payout?.void_reason ?? "—" }] : []),
-                { label: "Receipt", value: <DocumentActions fileKey={payout?.receipt_file_key} label="Payout Receipt" /> },
+                ...(isVoided ? [{ label: "Void reason", value: payout?.void_reason ?? "—" }] : []),
+                { label: "Receipt", value: <DocumentActions fileKey={payout?.receipt_file_key} label="Payout receipt" /> },
               ]}
             />
           </div>
 
           <div className="border-t border-ub-border px-6 py-6">
-            <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">Applications Covered</h3>
+            <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">Applications covered</h3>
             <DataTable
               caption="Applications covered by this payout"
               density="compact"

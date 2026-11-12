@@ -39,7 +39,7 @@ it("submits a complete branch using the existing institution ID and payload", as
     within(dialog).getByRole("button", { name: "Create branch" })
   ).toBeDisabled();
   await userEvent.type(
-    within(dialog).getByRole("textbox", { name: "Branch Name" }),
+    within(dialog).getByRole("textbox", { name: "Branch name" }),
     "Main Campus"
   );
   await userEvent.type(
@@ -68,7 +68,7 @@ it("locks the branch fields and prevents closing while saving", async () => {
   render(<CreateBranch isOpen onClose={onClose} universityId="uni-1" />);
   const dialog = await screen.findByRole("dialog", { name: "Create branch" });
   expect(
-    within(dialog).getByRole("textbox", { name: "Branch Name" })
+    within(dialog).getByRole("textbox", { name: "Branch name" })
   ).toBeDisabled();
   expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeDisabled();
   await userEvent.click(

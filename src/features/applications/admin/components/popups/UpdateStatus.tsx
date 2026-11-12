@@ -93,7 +93,7 @@ const DocumentRequestList = ({
 
           {documentTypes.length > 0 && <div>
             <FieldLabel as="span">
-              Document Type
+              Document type
             </FieldLabel>
 
             {doc.type.length > 0 && (
@@ -603,7 +603,7 @@ export default function UpdateStatusPopup({
           )}
 
           {actions?.correction_reason && (
-            <Alert tone="warning" title="Correction Reason">{actions.correction_reason}</Alert>
+            <Alert tone="warning" title="Correction reason">{actions.correction_reason}</Alert>
           )}
 
           <SectionCard title="Choose next status" description="Select an available transition for this application.">
@@ -643,7 +643,7 @@ export default function UpdateStatusPopup({
           {isUniversityApproved && (
             <>
               <DocumentUpload
-                label="Upload Offer Letter"
+                label="Upload offer letter"
                 description="Upload the official offer letter issued by the university"
                 id="offer-letter"
                 file={offerLetterFile}
@@ -665,7 +665,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_visa_invoice && (
                 <DocumentUpload
-                  label="Upload Visa Invoice"
+                  label="Upload visa invoice"
                   description="Upload the visa invoice to attach with the offer letter"
                   id="offer-letter-visa-invoice"
                   file={offerLetterVisaInvoiceFile}
@@ -687,7 +687,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_app_form_template && (
                 <DocumentUpload
-                  label="Upload Application Form Template"
+                  label="Upload application form template"
                   description="Upload the application form template for the student"
                   id="offer-letter-app-form-template"
                   file={offerLetterAppFormTemplateFile}
@@ -720,14 +720,14 @@ export default function UpdateStatusPopup({
                 />
               )}
               <SettingToggleInput
-                label="Health Declaration Form Required"
+                label="Health declaration form required"
                 field="health_declaration_form_required"
                 formData={formData}
                 updateFormData={updateFormData}
                 errors={formErrors}
               />
               <SettingToggleInput
-                label="Signed Offer Letter Required"
+                label="Signed offer letter required"
                 field="signed_offer_letter_required"
                 formData={formData}
                 updateFormData={updateFormData}
@@ -745,7 +745,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_english_form_template && (
                 <DocumentUpload
-                  label="Upload English Form Template"
+                  label="Upload English form template"
                   description="Upload the blank English proficiency form template for the student"
                   id="offer-letter-english-form-template"
                   file={offerLetterEnglishFormTemplateFile}
@@ -777,7 +777,7 @@ export default function UpdateStatusPopup({
 
           {isVisaSetupSelected && (
             <div className="space-y-2">
-              <Input label="Visa Fee Amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} required />
+              <Input label="Visa fee amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} required />
               {visaFeeAmount && (
                 <Alert>
                   <span>
@@ -790,7 +790,7 @@ export default function UpdateStatusPopup({
 
           {isVisaIssued && (
             <DocumentUpload
-              label="Upload Visa Document"
+              label="Upload visa document"
               description="Upload the visa document issued by the immigration authority"
               id="visa-document"
               file={visaDocumentFile}
@@ -804,7 +804,7 @@ export default function UpdateStatusPopup({
 
           {isCommissionPaid && (
             <div className="space-y-2">
-              <p className="text-ub-body-md font-semibold text-ub-text-primary">Payout Details</p>
+              <p className="text-ub-body-md font-semibold text-ub-text-primary">Payout details</p>
 
               <Card extra="p-3">
                 <BankAccountPayoutSummary account={partnerBankAccount} />
@@ -819,18 +819,18 @@ export default function UpdateStatusPopup({
               </Card>
 
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={payoutFormData.payment_method_id ? String(payoutFormData.payment_method_id) : null} onChange={(v) => updatePayoutFormData("payment_method_id", v ?? "")} error={payoutFormErrors.payment_method_id || undefined} />
-                <Input label="Bank Reference" placeholder="e.g. BANK-REF-001" value={String(payoutFormData.bank_reference ?? "")} onChange={(v) => updatePayoutFormData("bank_reference", v)} error={payoutFormErrors.bank_reference || undefined} />
-                <Input label="Payment Date" type="date" value={String(payoutFormData.paid_at ?? "")} onChange={(v) => updatePayoutFormData("paid_at", v)} error={payoutFormErrors.paid_at || undefined} />
+                <Combobox label="Payment method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={payoutFormData.payment_method_id ? String(payoutFormData.payment_method_id) : null} onChange={(v) => updatePayoutFormData("payment_method_id", v ?? "")} error={payoutFormErrors.payment_method_id || undefined} />
+                <Input label="Bank reference" placeholder="e.g. BANK-REF-001" value={String(payoutFormData.bank_reference ?? "")} onChange={(v) => updatePayoutFormData("bank_reference", v)} error={payoutFormErrors.bank_reference || undefined} />
+                <Input label="Payment date" type="date" value={String(payoutFormData.paid_at ?? "")} onChange={(v) => updatePayoutFormData("paid_at", v)} error={payoutFormErrors.paid_at || undefined} />
                 <Combobox label="Currency" options={[
                     { value: "RM", label: "RM" },
                     { value: "USD", label: "USD" },
                   ]} value={payoutFormData.currency ? String(payoutFormData.currency) : null} onChange={(v) => updatePayoutFormData("currency", v ?? "")} error={payoutFormErrors.currency || undefined} />
-                <Input label="Paid Amount" placeholder="Enter amount" type="number" value={String(payoutFormData.paid_amount ?? "")} onChange={(v) => updatePayoutFormData("paid_amount", v)} error={payoutFormErrors.paid_amount || undefined} />
+                <Input label="Paid amount" placeholder="Enter amount" type="number" value={String(payoutFormData.paid_amount ?? "")} onChange={(v) => updatePayoutFormData("paid_amount", v)} error={payoutFormErrors.paid_amount || undefined} />
               </div>
 
               <DocumentUpload
-                label="Upload Payout Receipt"
+                label="Upload payout receipt"
                 description="Upload proof of payment (receipt or transfer confirmation)"
                 id="payout-receipt"
                 file={payoutReceiptFile}
@@ -847,20 +847,20 @@ export default function UpdateStatusPopup({
             <div className="space-y-2">
               <p className="text-ub-body-md font-semibold text-ub-text-primary">Pay-In Details</p>
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <Input label="Payment Date" type="date" value={String(payInFormData.payment_date ?? "")} onChange={(v) => updatePayInFormData("payment_date", v)} error={payInFormErrors.payment_date || undefined} />
+                <Input label="Payment date" type="date" value={String(payInFormData.payment_date ?? "")} onChange={(v) => updatePayInFormData("payment_date", v)} error={payInFormErrors.payment_date || undefined} />
                 <Input label="Amount" placeholder="Enter amount" type="number" value={String(payInFormData.amount ?? "")} onChange={(v) => updatePayInFormData("amount", v)} error={payInFormErrors.amount || undefined} />
                 <Combobox label="Currency" options={[
                     { value: "RM", label: "RM" },
                     { value: "USD", label: "USD" },
                   ]} value={payInFormData.currency ? String(payInFormData.currency) : null} onChange={(v) => updatePayInFormData("currency", v ?? "")} error={payInFormErrors.currency || undefined} />
-                <Input label="Payment Reference" placeholder="e.g. UNI-REF-001" value={String(payInFormData.payment_reference ?? "")} onChange={(v) => updatePayInFormData("payment_reference", v)} error={payInFormErrors.payment_reference || undefined} />
+                <Input label="Payment reference" placeholder="e.g. UNI-REF-001" value={String(payInFormData.payment_reference ?? "")} onChange={(v) => updatePayInFormData("payment_reference", v)} error={payInFormErrors.payment_reference || undefined} />
               </div>
             </div>
           )}
 
           {hasArrivalFormSelected && (
             <DocumentUpload
-              label="Upload Arrival Form Template"
+              label="Upload arrival form template"
               description="Upload a template for the student to complete their arrival form"
               id="arrival-form-template"
               file={arrivalFormTemplateFile}

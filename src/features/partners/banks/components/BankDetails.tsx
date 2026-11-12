@@ -74,7 +74,7 @@ export default function BankDetails({
         <SectionCard
           title="Bank details"
           as="h2"
-          description="Official identifiers used for adviser payout accounts."
+          description="Official identifiers used for advisor payout accounts."
         >
           <DescriptionList
             columns={2}
@@ -98,7 +98,7 @@ export default function BankDetails({
             </Tag>
             <p className="text-ub-body-sm text-ub-text-secondary">
               {bank.is_active
-                ? "This bank is available in the bank picker on adviser account forms."
+                ? "This bank is available in the bank picker on advisor account forms."
                 : "This bank is hidden from new selections. Existing account records retain their bank reference."}
             </p>
           </div>

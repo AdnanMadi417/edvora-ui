@@ -102,7 +102,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
         {/* Role Name */}
         <div className="p-6">
           <InputField
-            label="Role Name"
+            label="Role name"
             field="name"
             placeholder="e.g. Finance Reviewer"
             required

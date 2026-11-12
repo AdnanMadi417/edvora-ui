@@ -450,7 +450,7 @@ const EditKnowledgeHubProgramDetails = ({
                     <div className="space-y-2 p-2">
                       {!hideDelete && (
                         <button
-                          aria-label="Delete Program"
+                          aria-label="Delete program"
                           className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-ub-surface px-4 py-3 text-left text-sm transition-all hover:border-ub-tone-danger-border hover:bg-ub-tone-danger-bg hover:shadow-sm"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -463,7 +463,7 @@ const EditKnowledgeHubProgramDetails = ({
                           </div>
 
                           <span className="font-semibold text-ub-tone-danger-text">
-                          Delete Program
+                          Delete program
                         </span>
                         </button>
                       )}
@@ -493,7 +493,7 @@ const EditKnowledgeHubProgramDetails = ({
 
               <CollapsibleSection
                 icon={BookOpen}
-                title="Program Details"
+                title="Program details"
                 hasError={sectionHasError(errors, 'details')}
                 summary={formData.name ? `${formData.name}${selectedQualification ? ` · ${selectedQualification.name}` : ''}` : 'Not started'}
                 open={openSections.details}
@@ -502,7 +502,7 @@ const EditKnowledgeHubProgramDetails = ({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="md:col-span-2">
                     <InputField
-                      label="Program Name"
+                      label="Program name"
                       field="name"
                       placeholder="e.g. BSc Data Science"
                       required
@@ -515,7 +515,7 @@ const EditKnowledgeHubProgramDetails = ({
                   </div>
 
                   <SearchableDropdown
-                    label="Qualification Level"
+                    label="Qualification level"
                     field="qualification_id"
                     required
                     options={qualifications.map((f) => ({ value: String(f.id), label: f.name.charAt(0).toUpperCase() + f.name.slice(1) }))}
@@ -527,7 +527,7 @@ const EditKnowledgeHubProgramDetails = ({
 
                   {isMasterOrPhd(selectedQualification?.name) && (
                     <SelectField
-                      label="Course Type"
+                      label="Course type"
                       field="course_type"
                       required={false}
                       options={COURSE_TYPE_OPTIONS}
@@ -538,7 +538,7 @@ const EditKnowledgeHubProgramDetails = ({
                   )}
 
                   <SearchableDropdown
-                    label="Field of Study"
+                    label="Field of study"
                     field="field_of_study_id"
                     required
                     options={fields.map((f) => ({ value: String(f.id), label: f.name }))}
@@ -560,7 +560,7 @@ const EditKnowledgeHubProgramDetails = ({
 
                   <div className="md:col-span-2">
                     <ToggleInput
-                      label="Delivery Mode"
+                      label="Delivery mode"
                       field="is_on_campus"
                       formData={formData}
                       errors={errors}
@@ -579,7 +579,7 @@ const EditKnowledgeHubProgramDetails = ({
 
               <CollapsibleSection
                 icon={MapPin}
-                title="University & Location"
+                title="University & location"
                 hasError={sectionHasError(errors, 'university')}
                 summary={selectedUniversity ? `${selectedUniversity.name}${selectedBranch ? ` · ${selectedBranch.name}` : ''}` : 'Not started'}
                 open={openSections.university}
@@ -618,7 +618,7 @@ const EditKnowledgeHubProgramDetails = ({
 
               <CollapsibleSection
                 icon={DollarSign}
-                title="Fees & Commission"
+                title="Fees & commission"
                 hasError={sectionHasError(errors, 'fees')}
                 summary={firstYearFee ? `First year ${firstYearFee}` : 'Not started'}
                 open={openSections.fees}
@@ -632,13 +632,13 @@ const EditKnowledgeHubProgramDetails = ({
 
               <CollapsibleSection
                 icon={CalendarRange}
-                title="Intakes & Requirements"
+                title="Intakes & requirements"
                 hasError={sectionHasError(errors, 'intakes')}
                 summary={formData.intake_months?.length ? `${formData.intake_months.length} intake month${formData.intake_months.length !== 1 ? 's' : ''}` : 'Not started'}
                 open={openSections.intakes}
                 onToggle={() => toggleSection('intakes')}
               >
-                <IntakeMonthsField field="intake_months" label="Intake Months" formData={formData} errors={errors} updateFormData={updateFormData} />
+                <IntakeMonthsField field="intake_months" label="Intake months" formData={formData} errors={errors} updateFormData={updateFormData} />
 
                 <SelectField
                   label="IELTS Required Score"
@@ -720,7 +720,7 @@ const EditKnowledgeHubProgramDetails = ({
 
                       <div className="md:col-span-2">
                         <InputField
-                          label="Scholarship Name"
+                          label="Scholarship name"
                           field={`scholarships[${index}].name`}
                           placeholder="e.g. Excellence Award"
                           type="text"
@@ -732,7 +732,7 @@ const EditKnowledgeHubProgramDetails = ({
                       </div>
 
                       <InputField
-                        label="Coverage Percentage"
+                        label="Coverage percentage"
                         field={`scholarships[${index}].coverage_percent`}
                         type="number"
                         formData={formData}
@@ -742,7 +742,7 @@ const EditKnowledgeHubProgramDetails = ({
                       />
 
                       <InputField
-                        label="Maximum Amount"
+                        label="Maximum amount"
                         field={`scholarships[${index}].max_amount`}
                         type="number"
                         formData={formData}

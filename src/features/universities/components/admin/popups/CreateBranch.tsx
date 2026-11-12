@@ -91,7 +91,7 @@ export default function CreateBranch({
     >
       <fieldset disabled={branchLoading} className="min-w-0 space-y-4">
         <InputField
-          label="Branch Name"
+          label="Branch name"
           field="name"
           placeholder="e.g. Main Campus"
           required

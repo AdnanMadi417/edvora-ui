@@ -164,7 +164,7 @@ export default function BanksTable({
         <div className="flex items-center gap-3">
           <Landmark className="h-6 w-6 shrink-0 text-ub-primary" />
           <p className="text-ub-body-md text-ub-text-secondary">
-            Manage the banks available for adviser payout accounts.
+            Manage the banks available for advisor payout accounts.
           </p>
         </div>
         <LinkBtn

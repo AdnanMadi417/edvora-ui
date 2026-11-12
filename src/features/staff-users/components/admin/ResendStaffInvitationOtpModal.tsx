@@ -66,7 +66,7 @@ export default function ResendStaffInvitationOtpModal({
     <FormModal
       open={isOpen}
       onClose={onClose}
-      title="Resend Verification Code"
+      title="Resend verification code"
       description="Send a new verification code to an invited staff member."
       icon={KeyRound}
       size="md"

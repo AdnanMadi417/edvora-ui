@@ -106,7 +106,7 @@ export default function EditMemberCommissionModal({
       >
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
-            title="Edit Commission Settings"
+            title="Edit commission settings"
             description={member ? `Update commission visibility for "${member.name}".` : undefined}
             icon={Percent}
             iconBg="bg-ub-tone-brand-bg"
@@ -118,7 +118,7 @@ export default function EditMemberCommissionModal({
 
           <div className="max-h-[60vh] space-y-2 overflow-y-auto px-6 py-6">
             <ToggleInput
-              label="Show Commission to This Member"
+              label="Show commission to this member"
               field="commission_visible"
               formData={formData}
               errors={errors}

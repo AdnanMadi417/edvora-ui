@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import StoredDocumentUpload from "components/ub/forms/uploads/StoredDocumentUpload";
 import React, { useEffect, useState } from "react";
@@ -294,10 +294,10 @@ export default function EditPartnerProfile() {
 
         {/* Base fields */}
         <div className="border-b border-ub-border p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Account Details</p>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Account details</p>
           <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
             <InputField
-              label="Full Name"
+              label="Full name"
               field="name"
               required
               placeholder="Enter your full name"
@@ -307,7 +307,7 @@ export default function EditPartnerProfile() {
               onBlur={() => validateField("name")}
             />
             <SelectField
-              label="Country of Residence"
+              label="Country of residence"
               field="country"
               options={COUNTRY_OPTIONS}
               formData={formData}
@@ -337,7 +337,7 @@ export default function EditPartnerProfile() {
         {/* Individual details */}
         {isIndividual && (
           <div className="border-b border-ub-border p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Individual Details</p>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Individual details</p>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <SelectField
                 label="Background"
@@ -360,7 +360,7 @@ export default function EditPartnerProfile() {
                 onBlur={() => validateField("linkedin_url")}
               />
               <InputField
-                label="Social Media URL"
+                label="Social media URL"
                 field="social_media_url"
                 type="url"
                 required={false}
@@ -371,7 +371,7 @@ export default function EditPartnerProfile() {
                 onBlur={() => validateField("social_media_url")}
               />
               <InputField
-                label="Date of Birth"
+                label="Date of birth"
                 field="date_of_birth"
                 type="date"
                 required={false}
@@ -380,7 +380,7 @@ export default function EditPartnerProfile() {
                 updateFormData={updateFormData}
               />
               <InputField
-                label="Passport Number"
+                label="Passport number"
                 field="passport_number"
                 required={false}
                 placeholder="A12345678"
@@ -392,7 +392,7 @@ export default function EditPartnerProfile() {
               />
             </div>
             <StoredDocumentUpload
-              label="Passport Photo"
+              label="Passport photo"
               document={passportPhoto}
               id="passport-photo"
               onUpload={(f) => handleUpload(f, setPassportPhoto, "passport_photo")}
@@ -404,10 +404,10 @@ export default function EditPartnerProfile() {
         {/* Company details */}
         {isCompany && (
           <div className="border-b border-ub-border p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Company Details</p>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Company details</p>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <InputField
-                label="Company Name"
+                label="Company name"
                 field="company_name"
                 required={false}
                 formData={formData}
@@ -426,7 +426,7 @@ export default function EditPartnerProfile() {
                 onBlur={() => validateField("website_url")}
               />
               <InputField
-                label="Date of Birth"
+                label="Date of birth"
                 field="date_of_birth"
                 type="date"
                 required={false}
@@ -435,7 +435,7 @@ export default function EditPartnerProfile() {
                 updateFormData={updateFormData}
               />
               <InputField
-                label="Passport Number"
+                label="Passport number"
                 field="passport_number"
                 required={false}
                 placeholder="A12345678"
@@ -448,13 +448,13 @@ export default function EditPartnerProfile() {
             </div>
             <div className="space-y-4">
               <StoredDocumentUpload
-                label="Company Registration Document"
+                label="Company registration document"
                 document={companyRegDoc}
                 id="company-reg-doc"
                 onUpload={(f) => handleUpload(f, setCompanyRegDoc, "company_registration_doc")}
               />
               <StoredDocumentUpload
-                label="Passport Photo"
+                label="Passport photo"
                 document={passportPhoto}
                 id="comp-passport-photo"
                 onUpload={(f) => handleUpload(f, setPassportPhoto, "passport_photo")}

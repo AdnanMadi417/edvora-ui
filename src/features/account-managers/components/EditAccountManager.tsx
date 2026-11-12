@@ -182,7 +182,7 @@ export default function EditAccountManager({
 
         <div>
           <PasswordField
-            label="Confirm Password"
+            label="Confirm password"
             field="confirm_password"
             placeholder="Repeat your new password"
             required={false}
@@ -200,7 +200,7 @@ export default function EditAccountManager({
       </FormSection>
       <FormSection id="manager-access" title="Account access" columns={1}>
         <ToggleInput
-          label="Active Status"
+          label="Active status"
           field="is_active"
           formData={formData}
           errors={errors}

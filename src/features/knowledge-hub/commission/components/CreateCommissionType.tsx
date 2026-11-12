@@ -67,7 +67,7 @@ export default function CreateCommissionType({
       submitDisabled={!formData.name.trim() || !formData.description.trim()}
     >
       <InputField
-        label="Commission Type Name"
+        label="Commission type name"
         field="name"
         placeholder="e.g. Percentage Commission"
         required

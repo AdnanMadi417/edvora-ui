@@ -87,7 +87,7 @@ const DocumentRequestList = ({
 
           {documentTypes.length > 0 && <div>
             <FieldLabel as="span">
-              Document Type
+              Document type
             </FieldLabel>
 
             {doc.type.length > 0 && (
@@ -500,10 +500,10 @@ export default function UpdateStatusPopup({
       onClose={handleClose}
       size="lg"
       icon={Clock}
-      title="Update Application Status"
+      title="Update application status"
       description={`Stage: ${application?.stage?.name || "No Stage"}   ·   Status: ${application?.stage?.statuses?.[0]?.name || "No Status"}`}
       onSubmit={handleConfirm}
-      submitLabel="Update Status"
+      submitLabel="Update status"
       submitting={isSubmitting}
       submitDisabled={!selectedStatus || !!error || (requiresReason && !reason.trim()) || (isUniversityApproved && !offerLetterFile) || (isVisaIssued && !visaDocumentFile) || (isCommissionPaid && !commissionPaymentFile) || (hasArrivalFormSelected && !arrivalFormTemplateFile)}
     >
@@ -517,13 +517,13 @@ export default function UpdateStatusPopup({
           )}
 
           {actions?.correction_reason && (
-            <Alert tone="warning" title="Correction Reason">{actions.correction_reason}</Alert>
+            <Alert tone="warning" title="Correction reason">{actions.correction_reason}</Alert>
           )}
 
           <div className="space-y-3">
             <FieldLabel as="span">
               <span className="flex items-center gap-1">
-                Select New Status
+                Select new status
               </span>
             </FieldLabel>
 
@@ -563,7 +563,7 @@ export default function UpdateStatusPopup({
           {isUniversityApproved && (
             <>
               <DocumentUpload
-                label="Upload Offer Letter"
+                label="Upload offer letter"
                 description="Upload the official offer letter issued by the university"
                 id="offer-letter"
                 file={offerLetterFile}
@@ -585,7 +585,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_visa_invoice && (
                 <DocumentUpload
-                  label="Upload Visa Invoice"
+                  label="Upload visa invoice"
                   description="Upload the visa invoice to attach with the offer letter"
                   id="offer-letter-visa-invoice"
                   file={offerLetterVisaInvoiceFile}
@@ -607,7 +607,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_app_form_template && (
                 <DocumentUpload
-                  label="Upload Application Form Template"
+                  label="Upload application form template"
                   description="Upload the application form template for the student"
                   id="offer-letter-app-form-template"
                   file={offerLetterAppFormTemplateFile}
@@ -640,14 +640,14 @@ export default function UpdateStatusPopup({
                 />
               )}
               <SettingToggleInput
-                label="Health Declaration Form Required"
+                label="Health declaration form required"
                 field="health_declaration_form_required"
                 formData={formData}
                 updateFormData={updateFormData}
                 errors={formErrors}
               />
               <SettingToggleInput
-                label="Signed Offer Letter Required"
+                label="Signed offer letter required"
                 field="signed_offer_letter_required"
                 formData={formData}
                 updateFormData={updateFormData}
@@ -665,7 +665,7 @@ export default function UpdateStatusPopup({
               />
               {formData.show_english_form_template && (
                 <DocumentUpload
-                  label="Upload English Form Template"
+                  label="Upload English form template"
                   description="Upload the blank English proficiency form template for the student"
                   id="offer-letter-english-form-template"
                   file={offerLetterEnglishFormTemplateFile}
@@ -697,7 +697,7 @@ export default function UpdateStatusPopup({
 
           {isVisaSetupSelected && (
             <div className="space-y-2">
-              <Input label="Visa Fee Amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} />
+              <Input label="Visa fee amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} />
               {visaFeeAmount && (
                 <Alert>
                   <span>
@@ -710,7 +710,7 @@ export default function UpdateStatusPopup({
 
           {isVisaIssued && (
             <DocumentUpload
-              label="Upload Visa Document"
+              label="Upload visa document"
               description="Upload the visa document issued by the immigration authority"
               id="visa-document"
               file={visaDocumentFile}
@@ -724,7 +724,7 @@ export default function UpdateStatusPopup({
 
           {isCommissionPaid && (
             <DocumentUpload
-              label="Upload Commission Payment Proof"
+              label="Upload commission payment proof"
               description="Upload proof of commission payment (receipt or transfer confirmation)"
               id="commission-payment"
               file={commissionPaymentFile}
@@ -738,7 +738,7 @@ export default function UpdateStatusPopup({
 
           {hasArrivalFormSelected && (
             <DocumentUpload
-              label="Upload Arrival Form Template"
+              label="Upload arrival form template"
               description="Upload a template for the student to complete their arrival form"
               id="arrival-form-template"
               file={arrivalFormTemplateFile}

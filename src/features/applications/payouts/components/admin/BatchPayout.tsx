@@ -167,10 +167,10 @@ export default function BatchPayout({
       onClose={onClose}
       size="lg"
       icon={Wallet}
-      title="Batch Payout"
+      title="Batch payout"
       description="One bank reference and one receipt cover every selected application."
       onSubmit={handleSubmit}
-      submitLabel="Record Payout"
+      submitLabel="Record payout"
       submitting={isSubmitting}
       submitDisabled={!canSubmit}
     >
@@ -223,7 +223,7 @@ export default function BatchPayout({
 
           <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
             <Combobox
-              label="Payment Method"
+              label="Payment method"
               placeholder="Search for a payment method..."
               options={paymentMethodOptions}
               value={
@@ -235,14 +235,14 @@ export default function BatchPayout({
               error={formErrors.payment_method_id || undefined}
             />
             <Input
-              label="Bank Reference"
+              label="Bank reference"
               placeholder="e.g. BULK-REF-001"
               value={String(formData.bank_reference ?? "")}
               onChange={(v) => updateFormData("bank_reference", v)}
               error={formErrors.bank_reference || undefined}
             />
             <Input
-              label="Payment Date"
+              label="Payment date"
               type="date"
               value={String(formData.paid_at ?? "")}
               onChange={(v) => updateFormData("paid_at", v)}
@@ -252,7 +252,7 @@ export default function BatchPayout({
 
           <DocumentUpload
             id="batch-payout-receipt"
-            label="Upload Payout Receipt"
+            label="Upload payout receipt"
             description="Upload proof of payment (receipt or transfer confirmation)"
             file={receiptFile}
             onFileChange={setReceiptFile}

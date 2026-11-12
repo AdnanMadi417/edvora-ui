@@ -241,7 +241,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
     ...(isCompany ? [{ key: "team" as const, label: "Team" }] : []),
     ...(isAgencyMember
       ? []
-      : [{ key: "bank" as const, label: "Bank Account" }]),
+      : [{ key: "bank" as const, label: "Bank account" }]),
   ];
 
   return (
@@ -368,7 +368,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-ub-text-secondary" />
                     <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
-                      Team Members
+                      Team members
                     </p>
                   </div>
                   <LinkBtn

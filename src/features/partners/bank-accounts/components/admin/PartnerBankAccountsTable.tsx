@@ -157,8 +157,8 @@ export default function PartnerBankAccountsTable() {
                 <tr className="border-b border-ub-border bg-ub-surface-subtle">
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Advisor</th>
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Bank</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account Holder</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account Number</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account holder</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account number</th>
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Currency</th>
                   <th className="w-8" />
                 </tr>

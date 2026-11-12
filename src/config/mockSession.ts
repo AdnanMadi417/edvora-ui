@@ -10,7 +10,7 @@ export function mockUser(role: string): SessionUser {
   return {
     id: role === "partner" ? MOCK_PARTNER.user_id : `mock-${role}`,
     partner_id: role === "partner" ? MOCK_PARTNER.id : null,
-    name: "Demo User",
+    name: "Demo user",
     email: `${role.replace("_", "-")}@example.com`,
     role,
     has_completed_onboarding: true,
@@ -23,7 +23,7 @@ export function mockUser(role: string): SessionUser {
 export const MOCK_PARTNER: PartnerDetails = {
   id: "ptn_001",
   user_id: "usr_ptn_001",
-  name: "Global Pathways Education",
+  name: "Global pathways education",
   email: "global@example.com",
   type: "agency",
   country: "Nigeria",

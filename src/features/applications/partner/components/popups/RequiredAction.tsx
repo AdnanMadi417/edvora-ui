@@ -209,7 +209,7 @@ export default function RequiredAction({
       onClose={onClose}
       size="lg"
       icon={Pause}
-      title="Required Documents"
+      title="Required documents"
       onSubmit={handleConfirm}
       submitLabel="Confirm"
       submitting={isSubmitting}
@@ -235,7 +235,7 @@ export default function RequiredAction({
                     stateLabel="Template"
                     meta="Download and complete this form before uploading"
                     asListItem={false}
-                    actions={<DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />}
+                    actions={<DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival form template" />}
                   />
                 )}
                 {requiresMedicalReportEmgs && (
@@ -248,7 +248,7 @@ export default function RequiredAction({
                     actions={<IconButton
                       onClick={downloadHealthDeclarationForm}
                       disabled={downloadingHealthDeclarationForm}
-                      aria-label="Download Health Declaration Form"
+                      aria-label="Download health declaration form"
                       variant="secondary"
                       size="sm"
                       icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "motion-safe:animate-pulse" : ""}`} />}
