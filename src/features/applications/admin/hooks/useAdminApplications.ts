@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -52,7 +52,12 @@ export function useAdminApplications({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Only the newest request may update state: an older, slower response (a previous
+  // page size, filter or search) must not overwrite a newer one.
+  const latestRequest = useRef(0);
+
   const fetchApplications = async () => {
+    const request = ++latestRequest.current;
     setLoading(true);
     setError(null);
 
@@ -75,12 +80,12 @@ export function useAdminApplications({
         }
       );
 
-      setData(res.data);
+      if (request === latestRequest.current) setData(res.data);
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch admin applications");
+      if (request === latestRequest.current) setError("Failed to fetch admin applications");
     } finally {
-      setLoading(false);
+      if (request === latestRequest.current) setLoading(false);
     }
   };
 

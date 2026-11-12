@@ -12,6 +12,7 @@ import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import api from "lib/useApi";
+import { useMediaQuery } from "hooks/useMediaQuery";
 
 const ACTION_REQUIRED_STATUSES = new Set([
   "new_application",
@@ -27,7 +28,10 @@ const ACTION_REQUIRED_STATUSES = new Set([
 
 const ModernApplicationsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  // Phones show applications as tall cards, so a page holds 10 there and 20 on wider screens.
+  const isPhone = useMediaQuery("(max-width: 767px)");
+  const itemsPerPage = isPhone ? 10 : 20;
+  useEffect(() => setCurrentPage(1), [isPhone]);
 
   const { universities } = useUniversities();
   const {
