@@ -1,3 +1,5 @@
+> **Superseded.** This is a snapshot from 10 Nov 2026. The current audit is the live *Unibexs UX Audit* report (version 13). The status names are in [unibexs-workflow-and-status-naming.md](unibexs-workflow-and-status-naming.md).
+
 UI and UX audit · whole Unibexs portal
 
 # Unibexs UX Audit

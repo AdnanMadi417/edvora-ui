@@ -21,4 +21,6 @@ Note: The `NEXT_PUBLIC_` prefix in `NEXT_PUBLIC_API_URL` makes this environment 
 ## Project folders
 
 See [Project structure](docs/project-structure.md) for shared UI categories, feature hook groups, import conventions, and test placement.
+
+See [Application workflow and the Advisor's voice](docs/workflow-and-advisor-voice.md) for where stage and status codes come from (`npm run sync:workflow`) and how text shown to Advisors is written.
 # edvora-ui
