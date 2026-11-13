@@ -59,17 +59,14 @@ export function describe(item: ApplicationTimelineItem): Described {
 
   switch (item.entry_type) {
     case "status_transition": {
-      if (item.to_stage) details.push({ label: "Stage", text: item.to_stage });
+      // Lead with where it went; the old status and an unchanged stage are secondary.
+      if (item.from_status && item.to_status) details.push({ label: "From", text: item.from_status });
+      if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: item.to_stage });
       const requiredDocs = formatDocTypeList(item.required_document_types);
       if (requiredDocs) details.push({ label: "Requested", text: requiredDocs });
       if (item.reason_text) details.push({ label: "Reason", text: item.reason_text });
       if (item.notes) details.push({ label: "Notes", text: item.notes });
-      const title =
-        item.from_status && item.to_status
-          ? `${actor} moved from ${item.from_status} to ${item.to_status}`
-          : item.to_status
-            ? `${actor} set the status to ${item.to_status}`
-            : `${actor} changed the status`;
+      const title = item.to_status ? `${actor} moved it to ${item.to_status}` : `${actor} changed the status`;
       return { category, title, details };
     }
 
@@ -129,9 +126,9 @@ export const CATEGORY_ICON: Record<Category, { icon: LucideIcon; tone: TagTone }
 };
 
 /** Pure: timeline API items → Timeline events (title plus "Label: text" detail lines). */
-export function toTimelineEvents(items: ApplicationTimelineItem[]): (TimelineEvent & { details: { label: string; text: string }[] })[] {
+export function toTimelineEvents(items: ApplicationTimelineItem[]): (TimelineEvent & { category: Category; details: { label: string; text: string }[] })[] {
   return items.map((item) => {
     const { category, title, details } = describe(item);
-    return { id: item.id, title, at: item.created_at, icon: CATEGORY_ICON[category].icon, tone: CATEGORY_ICON[category].tone, details };
+    return { id: item.id, category, title, at: item.created_at, icon: CATEGORY_ICON[category].icon, tone: CATEGORY_ICON[category].tone, details };
   });
 }

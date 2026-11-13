@@ -125,6 +125,25 @@ describe("Application Details components", () => {
     expect(screen.getByText(/only available while/)).toBeInTheDocument();
   });
 
+  it("ActivityTimeline: filter chips show one kind of event at a time", async () => {
+    render(
+      <ActivityTimeline
+        now={NOW}
+        events={[
+          { id: "1", title: "Moved it to Offer", at: "2026-11-02T08:00:00Z", category: "status" },
+          { id: "2", title: "Uploaded Passport", at: "2026-11-01T08:00:00Z", category: "documents" },
+          { id: "3", title: "Moved it to Submitted", at: "2026-10-01T08:00:00Z", category: "status" },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(screen.getByRole("button", { name: /^Documents/ }));
+    expect(screen.getByText("Uploaded Passport")).toBeInTheDocument();
+    expect(screen.queryByText("Moved it to Offer")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "All" }));
+    expect(screen.getByText("Moved it to Offer")).toBeInTheDocument();
+  });
+
   it("NotesPanel: adds a note", async () => {
     const onAdd = jest.fn();
     render(<NotesPanel notes={[]} onAdd={onAdd} />);

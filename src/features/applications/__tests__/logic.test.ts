@@ -112,9 +112,15 @@ describe("timeline", () => {
   });
   it("describes API items", () => {
     const [e] = toTimelineEvents([
-      { id: "1", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "New", to_status: "Submitted", reason_text: "OK", created_at: "2026-11-01T00:00:00Z" } as any,
+      { id: "1", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "New", to_status: "Submitted", from_stage: "Review", to_stage: "Review", reason_text: "OK", created_at: "2026-11-01T00:00:00Z" } as any,
+      { id: "2", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "Submitted", to_status: "Offer", from_stage: "Review", to_stage: "Offer Letter", created_at: "2026-11-02T00:00:00Z" } as any,
     ]);
-    expect(e.title).toBe("Farid moved from New to Submitted");
+    expect(e.title).toBe("Farid moved it to Submitted");
+    expect(e.category).toBe("status");
+    expect(e.details).toContainEqual({ label: "From", text: "New" });
+    // Same stage: no stage line. A stage change says so.
+    expect(e.details.find((d) => d.label.includes("tage"))).toBeUndefined();
+    expect(toTimelineEvents([{ id: "2", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "Submitted", to_status: "Offer", from_stage: "Review", to_stage: "Offer Letter", created_at: "2026-11-02T00:00:00Z" } as any])[0].details).toContainEqual({ label: "New stage", text: "Offer Letter" });
     expect(e.details).toContainEqual({ label: "Reason", text: "OK" });
   });
 });
