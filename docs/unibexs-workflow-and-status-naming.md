@@ -4,7 +4,7 @@ Proposal for sign-off · replaces *Unibexs Status Naming* (11 Nov 2026)
 
 Every stage and status an application can be in, taken from the backend, with one proposed label for each and the decisions product needs to make. **Status:** draft, not applied in the app. **Date:** 13 Nov 2026. **Source:** `unibexs-backend/scripts/prod-seed.json` at commit `8380737` (5 stages, 52 statuses), the same data as `src/config/workflow.generated.ts`.
 
-Interactive version with search and filters: the *Unibexs Workflow Reference* page. This file is generated from the same data, so the two match.
+Interactive version with search and filters: [Unibexs Workflow Reference](https://claude.ai/artifact/2QknEvCHAhqtqqN4s7ihyG). This file is generated from the same data, so the two match.
 
 ## Recommendation
 
@@ -50,7 +50,7 @@ Today the app answers this in two places: the Advisor's list filter, Home counts
 An Advisor deals with Unibexs, not with its internal roles. Whatever staff do, whether an account manager, an admin or finance, the Advisor reads it as done by **Unibexs**: never a role, a team or a staff member's name. Staff screens keep the real names and roles, for accountability. The Advisor's own agency (their team members, their agency admin) keeps its names.
 
 - **In the app: done** (commit `90315360`, `src/lib/unibexsVoice.ts`). Activity, notifications, chat, Home, next steps, status names and filters.
-- **In the backend: still to change.** See *Unibexs Backend Gaps*, section 5:
+- **In the backend: still to change.** See [Unibexs Backend Gaps](https://claude.ai/artifact/CABpPkEFgfN54GYaTAEbYm), section 5:
   - Set `STAFF_DISPLAY_NAME = "Unibexs"` in `app/services/actor_display.py` (today "Unibexs Operations Team"). It covers the timeline, chat, notification data and emails.
   - Drop `actor_role` from notification data sent to partners.
   - Reword the two partner notification texts in `notification_service.py` ("The account manager has re-uploaded…", "The account manager requested…").
