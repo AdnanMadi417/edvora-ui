@@ -54,6 +54,6 @@ export const ONBOARDING = [
 
 export const ACTIVITY = [
   { who: "Sunway University", what: "sent an offer letter for Nur Aisyah Binti Kamal", when: "2 hours ago" },
-  { who: "Finance team", what: "paid RM4,200 commission for UBX-2026-0398", when: "Yesterday" },
+  { who: "Unibexs", what: "paid RM4,200 commission for UBX-2026-0398", when: "Yesterday" },
   { who: "You", what: "submitted Chinedu Okafor to Taylor's University", when: "27 Oct 2026" },
 ];

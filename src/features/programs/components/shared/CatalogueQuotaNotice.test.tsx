@@ -11,7 +11,7 @@ describe("CatalogueQuotaNotice", () => {
     );
     expect(screen.getByText("You've reached today's limit for browsing the catalogue")).toBeInTheDocument();
     expect(screen.getByText(/try again tomorrow/)).toBeInTheDocument();
-    expect(screen.getByText(/contact your account manager/)).toBeInTheDocument();
+    expect(screen.getByText(/contact Unibexs/)).toBeInTheDocument();
     // The limit, the count, the metric and the countdown are log-only on purpose.
     expect(screen.queryByText(/300/)).toBeNull();
     expect(screen.queryByText(/301/)).toBeNull();

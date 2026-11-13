@@ -25,6 +25,7 @@ import EmptyData from "components/ub/feedback/states/EmptyData";
 import Skeleton from "components/ub/feedback/states/Skeleton";
 import Button from "components/ub/core/buttons/Button";
 import { useMe } from "hooks/useMe";
+import { unibexsVoice } from "lib/unibexsVoice";
 
 const PAGE_SIZE = 20;
 // Unread notifications load in batches of this size via "Load more" (rather
@@ -272,12 +273,14 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
             {displayed.map((notification, index) => {
               const isUnread = notification.read_at === null;
               const config = getNotificationIconConfig(notification);
-              const sender = getSenderName(notification);
+              const sender = getSenderName(notification, { forAdvisor });
               const href = getNotificationHref(notification, applicationBasePath, partnerBasePath);
+              // Advisors hear one voice: no staff roles, and backend copy reads as Unibexs.
+              const say = (text: string | null | undefined) => (forAdvisor ? unibexsVoice(text) : text);
               const university = notification.data?.university_name;
               const { stage, status } = getNotificationStageStatus(notification);
               const student = notification.data?.student_name as string | undefined;
-              const role = ROLE_LABELS[(notification.data?.actor_role as string) ?? ""];
+              const role = forAdvisor ? undefined : ROLE_LABELS[(notification.data?.actor_role as string) ?? ""];
 
               return (
                 <div
@@ -307,29 +310,29 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                       </p>
                     ) : (
                       <p className="text-ub-body-sm text-ub-text-primary">
-                        <span className="font-semibold">{sender}</span> {notification.title}
+                        <span className="font-semibold">{sender}</span> {say(notification.title)}
                       </p>
                     )}
                     {notification.body && (
-                      <p className="mt-0.5 text-ub-body-sm text-ub-text-primary">{notification.body}</p>
+                      <p className="mt-0.5 text-ub-body-sm text-ub-text-primary">{say(notification.body)}</p>
                     )}
                     {student && (
                       <p className="mt-1 text-ub-caption text-ub-text-secondary">
                         <span className="font-medium">{sender}</span>
-                        {role && <span>, {role}</span>} {eventText(notification.title ?? "", student)}
+                        {role && <span>, {role}</span>} {eventText(say(notification.title) ?? "", student)}
                       </p>
                     )}
                     {(stage || status) && (
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                         {stage && (
                           <span className="inline-flex items-center rounded-ub-full bg-ub-surface-subtle px-2 py-0.5 text-ub-caption text-ub-text-secondary">
-                            {stage}
+                            {say(stage)}
                           </span>
                         )}
                         {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-ub-text-tertiary rtl:-scale-x-100" aria-hidden="true" />}
                         {status && (
                           <span className="inline-flex items-center rounded-ub-full bg-ub-tone-brand-bg px-2 py-0.5 text-ub-caption text-ub-tone-brand-text">
-                            {status}
+                            {say(status)}
                           </span>
                         )}
                       </div>

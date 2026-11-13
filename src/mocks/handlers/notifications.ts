@@ -1,4 +1,5 @@
 import { mock, httpError } from "../router";
+import { maskNotificationData } from "../viewer";
 import { table, daysAgo } from "../db";
 import { APPLICATIONS, CURRENT_PARTNER, PARTNERS } from "../seed";
 import { messages } from "./chat";
@@ -319,7 +320,9 @@ mock.get("/me/notifications", ({ query }) => {
   items.sort((x, y) => y.created_at.localeCompare(x.created_at));
   const page = Number(query.page) || 1;
   const pageSize = Number(query.page_size) || 20;
-  return { items: items.slice((page - 1) * pageSize, page * pageSize), total: items.length, page, page_size: pageSize };
+  // Like the backend, an Advisor never sees which staff member acted.
+  const pageItems = items.slice((page - 1) * pageSize, page * pageSize).map((n) => ({ ...n, data: maskNotificationData(n.data) }));
+  return { items: pageItems, total: items.length, page, page_size: pageSize };
 });
 
 mock.get("/me/notifications/unread-count", () => ({

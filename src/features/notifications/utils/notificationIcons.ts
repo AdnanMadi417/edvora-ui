@@ -25,6 +25,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { Notification } from "../types";
+import { advisorActorName } from "lib/unibexsVoice";
 
 export type NotificationIconConfig = {
   icon: LucideIcon;
@@ -176,8 +177,11 @@ export function getNotificationIconConfig(notification: Notification): Notificat
   return FALLBACK;
 }
 
-export function getSenderName(notification: Notification): string {
+/** Who the notification is from. Advisors see every staff sender as Unibexs. */
+export function getSenderName(notification: Notification, { forAdvisor = false }: { forAdvisor?: boolean } = {}): string {
   const data = notification.data as Record<string, unknown>;
+  const staffSide = (data?.sender_name as string) || (data?.actor_name as string);
+  if (forAdvisor && staffSide) return advisorActorName(staffSide, data?.actor_role as string | undefined);
   return (
     (data?.sender_name as string) ||
     (data?.actor_name as string) ||

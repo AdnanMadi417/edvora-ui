@@ -21,6 +21,8 @@ export interface OverviewItem {
   href: string;
   at?: string;
   status?: string;
+  /** Display text for `status` when it differs from the raw value (e.g. the Unibexs voice for Advisors). */
+  statusLabel?: string;
 }
 export interface OverviewData {
   total: number;

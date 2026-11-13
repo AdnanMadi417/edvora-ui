@@ -8,6 +8,8 @@ import MarkAllAsReadButton from "./MarkAllAsReadButton";
 import { useAllNotifications, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import { getNotificationIconConfig, getSenderName, getNotificationPhotoKey } from "../utils/notificationIcons";
 import type { Notification } from "../types";
+import { useMe } from "hooks/useMe";
+import { unibexsVoice } from "lib/unibexsVoice";
 import NotificationAvatar from "./NotificationAvatar";
 
 const PREVIEW_LIMIT = 5;
@@ -105,6 +107,8 @@ function PreviewContent({
   onNotificationHandled?: () => void;
 }) {
   const router = useRouter();
+  const { user } = useMe();
+  const forAdvisor = user?.role === "partner";
   const { notifications, loading, error, refetch } = useAllNotifications({
     readStatus: "unread",
     page: 1,
@@ -169,7 +173,7 @@ function PreviewContent({
         ) : (
           notifications.map((notification, index) => {
             const config = getNotificationIconConfig(notification);
-            const sender = getSenderName(notification);
+            const sender = getSenderName(notification, { forAdvisor });
             return (
               <button
                 key={notification.id}
@@ -190,7 +194,7 @@ function PreviewContent({
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm leading-snug text-ub-text-primary">
                     <span className="font-semibold">{sender}</span>
-                    {notification.title && <span className="ml-1 font-normal text-ub-text-secondary">{notification.title}</span>}
+                    {notification.title && <span className="ml-1 font-normal text-ub-text-secondary">{forAdvisor ? unibexsVoice(notification.title) : notification.title}</span>}
                   </p>
                   <p className="mt-0.5 text-xs font-medium text-ub-text-link">{timeAgo(notification.created_at)}</p>
                 </div>

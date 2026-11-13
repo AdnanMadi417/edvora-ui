@@ -94,7 +94,7 @@ export default function ApplicationDetailsScreen({
   usePageTitle(view.student.name);
   const { visaCase } = useVisaCase(application?.id || "");
   const timeline = useApplicationTimeline(application?.id, application?.updated_at);
-  const events = useMemo(() => toTimelineEvents(timeline.items), [timeline.items]);
+  const events = useMemo(() => toTimelineEvents(timeline.items, { forAdvisor: viewer === "2" }), [timeline.items, viewer]);
 
   const download = async (doc: DocumentItem) => {
     if (!doc.fileKey || downloadingId) return;

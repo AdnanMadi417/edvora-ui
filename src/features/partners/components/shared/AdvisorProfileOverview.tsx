@@ -16,11 +16,14 @@ export default function AdvisorProfileOverview({
   renderDocument,
   managers,
   showProfilePhoto = false,
+  forAdvisor = false,
 }: {
   partner: Profile;
   renderDocument: (label: string, fileKey?: string | null) => ReactNode;
   managers?: ReactNode;
   showProfilePhoto?: boolean;
+  /** The Advisor's own profile: Unibexs is one voice to them, so no named manager. */
+  forAdvisor?: boolean;
 }) {
   const company = partner.type === "agency";
   const details = company
@@ -228,7 +231,7 @@ export default function AdvisorProfileOverview({
                 label: "Advisor type",
                 value: company ? "Company" : "Individual",
               },
-              ...("assigned_manager_name" in partner
+              ...(!forAdvisor && "assigned_manager_name" in partner
                 ? [
                     {
                       label: "Assigned manager",

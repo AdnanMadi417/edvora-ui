@@ -6,6 +6,7 @@ import { useSendMessage } from "features/chat/hooks/useSendMessage";
 import { useMarkMessagesRead } from "features/chat/hooks/useMarkMessagesRead";
 import { useChatPolling } from "features/chat/hooks/useChatPolling";
 import { useMe } from "hooks/useMe";
+import { advisorActorName } from "lib/unibexsVoice";
 import { useUnreadCount, useAllNotifications } from "features/notifications/hooks";
 import api from "lib/useApi";
 import { Send, User } from "lucide-react";
@@ -140,7 +141,8 @@ export default function AgentPartnerChat({
                 >
                   {!isMine && (
                     <span className="mb-1 block text-xs font-medium text-ub-text-secondary">
-                      {msg.sender_name || "Unknown"}
+                      {/* Advisors hear one voice: any staff sender reads as Unibexs. */}
+                      {user?.role === "partner" ? advisorActorName(msg.sender_name) : msg.sender_name || "Unknown"}
                     </span>
                   )}
                   <span>{msg.message_text}</span>

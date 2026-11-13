@@ -7,6 +7,7 @@ import type { FileRowState } from "components/ub/data/display/FileRow";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { resolveStage, stageCodeOf, statusCodeOf, type ResolvedStage } from "features/applications/stages";
+import { unibexsVoice } from "lib/unibexsVoice";
 
 /** Backend actor ids used in stage.statuses[].next_actions. */
 export type ViewerActor = "2" | "3";
@@ -176,6 +177,9 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
   // The detail response sends stage and status names only; look the codes up from the backend workflow.
   const statusCode = str(a.status_code) ?? str(statusCodeOf(status));
   const next = (status?.next_actions ?? []).find((n: any) => String(n.actor) === viewer);
+  // Advisors read backend copy in the Unibexs voice; staff keep the backend names, so their filters still match.
+  const forAdvisor = viewer === "2";
+  const voice = (text: string | null) => (forAdvisor ? unibexsVoice(text) : text);
   const commissions: ApplicationCommissionItem[] = a.commissions ?? [];
   const c = commissions[0];
   const disputeOpen = !!a.dispute && a.dispute.status !== "resolved";
@@ -210,13 +214,13 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
     updatedAt: str(a.updated_at),
     arrivalDate: str(a.arrival_date),
     stage: {
-      apiName: str(a.stage?.name),
-      statusName: str(status?.name),
+      apiName: voice(str(a.stage?.name)),
+      statusName: voice(str(status?.name)),
       statusCode,
       resolved: resolveStage({ stageCode: stageCodeOf(a.stage), statusCode, lifecycle: a.lifecycle_status }),
     },
     // The workflow text says Partner; the UI calls this role Advisor everywhere.
-    nextStep: str(next?.name)?.replace(/\bPartner\b/g, "Advisor").replace(/\bpartner\b/g, "advisor") ?? null,
+    nextStep: forAdvisor ? unibexsVoice(str(next?.name)) : (str(next?.name)?.replace(/\bPartner\b/g, "Advisor").replace(/\bpartner\b/g, "advisor") ?? null),
     documents: [...list(a.documents, "application"), ...list(a.payment_documents, "payment"), ...list(a.arrival_documents, "arrival")],
     offerLetter: toDocument(a.offer_letter_document, "offer"),
     visa: {

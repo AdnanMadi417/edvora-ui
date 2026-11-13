@@ -347,6 +347,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           <div {...tabPanelProps(tabId, tab)}>
             {tab === "profile" && (
               <AdvisorProfileOverview
+                forAdvisor
                 partner={partner}
                 renderDocument={(label, fileKey) => (
                   <DocRow

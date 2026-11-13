@@ -92,7 +92,7 @@ export default function OverviewItems({
                 <span className="mt-2 block">
                   <StatusTag
                     status={item.status}
-                    label={item.status.replace(/_/g, " ")}
+                    label={item.statusLabel ?? item.status.replace(/_/g, " ")}
                   />
                 </span>
               )}

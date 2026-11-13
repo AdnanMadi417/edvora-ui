@@ -125,7 +125,7 @@ export default function ApplicationDetails({ application, onRefetch }: Applicati
   };
 
   const docKey = (name: string) => application?.documents?.find((d: any) => d.document_type === name)?.file_key ?? null;
-  const formHint = "Download, complete, and re-upload when your account manager asks.";
+  const formHint = "Download, complete, and re-upload when Unibexs asks.";
   const candidates: (TemplateFile | false | undefined)[] = [
     { key: "visa-invoice", name: "Visa invoice", hint: "Invoice for the visa payment. Keep it for your records.", fileKey: docKey("Visa Invoice") },
     actions?.is_application_form_required && { key: "app-form", name: "Application form template", hint: formHint, fileKey: docKey("Application Form Template") },
@@ -163,7 +163,7 @@ export default function ApplicationDetails({ application, onRefetch }: Applicati
           visaFeeNote={visaCase?.notes}
           paymentMethods={methods}
           paymentMethodsLoading={paymentLoading}
-          templates={panelMode === "arrival-form" ? (arrivalTemplate?.file_key ? [{ key: "arrival", name: "Arrival form template", hint: "Provided by your account manager.", fileKey: arrivalTemplate.file_key }] : []) : paymentTemplates}
+          templates={panelMode === "arrival-form" ? (arrivalTemplate?.file_key ? [{ key: "arrival", name: "Arrival form template", hint: "Provided by Unibexs.", fileKey: arrivalTemplate.file_key }] : []) : paymentTemplates}
           onDownloadFile={downloadFile}
           downloading={downloading || downloadingHealth}
         />

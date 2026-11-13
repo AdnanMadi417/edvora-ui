@@ -1,4 +1,5 @@
 import { mock, httpError } from "../router";
+import { STAFF_DISPLAY_NAME, viewerIsPartner } from "../viewer";
 import { daysAgo, newId, nowIso, paginate, search, SAMPLE_PDF_URL } from "../db";
 import { CURRENT_PARTNER, PARTNERS, PROGRAMS } from "../seed";
 import { getApplicationFinance, recordFinanceForStatus } from "./finance";
@@ -231,8 +232,13 @@ mock.get("/applications/:id/timeline", ({ params, query }) => {
   if (!app.timeline.length) app.timeline = seedTimeline(app);
   const page = Number(query.page ?? 1) || 1;
   const pageSize = Number(query.page_size ?? 20) || 20;
+  // Like the backend, an Advisor sees staff actors under one generic name.
+  const partnerActorId = `usr_${app.partnerId}`;
+  const items = viewerIsPartner()
+    ? app.timeline.map((e) => (e.actor_id === partnerActorId ? e : { ...e, actor_id: null, actor_name: STAFF_DISPLAY_NAME }))
+    : app.timeline;
   return {
-    items: app.timeline.slice((page - 1) * pageSize, page * pageSize),
+    items: items.slice((page - 1) * pageSize, page * pageSize),
     total: app.timeline.length,
     page,
     page_size: pageSize,

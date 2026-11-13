@@ -6,6 +6,7 @@ import { ArrowRightLeft, FilePlus2, FileUp, Info, MessageCircle, Plane, Wallet, 
 import type { TimelineEvent } from "components/ub/data/display/Timeline";
 import type { TagTone } from "components/ub/recipes";
 import { formatCurrency } from "lib/format";
+import { advisorActorName, unibexsVoice } from "lib/unibexsVoice";
 import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 
 export type Category = "status" | "documents" | "correction" | "visa" | "program" | "message" | "other";
@@ -51,8 +52,14 @@ export interface Described {
 
 // `detail` shapes vary by entry_type (and document_upload by call site), so
 // every field is read defensively and an unknown entry_type still renders.
-export function describe(item: ApplicationTimelineItem): Described {
-  const actor = item.actor_name || "Unknown user";
+export interface DescribeOptions {
+  /** Advisor's view: staff read as Unibexs and backend names use the Unibexs voice. */
+  forAdvisor?: boolean;
+}
+
+export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: DescribeOptions = {}): Described {
+  const actor = forAdvisor ? advisorActorName(item.actor_name) : item.actor_name || "Unknown user";
+  const v = (text: string | null) => (forAdvisor ? unibexsVoice(text) : text);
   const d = item.detail ?? {};
   const category = ENTRY_CATEGORY[item.entry_type] ?? "other";
   const details: Described["details"] = [];
@@ -60,13 +67,13 @@ export function describe(item: ApplicationTimelineItem): Described {
   switch (item.entry_type) {
     case "status_transition": {
       // Lead with where it went; the old status and an unchanged stage are secondary.
-      if (item.from_status && item.to_status) details.push({ label: "From", text: item.from_status });
-      if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: item.to_stage });
+      if (item.from_status && item.to_status) details.push({ label: "From", text: v(item.from_status)! });
+      if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: v(item.to_stage)! });
       const requiredDocs = formatDocTypeList(item.required_document_types);
       if (requiredDocs) details.push({ label: "Requested", text: requiredDocs });
       if (item.reason_text) details.push({ label: "Reason", text: item.reason_text });
       if (item.notes) details.push({ label: "Notes", text: item.notes });
-      const title = item.to_status ? `${actor} moved it to ${item.to_status}` : `${actor} changed the status`;
+      const title = item.to_status ? `${actor} moved it to ${v(item.to_status)}` : `${actor} changed the status`;
       return { category, title, details };
     }
 
@@ -126,9 +133,9 @@ export const CATEGORY_ICON: Record<Category, { icon: LucideIcon; tone: TagTone }
 };
 
 /** Pure: timeline API items → Timeline events (title plus "Label: text" detail lines). */
-export function toTimelineEvents(items: ApplicationTimelineItem[]): (TimelineEvent & { category: Category; details: { label: string; text: string }[] })[] {
+export function toTimelineEvents(items: ApplicationTimelineItem[], options: DescribeOptions = {}): (TimelineEvent & { category: Category; details: { label: string; text: string }[] })[] {
   return items.map((item) => {
-    const { category, title, details } = describe(item);
+    const { category, title, details } = describe(item, options);
     return { id: item.id, category, title, at: item.created_at, icon: CATEGORY_ICON[category].icon, tone: CATEGORY_ICON[category].tone, details };
   });
 }

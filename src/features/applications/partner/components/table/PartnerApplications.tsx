@@ -20,6 +20,7 @@ import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
 import { isAdvisorAction } from "features/applications/stages";
+import { unibexsVoice } from "lib/unibexsVoice";
 
 
 const PartnerApplications = () => {
@@ -230,7 +231,8 @@ const PartnerApplications = () => {
     const match = stageStatuses.find(
       (s) => s.name.toLowerCase().replace(/\s+/g, "_") === normalized
     );
-    return (
+    // Advisors read status names in the Unibexs voice ("Under Review by Unibexs").
+    return unibexsVoice(
       match?.name ??
       (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
         "Unknown")
@@ -318,7 +320,7 @@ const PartnerApplications = () => {
             setSelectedStages(val === "all" ? null : val);
             setCurrentPage(1);
           }}
-          stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
+          stageOptions={stages.map((s) => ({ label: unibexsVoice(s.name), value: s.id }))}
           selectedUniversity={selectedUniversity}
           onUniversityChange={(val) => {
             setSelectedUniversity(val);
@@ -334,7 +336,7 @@ const PartnerApplications = () => {
             setCurrentPage(1);
           }}
           stageStatusOptions={stageStatuses.map((s) => ({
-            label: s.name,
+            label: unibexsVoice(s.name),
             value: s.id,
           }))}
           stageStatusLoading={stageStatusesLoading}

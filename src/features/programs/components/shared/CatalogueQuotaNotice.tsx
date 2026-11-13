@@ -26,7 +26,7 @@ export default function CatalogueQuotaNotice(_props: { quota: CatalogueQuotaErro
           <>
             Please try again tomorrow.
             <br />
-            If you need more for your work, contact your account manager.
+            If you need more for your work, contact Unibexs.
           </>
         }
       />

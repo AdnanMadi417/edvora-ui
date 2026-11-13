@@ -1,4 +1,5 @@
 import { mock, httpError } from "../router";
+import { STAFF_DISPLAY_NAME, viewerIsPartner } from "../viewer";
 import { table, daysAgo, newId } from "../db";
 import { APPLICATIONS } from "../seed";
 import type { ChatMessage } from "features/chat/types";
@@ -72,6 +73,9 @@ mock.get("/applications/:id/messages", ({ params, query }) => {
   let items = threadFor(params.id);
   if (query.since) items = items.filter((m) => m.created_at > String(query.since));
   const limit = Number(query.limit) || 50;
+  // Like the backend, an Advisor sees staff messages under one generic name.
+  const partnerUserId = APPLICATIONS.find((a) => a.id === params.id)?.partner.user_id;
+  if (viewerIsPartner()) items = items.map((m) => (m.sender_id === partnerUserId ? m : { ...m, sender_name: STAFF_DISPLAY_NAME }));
   return { items: items.slice(-limit) };
 });
 

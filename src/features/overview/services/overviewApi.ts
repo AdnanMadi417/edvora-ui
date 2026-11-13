@@ -1,6 +1,7 @@
 import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
 import { isAdvisorAction } from "features/applications/stages";
+import { unibexsVoice } from "lib/unibexsVoice";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
@@ -55,6 +56,8 @@ const auth = () => {
 
 export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
   const { role, partnerId, agencyAdmin, canViewCommission } = context;
+  // Advisors hear one voice: backend copy that names a staff role reads as Unibexs.
+  const say = (text: string) => (role === "partner" ? unibexsVoice(text) : text);
   if (
     !["admin", "account_manager", "reviewer", "data_entry", "partner"].includes(
       role
@@ -125,12 +128,13 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             .map(
               (item): OverviewItem => ({
                 id: item.id,
-                title: item.next_action || "Review application",
+                title: say(item.next_action || "Review application"),
                 description: [item.student_name, item.university_name]
                   .filter(Boolean)
                   .join(" · "),
                 href: idPath(`${base}/applications`, item.id),
                 status: item.status,
+                statusLabel: item.status ? say(item.status.replace(/_/g, " ")) : undefined,
               })
             );
           return { total: data.total, items };
@@ -468,8 +472,8 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
         items: data.items
           .map((item) => ({
             id: item.id,
-            title: item.title,
-            description: item.body,
+            title: say(item.title),
+            description: say(item.body),
             at: item.created_at,
             href: `${base}/notifications`,
           }))
