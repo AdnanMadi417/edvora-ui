@@ -27,7 +27,7 @@ export interface ApplicationTrackerCardProps {
   navigation?: ReactNode;
 }
 
-/** Progress card (brief §6): horizontal tracker from md, vertical below, with the next step. */
+/** Progress card (brief §6): horizontal tracker from md, a short summary with "Show all steps" below, and the next step. */
 export default function ApplicationTrackerCard({ stage, nextStep, statusName, state = "ready", onRetry, className, navigation }: ApplicationTrackerCardProps) {
   return (
     <SectionCard
@@ -42,7 +42,7 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
       className={className}
       footer={navigation}
     >
-      <ApplicationTracker steps={trackerStepsFor(stage)} orientation="auto" />
+      <ApplicationTracker steps={trackerStepsFor(stage)} orientation="responsive" />
       {/* Its own line (not under the current step) so it also shows on attention and completed states. */}
       <Alert className="mt-6">
         {nextStep ? (

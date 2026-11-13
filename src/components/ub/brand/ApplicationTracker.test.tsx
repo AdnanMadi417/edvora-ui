@@ -1,6 +1,6 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
-import ApplicationTracker, { trackerStepsAt } from "components/ub/brand/ApplicationTracker";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import ApplicationTracker, { trackerStepsAt, trackerSummary } from "components/ub/brand/ApplicationTracker";
 import { GLASS_BOX_STEPS, STUDENT_PROFILE_STEPS } from "config/applicationStages";
 
 describe("ApplicationTracker", () => {
@@ -45,5 +45,27 @@ describe("ApplicationTracker", () => {
     const { container } = render(<ApplicationTracker steps={trackerStepsAt(STUDENT_PROFILE_STEPS, "submitted")} />);
     const fills = Array.from(container.querySelectorAll("[data-filled]")).map((el) => el.getAttribute("data-filled"));
     expect(fills).toEqual(["true", "true", "false", "false"]);
+  });
+
+  it("responsive: summarises the step in focus and opens the full list on demand", () => {
+    // jsdom applies no media queries, so both the summary and the md+ list render; the toggle is the phone part.
+    render(<ApplicationTracker orientation="responsive" steps={trackerStepsAt(STUDENT_PROFILE_STEPS, "offer")} />);
+    expect(screen.getByText("Step 4 of 5")).toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: "Show all steps" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getAllByRole("list", { name: "Application progress" })).toHaveLength(1);
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Hide steps" })).toHaveAttribute("aria-expanded", "true");
+    const lists = screen.getAllByRole("list", { name: "Application progress" });
+    expect(lists).toHaveLength(2);
+    expect(lists.some((l) => l.id === toggle.getAttribute("aria-controls"))).toBe(true);
+  });
+
+  it("trackerSummary focuses attention, then current, then the last complete step", () => {
+    const attention = trackerStepsAt(GLASS_BOX_STEPS, "submitted", { documents: { state: "attention" } });
+    expect(trackerSummary(attention).step?.id).toBe("documents");
+    expect(trackerSummary(trackerStepsAt(STUDENT_PROFILE_STEPS, "offer")).index).toBe(3);
+    const done = STUDENT_PROFILE_STEPS.map((s) => ({ id: s.id, label: s.label, state: "complete" as const }));
+    expect(trackerSummary(done).done).toBe(true);
   });
 });

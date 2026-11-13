@@ -143,7 +143,7 @@ export default function NewBrand() {
         </Variant>
       </Demo>
 
-      <Demo name="ApplicationTracker" path="components/ub/brand/ApplicationTracker.tsx" description="Steps come from src/config/applicationStages.ts (pending confirmation). Horizontal from 768px, vertical below." className="grid gap-8">
+      <Demo name="ApplicationTracker" path="components/ub/brand/ApplicationTracker.tsx" description="Steps come from src/config/applicationStages.ts (pending confirmation). Horizontal from 768px, vertical below; the responsive orientation shows a short summary below 768px instead." className="grid gap-8">
         <Variant label="Student profile (5 steps): pick the current step to see the connector fill and pulse">
           <StateSwitch<string> label="Current step" value={currentId} options={stepIds} onChange={setCurrentId} />
           <div className="rounded-ub-lg border border-ub-border p-4 md:p-6">
@@ -158,6 +158,11 @@ export default function NewBrand() {
             <div className="min-w-[640px]">
               <ApplicationTracker orientation="horizontal" steps={allStates} nextStep="Sunway University replies within 10 working days" />
             </div>
+          </div>
+        </Variant>
+        <Variant label='Responsive (application details): below 768px a summary, segmented bar and "Show all steps"; resize to compare'>
+          <div className="max-w-sm rounded-ub-lg border border-ub-border p-4 md:max-w-none md:p-6">
+            <ApplicationTracker orientation="responsive" steps={allStates} />
           </div>
         </Variant>
         <Variant label="All five states, vertical (Glass Box, mobile)">

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import clsx from "clsx";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import type { TrackerStepConfig } from "config/applicationStages";
 
 // Application Tracker (brief §4.5), the hero component. Steps come from
@@ -10,7 +10,7 @@ import type { TrackerStepConfig } from "config/applicationStages";
 // GLASS_BOX_STEPS) because the stage list is not confirmed (§11.1).
 
 export type TrackerStepState = "complete" | "current" | "upcoming" | "attention" | "skipped";
-export type TrackerOrientation = "auto" | "horizontal" | "vertical";
+export type TrackerOrientation = "auto" | "horizontal" | "vertical" | "responsive";
 
 export interface TrackerStep {
   id: string;
@@ -26,7 +26,12 @@ export interface ApplicationTrackerProps {
   steps: TrackerStep[];
   /** Text after "Next step:" under the current step, e.g. "Upload the offer letter from Sunway University". */
   nextStep?: string;
-  /** auto: horizontal from 768px, vertical below (default). Or force one. */
+  /**
+   * auto: horizontal from 768px, vertical below (default). responsive: horizontal
+   * from 768px, and below it a one-line summary ("Step 6 of 7 · Arrival") with a
+   * segmented bar and a "Show all steps" toggle, so the tracker stays short on
+   * phones. Or force horizontal / vertical.
+   */
   orientation?: TrackerOrientation;
   /** Accessible name of the list. Default "Application progress". */
   label?: string;
@@ -41,7 +46,31 @@ export const TRACKER_COPY = {
   srAttention: "needs attention",
   srUpcoming: "upcoming",
   allComplete: "All steps complete.",
+  showSteps: "Show all steps",
+  hideSteps: "Hide steps",
 } as const;
+
+/** "Step 6 of 7" for the step in focus (attention, else current, else last complete). */
+export function trackerSummary(steps: TrackerStep[]): { index: number; total: number; step: TrackerStep | null; done: boolean } {
+  const total = steps.length;
+  const done = total > 0 && steps.every((s) => s.state === "complete" || s.state === "skipped");
+  let index = steps.findIndex((s) => s.state === "attention");
+  if (index < 0) index = steps.findIndex((s) => s.state === "current");
+  if (index < 0) {
+    steps.forEach((s, i) => {
+      if (s.state === "complete") index = i;
+    });
+  }
+  return { index, total, step: index >= 0 ? steps[index] : null, done };
+}
+
+const SEGMENT: Record<TrackerStepState, string> = {
+  complete: "bg-ub-chart-1",
+  current: "bg-ub-border-focus",
+  upcoming: "bg-ub-border",
+  attention: "bg-ub-danger-fill",
+  skipped: "bg-ub-border-muted",
+};
 
 // Motion tokens in ms (brief §2.8): connector fill uses duration-ub-slow;
 // the one-off pulse of the new current step runs for duration-deliberate.
@@ -139,8 +168,9 @@ function prefersReducedMotion() {
  * pulses once (instant under prefers-reduced-motion).
  */
 export default function ApplicationTracker({ steps, nextStep, orientation = "auto", label = TRACKER_COPY.listLabel, className }: ApplicationTrackerProps) {
-  const L = LAYOUT[orientation];
   const nodeRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+  const [expanded, setExpanded] = useState(false);
+  const panelId = useId();
   const signature = steps.map((s) => `${s.id}:${s.state}`).join("|");
   const prevSignature = useRef(signature);
   const currentId = steps.find((s) => s.state === "current")?.id;
@@ -159,9 +189,12 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
   useEffect(() => {
     if (prevCurrent.current === currentId) return;
     prevCurrent.current = currentId;
-    const node = currentId ? nodeRefs.current[currentId] : null;
-    if (!node || typeof node.animate !== "function" || prefersReducedMotion()) return;
-    node.animate([{ transform: "scale(1)" }, { transform: "scale(1.3)" }, { transform: "scale(1)" }], { duration: PULSE_MS, easing: EASE_STANDARD, iterations: 1 });
+    if (!currentId || prefersReducedMotion()) return;
+    // One node per rendered list (responsive mode renders two); pulse whichever is visible.
+    Object.entries(nodeRefs.current).forEach(([key, node]) => {
+      if (!key.endsWith(`:${currentId}`) || !node || typeof node.animate !== "function") return;
+      node.animate([{ transform: "scale(1)" }, { transform: "scale(1.3)" }, { transform: "scale(1)" }], { duration: PULSE_MS, easing: EASE_STANDARD, iterations: 1 });
+    });
   }, [currentId]);
 
   // A connector is filled once the step after it has been reached.
@@ -170,9 +203,10 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
     if (s.state === "complete" || s.state === "current" || s.state === "attention") reached = i;
   });
 
-  return (
-    <div className={clsx("relative", className)}>
-      <ol aria-label={label} className={L.list}>
+  const renderList = (layout: keyof typeof LAYOUT, id?: string) => {
+    const L = LAYOUT[layout];
+    return (
+      <ol id={id} aria-label={label} className={L.list}>
         {steps.map((step, i) => {
           const last = i === steps.length - 1;
           const filled = i + 1 <= reached;
@@ -183,7 +217,7 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
               <div className={L.rail}>
                 <span
                   ref={(el) => {
-                    nodeRefs.current[step.id] = el;
+                    nodeRefs.current[`${layout}:${step.id}`] = el;
                   }}
                   aria-hidden="true"
                   className={clsx(NODE_BASE, NODE[step.state])}
@@ -222,6 +256,58 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
           );
         })}
       </ol>
+    );
+  };
+
+  const summary = trackerSummary(steps);
+
+  return (
+    <div className={clsx("relative", className)}>
+      {orientation === "responsive" ? (
+        <>
+          <div className="md:hidden">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="min-w-0 text-ub-label-md text-ub-text-primary">
+                {summary.done ? (
+                  TRACKER_COPY.allComplete
+                ) : summary.step ? (
+                  <>
+                    <span className="ub-tabular text-ub-text-secondary">
+                      Step {summary.index + 1} of {summary.total}
+                    </span>
+                    <span aria-hidden="true" className="text-ub-text-tertiary"> · </span>
+                    <span className={clsx("font-semibold", summary.step.state === "attention" && "text-ub-tone-danger-text")}>
+                      {summary.step.label}
+                      {summary.step.state === "attention" && <span className="sr-only">{` (${TRACKER_COPY.srAttention})`}</span>}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-ub-text-secondary">Not started</span>
+                )}
+              </p>
+              <button
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={panelId}
+                onClick={() => setExpanded((v) => !v)}
+                className="-my-2 inline-flex min-h-10 shrink-0 items-center gap-1 rounded-ub-md px-1 text-ub-label-md text-ub-text-link focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ub-border-focus"
+              >
+                {expanded ? TRACKER_COPY.hideSteps : TRACKER_COPY.showSteps}
+                <ChevronDown aria-hidden="true" className={clsx("h-4 w-4 transition-transform duration-ub-fast motion-reduce:transition-none", expanded && "rotate-180")} />
+              </button>
+            </div>
+            <div aria-hidden="true" className="mt-3 flex gap-1">
+              {steps.map((s) => (
+                <span key={s.id} className={clsx("h-1.5 flex-1 rounded-ub-full", SEGMENT[s.state])} />
+              ))}
+            </div>
+            {expanded && <div className="mt-5">{renderList("vertical", panelId)}</div>}
+          </div>
+          <div className="hidden md:block">{renderList("horizontal")}</div>
+        </>
+      ) : (
+        renderList(orientation)
+      )}
       <p aria-live="polite" className="sr-only">
         {announcement}
       </p>
