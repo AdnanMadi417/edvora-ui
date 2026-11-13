@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -56,7 +56,7 @@ export function useAdminApplications({
   // page size, filter or search) must not overwrite a newer one.
   const latestRequest = useRef(0);
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     const request = ++latestRequest.current;
     setLoading(true);
     setError(null);
@@ -87,11 +87,11 @@ export function useAdminApplications({
     } finally {
       if (request === latestRequest.current) setLoading(false);
     }
-  };
+  }, [limit, offset, status, stage_id, stage_status_id, partner_id, search]);
 
   useEffect(() => {
     fetchApplications();
-  }, [limit, offset, status, stage_id, stage_status_id, partner_id, search]);
+  }, [fetchApplications]);
 
   return {
     items: data?.items ?? [],

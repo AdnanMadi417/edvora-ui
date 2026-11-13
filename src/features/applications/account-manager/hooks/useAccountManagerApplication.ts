@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "lib/useApi";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 
@@ -22,7 +22,7 @@ export const useAccountManagerApplication = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchApplication = async () => {
+  const fetchApplication = useCallback(async () => {
     if (!applicationId) return;
 
     try {
@@ -40,11 +40,11 @@ export const useAccountManagerApplication = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [applicationId]);
 
   useEffect(() => {
     fetchApplication();
-  }, [applicationId]);
+  }, [fetchApplication]);
 
   return { data, loading, error, refetch: fetchApplication };
 };

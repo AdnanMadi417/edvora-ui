@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { programApi } from "../../services";
 import type { Program, GetProgramsParams } from "../../types";
 import { getCatalogueQuotaError, type CatalogueQuotaError } from "../../utils/catalogueQuota";
@@ -12,15 +12,22 @@ export function usePrograms(params?: GetProgramsParams) {
   // Set instead of a generic error when the partner's daily catalogue quota is used up (UBX-425).
   const [quota, setQuota] = useState<CatalogueQuotaError | null>(null);
 
-  const fetch = async (isInitial = false) => {
+  // Refetch when the params' values change, not on every new object from the caller.
+  const paramsKey = JSON.stringify(params ?? null);
+  // Full loader only until the first rows arrive; later refetches use isFetching.
+  const hasRows = useRef(false);
+
+  const fetch = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     setIsFetching(true);
     setError(null);
     setQuota(null);
     try {
-      const res = await programApi.programs.list(params);
+      const res = await programApi.programs.list(JSON.parse(paramsKey) ?? undefined);
       const data = res.data;
-      setPrograms(data?.items ?? data ?? []);
+      const rows = data?.items ?? data ?? [];
+      hasRows.current = rows.length > 0;
+      setPrograms(rows);
       setTotal(data?.total ?? 0);
     } catch (err) {
       const limit = getCatalogueQuotaError(err);
@@ -30,11 +37,11 @@ export function usePrograms(params?: GetProgramsParams) {
       setLoading(false);
       setIsFetching(false);
     }
-  };
+  }, [paramsKey]);
 
   useEffect(() => {
-    fetch(programs.length === 0);
-  }, [JSON.stringify(params)]);
+    fetch(!hasRows.current);
+  }, [fetch]);
 
   return { programs, total, loading, isFetching, error, quota, refetch: () => fetch(false) };
 }

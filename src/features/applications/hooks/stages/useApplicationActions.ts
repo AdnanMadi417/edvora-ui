@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -83,7 +83,7 @@ export const useApplicationActions = (applicationId?: string): HookReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchActions = async () => {
+  const fetchActions = useCallback(async () => {
     if (!applicationId) return;
 
     try {
@@ -99,11 +99,11 @@ export const useApplicationActions = (applicationId?: string): HookReturn => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [applicationId]);
 
   useEffect(() => {
     fetchActions();
-  }, [applicationId]);
+  }, [fetchActions]);
 
   return { actions, loading, error, refetch: fetchActions };
 };

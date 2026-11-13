@@ -134,14 +134,19 @@ const EditKnowledgeHubProgramDetails = ({
   const { universities } = useUniversities();
   const { branches } = useBranches(formData.uni_id);
 
+  // When the university's branches load, keep a still-valid branch, pick the only one, or clear it.
   useEffect(() => {
-    if (!branches || branches.length === 0) {
-      updateFormData('branch_id', '');
-      return;
-    }
-    const stillValid = branches.some((b: any) => String(b.id) === String(formData.branch_id));
-    if (stillValid) return;
-    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
+    setFormData((prev: any) => {
+      const list = branches ?? [];
+      const keep = list.some((b: any) => String(b.id) === String(prev.branch_id));
+      const next = keep ? prev.branch_id : list.length === 1 ? String(list[0].id) : "";
+      return next === prev.branch_id ? prev : { ...prev, branch_id: next };
+    });
+    setErrors((prev) => {
+      if (!("branch_id" in prev)) return prev;
+      const { branch_id: _cleared, ...rest } = prev;
+      return rest;
+    });
   }, [branches]);
 
   const toggleSection = (key: SectionKey) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -247,6 +252,9 @@ const EditKnowledgeHubProgramDetails = ({
 
     setFormData(initialData);
     setInitialFormData(initialData);
+    // commissionTypes is left out on purpose: re-seeding when the types change would wipe the
+    // user's edits. The effect below fills the type in if the types arrive after the program.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [program, commission]);
 
   useEffect(() => {

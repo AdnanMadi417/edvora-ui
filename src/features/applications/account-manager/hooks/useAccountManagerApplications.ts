@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import api from "lib/useApi";
 
 export type AccountManagerApplication = {
@@ -56,7 +56,7 @@ export function useAccountManagerApplications({
   // page size, filter or search) must not overwrite a newer one.
   const latestRequest = useRef(0);
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     const request = ++latestRequest.current;
     setLoading(true);
     setError(null);
@@ -83,11 +83,11 @@ export function useAccountManagerApplications({
     } finally {
       if (request === latestRequest.current) setLoading(false);
     }
-  };
+  }, [limit, offset, status, partner_id, stage_id, stage_status_id, search, university_id]);
 
   useEffect(() => {
     fetchApplications();
-  }, [limit, offset, status, partner_id, stage_id, stage_status_id, search, university_id]);
+  }, [fetchApplications]);
 
   return {
     items: data?.items ?? [],

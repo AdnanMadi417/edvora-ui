@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { universityApi } from "../../services";
 import type { UniversityPaymentMethod } from "../../types";
 
@@ -7,7 +7,7 @@ export function useUniversityPaymentMethods(universityId?: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUniversityPaymentMethods = async () => {
+  const fetchUniversityPaymentMethods = useCallback(async () => {
     if (!universityId) return;
     setLoading(true);
     setError(null);
@@ -20,11 +20,11 @@ export function useUniversityPaymentMethods(universityId?: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [universityId]);
 
   useEffect(() => {
     fetchUniversityPaymentMethods();
-  }, [universityId]);
+  }, [fetchUniversityPaymentMethods]);
 
   return { universityPaymentMethods, loading, error, refetch: fetchUniversityPaymentMethods };
 }

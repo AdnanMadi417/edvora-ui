@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -61,7 +61,7 @@ export function usePartnerApplications({
   // page size, filter or search) must not overwrite a newer one.
   const latestRequest = useRef(0);
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     const request = ++latestRequest.current;
     if (!partnerId) return;
 
@@ -95,11 +95,11 @@ export function usePartnerApplications({
     } finally {
       if (request === latestRequest.current) setLoading(false);
     }
-  };
+  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search, university_id, include_members]);
 
   useEffect(() => {
     fetchApplications();
-  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search, university_id, include_members]);
+  }, [fetchApplications]);
 
   return {
     items: data?.items ?? [],

@@ -44,6 +44,8 @@ export default function BatchDeleteScholarships({
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
     }
+    // Loads once each time the dialog opens; the selected programs can't change while it's open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const toggleOne = (name: string) => {

@@ -25,6 +25,8 @@ const PresignedImage = ({ fileKey, alt, className, fallback, renderImage }: Pres
   if (renderImage) return <>{renderImage(src)}</>;
 
   return (
+    // Presigned links change per request and expire, so next/image can't optimise or cache them.
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}

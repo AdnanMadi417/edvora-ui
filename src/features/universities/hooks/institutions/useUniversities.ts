@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { universityApi } from "../../services";
 import type { University } from "../../types";
 
@@ -16,7 +16,7 @@ export function useUniversities({ includeInactive = false, isPublic, hasLanguage
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetch = async () => {
+  const fetch = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -52,9 +52,9 @@ export function useUniversities({ includeInactive = false, isPublic, hasLanguage
     } finally {
       setLoading(false);
     }
-  };
+  }, [includeInactive, isPublic, hasLanguageCenter, isHidden]);
 
-  useEffect(() => { fetch(); }, [includeInactive, isPublic, hasLanguageCenter, isHidden]);
+  useEffect(() => { fetch(); }, [fetch]);
 
   return { universities, loading, error, refetch: fetch };
 }

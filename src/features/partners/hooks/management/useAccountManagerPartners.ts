@@ -16,8 +16,11 @@ export function useAccountManagerPartners(params: UseAccountManagerPartnersParam
   const [refetchCounter, setRefetchCounter] = useState(0);
 
   const refetch = () => setRefetchCounter((c) => c + 1);
+  // Refetch when the params' values change, not on every new object from the caller.
+  const paramsKey = JSON.stringify(params);
 
   useEffect(() => {
+    const query = JSON.parse(paramsKey) as typeof params;
     // Only the latest request may touch state. Without this, a slower
     // response for an earlier search term could land after the newer one
     // and overwrite it with stale rows.
@@ -27,7 +30,7 @@ export function useAccountManagerPartners(params: UseAccountManagerPartnersParam
       setLoading(true);
       setError('');
       try {
-        const res = await partnersApi.listForAccountManager(params, controller.signal);
+        const res = await partnersApi.listForAccountManager(query, controller.signal);
         if (stale) return;
         setPartners(res.data?.items ?? []);
         setTotal(res.data?.total ?? 0);
@@ -43,7 +46,7 @@ export function useAccountManagerPartners(params: UseAccountManagerPartnersParam
       stale = true;
       controller.abort();
     };
-  }, [JSON.stringify(params), refetchCounter]);
+  }, [paramsKey, refetchCounter]);
 
   return { partners, total, loading, error, refetch };
 }

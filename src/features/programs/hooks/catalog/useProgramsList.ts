@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -60,13 +60,16 @@ export function useAllPrograms(params?: GetProgramsParams) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPrograms = async () => {
+  // Refetch when the params' values change, not on every new object from the caller.
+  const paramsKey = JSON.stringify(params ?? null);
+
+  const fetchPrograms = useCallback(async () => {
     setLoading(true);
     try {
       const token = Cookies.get("token");
       const res = await api.get("/knowledge-hub/programs", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        params,
+        params: JSON.parse(paramsKey) ?? undefined,
       });
       setPrograms(res.data?.items ?? res.data ?? []);
     } catch (err) {
@@ -75,11 +78,11 @@ export function useAllPrograms(params?: GetProgramsParams) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [paramsKey]);
 
   useEffect(() => {
     fetchPrograms();
-  }, [JSON.stringify(params)]);
+  }, [fetchPrograms]);
 
   return { programs, loading, error, refetch: fetchPrograms };
 }

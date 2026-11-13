@@ -60,8 +60,13 @@ export default function AgentPartnerChat({
 
   useChatPolling({ enabled: !loading, fetchNewMessages });
 
+  // Latest notifications and refetchers, read when messages change without re-running the effect for them.
+  const notificationState = useRef({ notifications, refetchNotifications, refetchUnreadCount });
+  notificationState.current = { notifications, refetchNotifications, refetchUnreadCount };
+
   useEffect(() => {
     if (messages.length === 0) return;
+    const { notifications, refetchNotifications, refetchUnreadCount } = notificationState.current;
 
     markMessagesRead(messages).then(async (markedIds) => {
       if (markedIds.length === 0) return;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { programApi } from "../../services";
 import type { Program, ExchangeRate } from "../../types";
 import { getCatalogueQuotaError, type CatalogueQuotaError } from "../../utils/catalogueQuota";
@@ -13,7 +13,7 @@ export function useProgram(programId: string) {
   // Set instead of a generic error when the partner's daily catalogue quota is used up (UBX-425).
   const [quota, setQuota] = useState<CatalogueQuotaError | null>(null);
 
-  const fetch = async () => {
+  const fetch = useCallback(async () => {
     if (!programId) return;
     setLoading(true);
     setError(null);
@@ -31,11 +31,11 @@ export function useProgram(programId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [programId]);
 
   useEffect(() => {
     fetch();
-  }, [programId]);
+  }, [fetch]);
 
   return { program, requiredDocuments, commission, exchangeRates, loading, error, quota, refetch: fetch };
 }

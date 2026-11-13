@@ -46,9 +46,12 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
 
   const [name, setName] = useState("");
 
+  const loadedRoleId = role?.id;
+  const loadedRoleName = role?.name;
+  // Reset the name field when another role loads or the saved name changes.
   useEffect(() => {
-    if (role) setName(role.name);
-  }, [role?.id, role?.name]);
+    if (loadedRoleName !== undefined) setName(loadedRoleName);
+  }, [loadedRoleId, loadedRoleName]);
 
   const nameChanged = !!role && !role.is_system && name.trim() !== role.name;
   const isDirty = nameChanged;

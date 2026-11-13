@@ -33,8 +33,11 @@ export function usePartners(params: GetPartnersParams = {}) {
   const [refetchCounter, setRefetchCounter] = useState(0);
 
   const refetch = () => setRefetchCounter((c) => c + 1);
+  // Refetch when the params' values change, not on every new object from the caller.
+  const paramsKey = JSON.stringify(params);
 
   useEffect(() => {
+    const query = JSON.parse(paramsKey) as typeof params;
     // Only the latest request may touch state. Without this, a slower
     // response for an earlier search term could land after the newer one
     // and overwrite it with stale rows.
@@ -44,7 +47,7 @@ export function usePartners(params: GetPartnersParams = {}) {
       setLoading(true);
       setError('');
       try {
-        const res = await partnersApi.list(params, controller.signal);
+        const res = await partnersApi.list(query, controller.signal);
         if (stale) return;
         setPartners(res.data?.items ?? []);
         setTotal(res.data?.total ?? 0);
@@ -61,7 +64,7 @@ export function usePartners(params: GetPartnersParams = {}) {
       stale = true;
       controller.abort();
     };
-  }, [JSON.stringify(params), refetchCounter]);
+  }, [paramsKey, refetchCounter]);
 
   return { partners, total, stats, loading, error, refetch };
 }

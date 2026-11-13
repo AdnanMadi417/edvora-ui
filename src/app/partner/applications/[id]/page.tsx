@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
@@ -25,7 +25,7 @@ export default function ApplicationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchApplication = async () => {
+  const fetchApplication = useCallback(async () => {
     try {
       setError(null);
       const token = Cookies.get("token");
@@ -50,11 +50,11 @@ export default function ApplicationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [applicationId, sessionPartnerId]);
 
   useEffect(() => {
     fetchApplication();
-  }, [applicationId, sessionPartnerId]);
+  }, [fetchApplication]);
 
   if (loading) return <Loading text="Fetching application data..." />;
   if (error) return <Alert tone="danger" title="This application couldn't load">{error}</Alert>;
