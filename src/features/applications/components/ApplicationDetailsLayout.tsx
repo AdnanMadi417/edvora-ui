@@ -134,7 +134,7 @@ export function OverviewGrid({
   );
 }
 
-/** Two cards side by side from 992px (Offer & visa tab). */
+/** Two cards side by side from 992px (Offer & visa tab). Each card keeps its own height, so a short card isn't stretched into an empty box. */
 export function TwoColumn({ children }: { children: ReactNode }) {
-  return <div className="grid gap-4 md:gap-6 lg:grid-cols-2">{children}</div>;
+  return <div className="grid items-start gap-4 md:gap-6 lg:grid-cols-2">{children}</div>;
 }

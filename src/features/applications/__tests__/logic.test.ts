@@ -93,6 +93,8 @@ describe("commission, offer and visa", () => {
     const d = (state: any) => ({ id: state, name: state, state, group: "visa", uploadedAt: null, reason: null, fileKey: null, fileUrl: null }) as any;
     expect(visaSteps([{ id: "a", label: "A", document: d("verified") }, { id: "b", label: "B", document: null }, { id: "c", label: "C", document: null }]).map((s) => s.state)).toEqual(["complete", "current", "upcoming"]);
     expect(visaSteps([{ id: "a", label: "A", document: d("needs-replacing") }])[0].state).toBe("attention");
+    // No offer yet: nothing is current.
+    expect(visaSteps([{ id: "a", label: "A", document: null }, { id: "b", label: "B", document: null }], false).map((s) => s.state)).toEqual(["upcoming", "upcoming"]);
   });
 });
 

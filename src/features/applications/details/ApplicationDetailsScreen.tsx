@@ -194,8 +194,9 @@ export default function ApplicationDetailsScreen({
     "offer-visa": (
       <div className="grid gap-4 md:gap-6">
         <TwoColumn>
-          {offerCard}
-          <VisaStatusCard steps={visaStepInputs} onDownload={download} downloadingId={downloadingId} />
+          {/* The visa fee sits with the visa steps here; the Overview keeps it on the Offer card. */}
+          <OfferCard status={offerStatus} offerLetter={view.offerLetter} onDownload={download} downloadingId={downloadingId} />
+          <VisaStatusCard steps={visaStepInputs} started={!!view.offerLetter || !!visaCase} visaFee={visaFee} visaFeeNote={visaCase?.notes} onDownload={download} downloadingId={downloadingId} />
         </TwoColumn>
         {offerVisaExtra}
       </div>
