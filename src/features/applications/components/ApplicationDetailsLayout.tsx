@@ -89,6 +89,8 @@ export default function ApplicationDetailsLayout({
           {...tabPanelProps(tabId, activeTab)}
           className="mt-4 min-w-0 focus-visible:outline-none md:mt-6"
         >
+          {/* Names the panel for screen readers so its cards (h3) sit under an h2. */}
+          <h2 className="sr-only">{APPLICATION_DETAILS_TABS.find((t) => t.key === activeTab)?.label}</h2>
           {panels[activeTab]}
         </motion.div>
       </div>

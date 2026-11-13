@@ -55,7 +55,7 @@ export default function DocumentChecklist({
     <SectionCard
       title={
         <span className="inline-flex items-center gap-2">
-          {title}
+          {title}{" "}
           {attention > 0 && <CountBadge count={attention} tone="danger" label={(n) => `${n} need replacing`} />}
         </span>
       }

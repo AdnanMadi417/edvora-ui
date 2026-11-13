@@ -5,6 +5,7 @@
 import { ArrowRightLeft, FilePlus2, FileUp, Info, MessageCircle, Plane, Wallet, type LucideIcon } from "lucide-react";
 import type { TimelineEvent } from "components/ub/data/display/Timeline";
 import type { TagTone } from "components/ub/recipes";
+import { formatCurrency } from "lib/format";
 import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 
 export type Category = "status" | "documents" | "correction" | "visa" | "program" | "message" | "other";
@@ -22,11 +23,15 @@ const ENTRY_CATEGORY: Record<string, Category> = {
   message_sent: "message",
 };
 
+// Acronyms keep their capitals ("EMGS_EVALUATION" → "EMGS Evaluation", not "Emgs Evaluation").
+const ACRONYMS = new Set(["EMGS", "MDAC", "IELTS", "TOEFL", "PTE", "MUET", "CV", "ID", "SPM", "STPM", "GPA", "CGPA", "PDF"]);
 const humanize = (code: string) =>
   code
     .replace(/_/g, " ")
     .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .split(/\s+/)
+    .map((w) => (ACRONYMS.has(w.toUpperCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+    .join(" ");
 
 const asString = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v : null);
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -71,7 +76,8 @@ export function describe(item: ApplicationTimelineItem): Described {
     case "document_upload": {
       const code = asString(d.document_type_code);
       const uploaded = formatDocTypeList(item.uploaded_document_types);
-      const label = code ? humanize(code) : (uploaded ?? "a document");
+      // Prefer the document type's own name; the code is only a fallback.
+      const label = uploaded ?? (code ? humanize(code) : "a document");
       const requested = formatDocTypeList(item.requested_document_types);
       if (requested) details.push({ label: "Requested", text: requested });
       return { category, title: `${actor} ${d.reupload === true ? "re-uploaded" : "uploaded"} ${label}`, details };
@@ -86,9 +92,10 @@ export function describe(item: ApplicationTimelineItem): Described {
     }
 
     case "visa_payment_created": {
-      const amount = typeof d.amount === "number" || asString(d.amount) ? String(d.amount) : null;
-      const currency = asString(d.currency);
-      const suffix = amount ? `: ${amount}${currency ? ` ${currency}` : ""}` : "";
+      const amount = typeof d.amount === "number" ? d.amount : Number(asString(d.amount) ?? NaN);
+      const currency = asString(d.currency) ?? undefined;
+      // Same money format as the rest of the app: "RM2,450", "USD 3,000".
+      const suffix = Number.isFinite(amount) ? `: ${formatCurrency(amount, { currency: currency?.toUpperCase() })}` : "";
       return { category, title: `Visa payment recorded${suffix}`, details };
     }
 

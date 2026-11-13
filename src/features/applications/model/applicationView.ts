@@ -215,7 +215,8 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
       statusCode,
       resolved: resolveStage({ stageCode: stageCodeOf(a.stage), statusCode, lifecycle: a.lifecycle_status }),
     },
-    nextStep: str(next?.name),
+    // The workflow text says Partner; the UI calls this role Advisor everywhere.
+    nextStep: str(next?.name)?.replace(/\bPartner\b/g, "Advisor").replace(/\bpartner\b/g, "advisor") ?? null,
     documents: [...list(a.documents, "application"), ...list(a.payment_documents, "payment"), ...list(a.arrival_documents, "arrival")],
     offerLetter: toDocument(a.offer_letter_document, "offer"),
     visa: {

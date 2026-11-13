@@ -32,6 +32,8 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
   return (
     <SectionCard
       title="Application progress"
+      // Sits under the page h1, beside the tab panels (each starts with its own h2).
+      as="h2"
       description={statusName ?? undefined}
       state={state}
       loadingRows={2}

@@ -73,7 +73,8 @@ export default function FileRow({ name, state, meta, reason, progress, actions, 
           {state === "uploading" && <ProgressBar className="mt-2" value={progress} indeterminate={progress === undefined} showValue={false} aria-label={`Uploading ${name}`} />}
         </div>
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+      {/* Below sm the actions wrap under the name, so indent them past the 40px icon + 12px gap. */}
+      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2 ps-[52px] sm:ps-0">{actions}</div>}
     </Root>
   );
 }
