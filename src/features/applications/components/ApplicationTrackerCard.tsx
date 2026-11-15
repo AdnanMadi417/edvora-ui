@@ -41,6 +41,7 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
       onRetry={onRetry}
       className={className}
       footer={navigation}
+      footerFlush={!!navigation}
     >
       <ApplicationTracker steps={trackerStepsFor(stage)} orientation="responsive" />
       {/* Its own line (not under the current step) so it also shows on attention and completed states. */}

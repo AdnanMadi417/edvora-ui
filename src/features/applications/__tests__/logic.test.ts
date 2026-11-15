@@ -115,7 +115,8 @@ describe("timeline", () => {
       { id: "1", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "New", to_status: "Submitted", from_stage: "Review", to_stage: "Review", reason_text: "OK", created_at: "2026-11-01T00:00:00Z" } as any,
       { id: "2", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "Submitted", to_status: "Offer", from_stage: "Review", to_stage: "Offer Letter", created_at: "2026-11-02T00:00:00Z" } as any,
     ]);
-    expect(e.title).toBe("Farid moved it to Submitted");
+    expect(e.title).toBe("Status changed to Submitted");
+    expect(e.actor).toBe("Farid");
     expect(e.category).toBe("status");
     expect(e.details).toContainEqual({ label: "From", text: "New" });
     // Same stage: no stage line. A stage change says so.

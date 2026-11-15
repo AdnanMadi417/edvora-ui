@@ -47,7 +47,7 @@ const formatDocTypeList = (refs: TimelineDocumentTypeRef[] | null): string | nul
 export interface Described {
   category: Category;
   title: string;
-  details: { label: string; text: string }[];
+  details: { label: string; text: string; items?: string[] }[];
 }
 
 // `detail` shapes vary by entry_type (and document_upload by call site), so
@@ -58,7 +58,6 @@ export interface DescribeOptions {
 }
 
 export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: DescribeOptions = {}): Described {
-  const actor = forAdvisor ? advisorActorName(item.actor_name) : item.actor_name || "Unknown user";
   const v = (text: string | null) => (forAdvisor ? unibexsVoice(text) : text);
   const d = item.detail ?? {};
   const category = ENTRY_CATEGORY[item.entry_type] ?? "other";
@@ -70,10 +69,10 @@ export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: 
       if (item.from_status && item.to_status) details.push({ label: "From", text: v(item.from_status)! });
       if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: v(item.to_stage)! });
       const requiredDocs = formatDocTypeList(item.required_document_types);
-      if (requiredDocs) details.push({ label: "Requested", text: requiredDocs });
+      if (requiredDocs) details.push({ label: "Requested documents", text: requiredDocs, items: item.required_document_types!.map(formatDocType) });
       if (item.reason_text) details.push({ label: "Reason", text: item.reason_text });
       if (item.notes) details.push({ label: "Notes", text: item.notes });
-      const title = item.to_status ? `${actor} moved it to ${v(item.to_status)}` : `${actor} changed the status`;
+      const title = item.to_status ? `Status changed to ${v(item.to_status)}` : "Status changed";
       return { category, title, details };
     }
 
@@ -83,16 +82,19 @@ export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: 
       // Prefer the document type's own name; the code is only a fallback.
       const label = uploaded ?? (code ? humanize(code) : "a document");
       const requested = formatDocTypeList(item.requested_document_types);
-      if (requested) details.push({ label: "Requested", text: requested });
-      return { category, title: `${actor} ${d.reupload === true ? "re-uploaded" : "uploaded"} ${label}`, details };
+      const uploadedCount = item.uploaded_document_types?.length ?? 0;
+      if (uploadedCount > 1) details.push({ label: "Uploaded documents", text: uploaded!, items: item.uploaded_document_types!.map(formatDocType) });
+      if (requested && requested !== uploaded) details.push({ label: "Requested documents", text: requested, items: item.requested_document_types!.map(formatDocType) });
+      const documentLabel = uploadedCount > 1 ? plural(uploadedCount, "document") : label;
+      return { category, title: `${d.reupload === true ? "Re-uploaded" : "Uploaded"} ${documentLabel}`, details };
     }
 
     case "correction_request_updated": {
       const reason = asString(d.reason_text);
       const requested = formatDocTypeList(item.required_document_types);
       if (reason) details.push({ label: "Reason", text: reason });
-      if (requested) details.push({ label: "Requested", text: requested });
-      return { category, title: `${actor} updated the correction request`, details };
+      if (requested) details.push({ label: "Requested documents", text: requested, items: item.required_document_types!.map(formatDocType) });
+      return { category, title: "Correction request updated", details };
     }
 
     case "visa_payment_created": {
@@ -104,20 +106,20 @@ export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: 
     }
 
     case "visa_case_updated":
-      return { category, title: `${actor} updated the visa case`, details };
+      return { category, title: "Visa case updated", details };
     case "arrival_date_updated":
-      return { category, title: `${actor} updated the arrival date`, details };
+      return { category, title: "Arrival date updated", details };
     case "program_changed":
-      return { category, title: `${actor} changed the program`, details };
+      return { category, title: "Programme changed", details };
     case "lifecycle_status_changed":
-      return { category, title: `${actor} changed the application status`, details };
+      return { category, title: "Application status changed", details };
     case "commission_disputed":
-      return { category, title: `${actor} disputed the commission`, details };
+      return { category, title: "Commission disputed", details };
     case "message_sent":
-      return { category, title: `${actor} sent a message`, details };
+      return { category, title: "Message sent", details };
 
     default:
-      return { category, title: `${humanize(item.entry_type)} by ${actor}`, details };
+      return { category, title: humanize(item.entry_type), details };
   }
 }
 
@@ -132,10 +134,10 @@ export const CATEGORY_ICON: Record<Category, { icon: LucideIcon; tone: TagTone }
   other: { icon: Info, tone: "neutral" },
 };
 
-/** Pure: timeline API items → Timeline events (title plus "Label: text" detail lines). */
-export function toTimelineEvents(items: ApplicationTimelineItem[], options: DescribeOptions = {}): (TimelineEvent & { category: Category; details: { label: string; text: string }[] })[] {
+/** Timeline API items → action headlines, actor metadata, and labelled details. */
+export function toTimelineEvents(items: ApplicationTimelineItem[], options: DescribeOptions = {}): (TimelineEvent & { category: Category; details: { label: string; text: string; items?: string[] }[] })[] {
   return items.map((item) => {
     const { category, title, details } = describe(item, options);
-    return { id: item.id, category, title, at: item.created_at, icon: CATEGORY_ICON[category].icon, tone: CATEGORY_ICON[category].tone, details };
+    return { id: item.id, category, title, actor: options.forAdvisor ? advisorActorName(item.actor_name) : item.actor_name || "Unknown user", at: item.created_at, icon: CATEGORY_ICON[category].icon, tone: CATEGORY_ICON[category].tone, details };
   });
 }

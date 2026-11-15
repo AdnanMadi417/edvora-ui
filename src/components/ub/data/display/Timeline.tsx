@@ -8,6 +8,8 @@ type IconComponent = ComponentType<{ className?: string; "aria-hidden"?: boolean
 export interface TimelineEvent {
   id: string;
   title: ReactNode;
+  /** Person responsible for the event, kept separate from the action headline. */
+  actor?: string;
   /** Second line: who did it, a reason or notes. */
   description?: ReactNode;
   /** ISO date-time; drives grouping and the time label. */
@@ -61,6 +63,8 @@ export function groupTimeline<T extends { at: string }>(events: T[], now: Date =
 }
 
 export interface TimelineProps {
+  /** Include the exact clock time as well as the relative/date label. */
+  showTime?: boolean;
   events: TimelineEvent[];
   /** Group under Today / This week / Earlier headings. Default true. */
   grouped?: boolean;
@@ -71,7 +75,7 @@ export interface TimelineProps {
   className?: string;
 }
 
-function EventItem({ event, now, last }: { event: TimelineEvent; now: Date; last: boolean }) {
+function EventItem({ event, now, last, showTime }: { event: TimelineEvent; now: Date; last: boolean; showTime?: boolean }) {
   const date = parseDate(event.at);
   const Icon = event.icon;
   return (
@@ -83,15 +87,20 @@ function EventItem({ event, now, last }: { event: TimelineEvent; now: Date; last
         {!last && <span className="my-1 w-px flex-1 bg-ub-border" />}
       </div>
       <div className={clsx("min-w-0 flex-1", !last && "pb-5")}>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-          <p className="min-w-0 text-ub-label-md text-ub-text-primary">{event.title}</p>
-          {date && (
-            <time dir="auto" dateTime={toISOString(date)} className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">
-              {formatEventTime(event.at, now)}
-            </time>
-          )}
+        <div className={clsx("flex gap-x-3 gap-y-1", showTime ? "flex-col items-start" : "flex-wrap items-baseline justify-between")}>
+          <p className="min-w-0 text-ub-label-md leading-6 text-ub-text-primary [overflow-wrap:anywhere]">{event.title}</p>
+          <div className="flex max-w-full flex-wrap items-baseline gap-x-2 gap-y-1 text-ub-caption text-ub-text-secondary">
+            {event.actor && <span className="min-w-0 [overflow-wrap:anywhere]">{event.actor}</span>}
+            {event.actor && date && <span aria-hidden="true">·</span>}
+            {date && (
+              <time dir="auto" dateTime={toISOString(date)} title={formatDate(date, "datetime", "en-GB")} className="ub-tabular text-ub-caption text-ub-text-secondary">
+                <span>{formatEventTime(event.at, now)}</span>
+                {showTime && <span> · {new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", hour12: true }).format(date).toUpperCase()}</span>}
+              </time>
+            )}
+          </div>
         </div>
-        {event.description && <div className="mt-0.5 text-ub-body-sm text-ub-text-secondary">{event.description}</div>}
+        {event.description && <div className={clsx("text-ub-body-sm text-ub-text-secondary [overflow-wrap:anywhere]", showTime ? "mt-3 leading-6" : "mt-0.5")}>{event.description}</div>}
       </div>
     </li>
   );
@@ -101,12 +110,12 @@ function EventItem({ event, now, last }: { event: TimelineEvent; now: Date; last
  * Vertical event timeline (brief §4 Data, §8 time rules): newest first,
  * grouped Today / This week / Earlier, relative time under 7 days.
  */
-export default function Timeline({ events, grouped = true, now = new Date(), "aria-label": ariaLabel = "Activity", className }: TimelineProps) {
+export default function Timeline({ events, grouped = true, showTime = false, now = new Date(), "aria-label": ariaLabel = "Activity", className }: TimelineProps) {
   if (!grouped) {
     return (
       <ol aria-label={ariaLabel} className={className}>
         {events.map((e, i) => (
-          <EventItem key={e.id} event={e} now={now} last={i === events.length - 1} />
+          <EventItem key={e.id} event={e} now={now} showTime={showTime} last={i === events.length - 1} />
         ))}
       </ol>
     );
@@ -118,7 +127,7 @@ export default function Timeline({ events, grouped = true, now = new Date(), "ar
           <h4 className="mb-3 text-ub-label-sm text-ub-text-tertiary">{g.label}</h4>
           <ol>
             {g.events.map((e, i) => (
-              <EventItem key={e.id} event={e} now={now} last={i === g.events.length - 1} />
+              <EventItem key={e.id} event={e} now={now} showTime={showTime} last={i === g.events.length - 1} />
             ))}
           </ol>
         </section>

@@ -11,11 +11,11 @@ const TABS: TabItem<K>[] = [
   { key: "d", label: "Activity" },
 ];
 
-function Harness({ variant }: { variant?: TabsVariant }) {
+function Harness({ variant, contained }: { variant?: TabsVariant; contained?: boolean }) {
   const [active, setActive] = useState<K>("a");
   return (
     <>
-      <Tabs<K> tabs={TABS} active={active} onChange={setActive} variant={variant} idPrefix="t" aria-label="Profile" />
+      <Tabs<K> tabs={TABS} active={active} onChange={setActive} variant={variant} contained={contained} idPrefix="t" aria-label="Profile" />
       <div {...tabPanelProps("t", active)}>panel {active}</div>
     </>
   );
@@ -24,7 +24,7 @@ function Harness({ variant }: { variant?: TabsVariant }) {
 describe("Tabs", () => {
   it("roves focus with arrows, skipping disabled tabs, and wraps", async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    render(<Harness contained />);
     await user.tab();
     expect(screen.getByRole("tab", { name: "Overview" })).toHaveFocus();
     await user.keyboard("{ArrowRight}{ArrowRight}");

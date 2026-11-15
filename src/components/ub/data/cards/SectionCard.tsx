@@ -43,6 +43,8 @@ export interface SectionCardProps {
   onRetry?: () => void;
   /** Footer row under the body, e.g. "Tracked automatically". */
   footer?: ReactNode;
+  /** Remove footer padding when it contains edge-to-edge navigation. */
+  footerFlush?: boolean;
   /** Removes body padding so a List or table can run edge to edge. */
   flush?: boolean;
   children?: ReactNode;
@@ -70,6 +72,7 @@ const SectionCard = forwardRef<HTMLElement, SectionCardProps>(
       errorMessage,
       onRetry,
       footer,
+      footerFlush = false,
       flush = false,
       children,
       className,
@@ -191,8 +194,8 @@ const SectionCard = forwardRef<HTMLElement, SectionCardProps>(
         {footer && state === "ready" && (
           <footer
             className={clsx(
-              pad,
-              "border-t border-ub-border py-3 text-ub-body-sm text-ub-text-secondary"
+              footerFlush ? "overflow-hidden rounded-b-[calc(var(--ub-radius-lg)-1px)]" : [pad, "py-3"],
+              "border-t border-ub-border text-ub-body-sm text-ub-text-secondary"
             )}
           >
             {footer}

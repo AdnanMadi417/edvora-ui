@@ -62,6 +62,7 @@ export default function ApplicationDetailsLayout({
           variant="underline"
           idPrefix={tabId}
           inset={false}
+          contained
           aria-label="Application sections"
           className="min-w-0 bg-ub-surface"
         />

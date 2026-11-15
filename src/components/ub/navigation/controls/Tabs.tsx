@@ -37,6 +37,8 @@ export interface TabsProps<T extends string> {
   iconOnly?: boolean;
   /** Underline only: 24px inline padding so the first tab lines up with card content. Default true. */
   inset?: boolean;
+  /** Underline tabs inside a bordered card: the card owns the bottom border. */
+  contained?: boolean;
   /** Prefix for tab/panel ids; pair with tabPanelProps() on each panel for aria-controls. */
   idPrefix?: string;
   className?: string;
@@ -67,7 +69,7 @@ const HEIGHT: Record<TabsVariant, Record<TabsSize, string>> = {
   vertical: { md: "h-10 px-3 text-ub-label-md", sm: "h-9 px-3 text-ub-label-sm" },
 };
 
-function tabClasses(variant: TabsVariant, selected: boolean): string {
+function tabClasses(variant: TabsVariant, selected: boolean, contained = false): string {
   switch (variant) {
     case "segmented":
       return clsx(
@@ -94,9 +96,11 @@ function tabClasses(variant: TabsVariant, selected: boolean): string {
     default:
       // brief §4.7: 2px blue underline on the active tab
       return clsx(
-        "-mb-px border-b-2",
+        contained ? "relative" : "-mb-px border-b-2",
         focusRingInset,
-        selected ? "border-ub-border-focus text-ub-tab-active" : "border-transparent text-ub-text-secondary hover:text-ub-text-primary",
+        selected
+          ? clsx(!contained && "border-ub-border-focus", "text-ub-tab-active")
+          : clsx(!contained && "border-transparent", "text-ub-text-secondary hover:text-ub-text-primary"),
       );
   }
 }
@@ -118,6 +122,7 @@ export default function Tabs<T extends string>({
   fullWidth = false,
   iconOnly = false,
   inset = true,
+  contained = false,
   idPrefix,
   className,
   "aria-label": ariaLabel,
@@ -158,7 +163,7 @@ export default function Tabs<T extends string>({
       aria-label={ariaLabel}
       aria-orientation={vertical ? "vertical" : "horizontal"}
       onKeyDown={onKeyDown}
-      className={clsx(LIST[variant], variant === "underline" && inset && "px-6", fullWidth && variant !== "vertical" && "w-full", className)}
+      className={clsx(variant === "underline" && contained ? "flex gap-1 overflow-x-auto" : LIST[variant], variant === "underline" && inset && "px-6", fullWidth && variant !== "vertical" && "w-full", className)}
     >
       {tabs.map(({ key, label, icon: Icon, count, disabled }, i) => {
         const selected = active === key;
@@ -181,12 +186,15 @@ export default function Tabs<T extends string>({
               "inline-flex shrink-0 items-center gap-2 whitespace-nowrap",
               transition,
               HEIGHT[variant][size],
-              tabClasses(variant, selected),
+              tabClasses(variant, selected, contained),
               fullWidth && variant !== "vertical" && "flex-1 justify-center",
               hideLabels && "px-0 aspect-square justify-center",
               "disabled:cursor-not-allowed disabled:text-ub-text-disabled disabled:hover:bg-transparent",
             )}
           >
+            {variant === "underline" && contained && selected && (
+              <span data-tab-indicator aria-hidden="true" className="absolute inset-x-3 bottom-0 h-0.5 rounded-ub-full bg-ub-action-primary" />
+            )}
             {Icon && <Icon className={clsx("h-4 w-4 shrink-0", selected ? "text-current" : "text-ub-icon")} aria-hidden="true" />}
             <span className={clsx(hideLabels && "sr-only", vertical && "min-w-0 flex-1 truncate text-start")}>{label}</span>
             {typeof count === "number" && count > 0 && (

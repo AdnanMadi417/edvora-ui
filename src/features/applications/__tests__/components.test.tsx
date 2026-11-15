@@ -125,6 +125,19 @@ describe("Application Details components", () => {
     expect(screen.getByText(/only available while/)).toBeInTheDocument();
   });
 
+  it("ActivityTimeline: shows the actor, precise timestamp and complete document list", () => {
+    const { container } = render(<ActivityTimeline now={NOW} events={[{
+      id: "upload", title: "Uploaded 2 documents", actor: "Priya Nair", at: "2026-11-02T08:00:00Z",
+      details: [{ label: "Uploaded documents", text: "Passport, Academic transcript", items: ["Passport", "Academic transcript"] }, { label: "Reason", text: "Please keep every page visible." }],
+    }]} />);
+    expect(screen.getByText("Priya Nair")).toBeInTheDocument();
+    expect(screen.getByText("Passport").tagName).toBe("LI");
+    expect(screen.getByText("Academic transcript")).toBeInTheDocument();
+    expect(screen.getByText("Please keep every page visible.")).toBeInTheDocument();
+    expect(container.querySelector("time")).toHaveAttribute("datetime", "2026-11-02T08:00:00.000Z");
+    expect(container.querySelector("time").title).toContain("2026");
+  });
+
   it("ActivityTimeline: filter chips show one kind of event at a time", async () => {
     render(
       <ActivityTimeline

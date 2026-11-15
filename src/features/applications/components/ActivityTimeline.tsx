@@ -8,8 +8,8 @@ import SectionCard from "components/ub/data/cards/SectionCard";
 import Timeline, { type TimelineEvent } from "components/ub/data/display/Timeline";
 
 export interface ActivityEvent extends TimelineEvent {
-  /** "Label: text" lines under the title (reason, notes, requested documents). */
-  details?: { label: string; text: string }[];
+  /** Labelled reasons, notes, and document lists under the event. */
+  details?: { label: string; text: string; items?: string[] }[];
   /** Drives the filter chips (see ACTIVITY_FILTERS). */
   category?: string;
 }
@@ -80,16 +80,24 @@ export default function ActivityTimeline({ events, total, loading = false, error
       <Timeline
         now={now}
         aria-label="Activity"
+        showTime
         events={shown.map((e) => ({
           ...e,
           description: e.details?.length ? (
-            <div className="grid gap-0.5">
-              {e.details.map((d) => (
-                <p key={d.label} className="whitespace-pre-wrap break-words">
-                  <span className="font-medium text-ub-text-primary">{d.label}:</span> {d.text}
-                </p>
+            <dl className="space-y-3 rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3">
+              {e.details.map((d, index) => (
+                <div key={`${d.label}-${index}`} className="min-w-0">
+                  <dt className="mb-1 text-ub-label-sm text-ub-text-primary">{d.label}</dt>
+                  <dd className="whitespace-pre-wrap text-ub-body-sm leading-6 text-ub-text-secondary [overflow-wrap:anywhere]">
+                    {d.items && d.items.length > 1 ? (
+                      <ul className="list-disc space-y-1 ps-4">
+                        {d.items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+                      </ul>
+                    ) : d.text}
+                  </dd>
+                </div>
               ))}
-            </div>
+            </dl>
           ) : (
             e.description
           ),
