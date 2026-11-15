@@ -41,13 +41,13 @@ describe("Combobox", () => {
     expect(screen.getAllByRole("option")).toHaveLength(4);
     // First option is active; two downs skip the disabled UCSI option.
     await user.keyboard("{ArrowDown}{ArrowDown}");
-    const active = input.getAttribute("aria-activedescendant");
+    const active = screen.getByRole("searchbox").getAttribute("aria-activedescendant");
     expect(document.getElementById(active!)).toHaveTextContent("Asia Pacific University");
 
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith("apu");
     expect(input).toHaveAttribute("aria-expanded", "false");
-    expect(input).toHaveValue("Asia Pacific University");
+    expect(input).toHaveTextContent("Asia Pacific University");
   });
 
   it("filters as you type and shows an empty state that says how to fix it", async () => {
@@ -56,13 +56,14 @@ describe("Combobox", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox", { name: /^Institution/ });
 
-    await user.type(input, "subang");
+    await user.click(input);
+    await user.type(screen.getByRole("searchbox"), "subang");
     expect(screen.getAllByRole("option")).toHaveLength(1);
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith("taylors");
 
-    await user.clear(input);
-    await user.type(input, "monash");
+    await user.click(input);
+    await user.type(screen.getByRole("searchbox"), "monash");
     expect(screen.queryAllByRole("option")).toHaveLength(0);
     expect(screen.getByText(/No results for "monash". Check the spelling/)).toBeInTheDocument();
   });
@@ -76,7 +77,8 @@ describe("server-side combobox search", () => {
     const props = { label: "Advisor", options: [{ value: "1", label: "Global Pathways", description: "advisor@example.com" }], value: null, onChange: selected, serverResults: true, onSearchChange: changed };
     const { rerender } = render(<Combobox {...props} searchValue="" resultsVisible={false} />);
     const input = screen.getByRole("combobox", { name: /^Advisor/ });
-    await user.type(input, "x");
+    await user.click(input);
+    await user.type(screen.getByRole("searchbox"), "x");
     expect(changed).toHaveBeenLastCalledWith("x");
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     rerender(<Combobox {...props} searchValue="remote query" resultsVisible loading />);
@@ -87,4 +89,20 @@ describe("server-side combobox search", () => {
     await user.click(screen.getByRole("option", { name: /Global Pathways/ }));
     expect(selected).toHaveBeenCalledWith("1", props.options[0]);
   });
+});
+
+it("portals options outside a clipped container and keeps the saved value while searching", async () => {
+  const user = userEvent.setup();
+  const changed = jest.fn();
+  const { container } = render(<div style={{ overflow: "hidden", height: 40 }}><Combobox label="Institution" options={INSTITUTIONS} value="sunway" onChange={changed} /></div>);
+  const trigger = screen.getByRole("combobox", { name: /^Institution/ });
+  await user.click(trigger);
+  expect(container.querySelector('[role="listbox"]')).toBeNull();
+  expect(screen.getByRole("listbox")).toBeInTheDocument();
+  await user.type(screen.getByRole("searchbox"), "Taylor");
+  expect(trigger).toHaveTextContent("Sunway University");
+  expect(changed).not.toHaveBeenCalled();
+  await user.keyboard("{Escape}");
+  expect(trigger).toHaveFocus();
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 });

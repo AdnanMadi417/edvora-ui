@@ -56,13 +56,13 @@ it("requires each section, preserves service pricing, and creates only after rev
   await userEvent.click(
     within(
       container.querySelector('[data-field="nationality"]') as HTMLElement
-    ).getByRole("button")
+    ).getByRole("combobox")
   );
   await userEvent.click(screen.getByRole("option", { name: "Malaysian" }));
   await userEvent.click(
     within(
       container.querySelector('[data-field="main_location"]') as HTMLElement
-    ).getByRole("button")
+    ).getByRole("combobox")
   );
   await userEvent.click(screen.getByRole("option", { name: "Selangor" }));
   await userEvent.click(screen.getByRole("button", { name: "Continue" }));

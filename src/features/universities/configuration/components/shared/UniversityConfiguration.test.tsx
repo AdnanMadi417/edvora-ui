@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import UniversityTypeDirectory from "features/universities/configuration/components/shared/UniversityTypeDirectory";
@@ -14,7 +15,7 @@ beforeEach(() => { jest.clearAllMocks(); mockDelete.mockResolvedValue(undefined)
 it("searches details without changing required/optional totals", async () => {
   const user = userEvent.setup();
   render(<UniversityTypeDetailsView university={type} />);
-  await user.selectOptions(screen.getByRole("combobox", { name: "Requirement status" }), "required");
+  await selectOption(user, screen.getByRole("combobox", { name: "Requirement status" }), "required");
   expect(screen.getByText("Phone number")).toBeInTheDocument();
   expect(screen.queryByText("Current address")).not.toBeInTheDocument();
   expect(screen.getByRole("status")).toHaveTextContent("1 field shown");

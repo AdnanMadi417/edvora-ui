@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -106,6 +107,7 @@ describe("TransferPartnersModal", () => {
     expect(screen.getByText("Acme Agency")).toBeInTheDocument();
     expect(screen.getByText("John Doe")).toBeInTheDocument();
 
+    await userEvent.click(screen.getByRole("combobox"));
     const options = screen.getAllByRole("option").map((o) => o.textContent);
     expect(options).toContain("Ahmad Razak");
     expect(options).not.toContain("Sarah Lim");
@@ -118,7 +120,7 @@ describe("TransferPartnersModal", () => {
     const confirm = screen.getByRole("button", { name: /Transfer 2 advisors/ });
     expect(confirm).toBeDisabled();
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     expect(confirm).toBeEnabled();
   });
 
@@ -126,7 +128,7 @@ describe("TransferPartnersModal", () => {
     const user = userEvent.setup();
     const { transfer, onClose, onTransferred } = setup({ transfer: jest.fn().mockResolvedValue(MOVE_RESULT) });
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -147,7 +149,7 @@ describe("TransferPartnersModal", () => {
     expect(screen.getByText(/not shared automatically/)).toBeInTheDocument();
     expect(screen.getByText("Share with account manager")).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Share 2 advisors/ }));
 
     await waitFor(() =>
@@ -162,7 +164,7 @@ describe("TransferPartnersModal", () => {
     setup({ transfer: jest.fn().mockResolvedValue(shareResult) });
 
     await user.click(screen.getByRole("radio", { name: /Share/ }));
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Share 2 advisors/ }));
 
     await waitFor(() =>
@@ -184,7 +186,7 @@ describe("TransferPartnersModal", () => {
       transfer: jest.fn().mockRejectedValue(apiError(409, "target_manager_inactive")),
     });
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     expect(
@@ -198,7 +200,7 @@ describe("TransferPartnersModal", () => {
     const user = userEvent.setup();
     setup({ transfer: jest.fn().mockRejectedValue(apiError(500, "something_else")) });
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     expect(await screen.findByText("backend message")).toBeInTheDocument();
@@ -220,7 +222,7 @@ describe("TransferPartnersModal", () => {
     expect(screen.getByRole("radio", { name: /All advisors/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     await waitFor(() => expect(transfer).toHaveBeenCalledTimes(1));
@@ -237,7 +239,7 @@ describe("TransferPartnersModal", () => {
     expect(screen.queryByRole("button", { name: /Show advisors/ })).not.toBeInTheDocument();
 
     const confirm = screen.getByRole("button", { name: /Transfer 0 advisors/ });
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     expect(confirm).toBeDisabled();
 
     await user.click(screen.getByRole("checkbox", { name: "John Doe" }));
@@ -264,7 +266,7 @@ describe("TransferPartnersModal", () => {
     expect(screen.getByText(/not shared automatically/)).toBeInTheDocument();
 
     await user.click(screen.getByRole("checkbox", { name: "Acme Agency" }));
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Share 1 advisor$/ }));
 
     await waitFor(() =>
@@ -315,7 +317,7 @@ describe("TransferPartnersModal", () => {
     await user.click(screen.getByRole("radio", { name: /Selected advisors/ }));
     await user.click(screen.getByRole("checkbox", { name: "Acme Agency" }));
     await user.click(screen.getByRole("checkbox", { name: "John Doe" }));
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     expect(await screen.findByText(/changed while you were on this screen/)).toBeInTheDocument();

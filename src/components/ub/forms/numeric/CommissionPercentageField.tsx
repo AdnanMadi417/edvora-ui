@@ -2,9 +2,10 @@
 
 import React, { useId } from "react";
 import { Info } from "lucide-react";
+import Combobox from "components/ub/forms/selection/Combobox";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
-import { fieldControl, fieldControlError, fieldControlHeight, fieldWrapper } from "components/ub/recipes";
-import { FieldError, FieldLabel, SelectChevron, describedBy, selectControl } from "components/ub/forms/layout/FieldChrome";
+import { fieldControlError, fieldControlHeight, fieldWrapper } from "components/ub/recipes";
+import { FieldError, FieldLabel, describedBy } from "components/ub/forms/layout/FieldChrome";
 
 interface CommissionPercentageFieldProps {
   field: string;
@@ -44,23 +45,7 @@ export default function CommissionPercentageField({
         </span>
       </div>
 
-      <div className="relative">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => updateFormData(field, Number(e.target.value))}
-          disabled={disabled}
-          aria-required={required || undefined}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy(errorId)}
-          className={`${fieldControl} ${fieldControlHeight} ${selectControl} ub-tabular ${error ? fieldControlError : ""}`}
-        >
-          {PERCENTAGE_OPTIONS.map((pct) => (
-            <option key={pct} value={pct}>{pct}%</option>
-          ))}
-        </select>
-        <SelectChevron />
-      </div>
+      <Combobox compact id={id} ariaLabel="Commission display percentage" value={String(value)} options={PERCENTAGE_OPTIONS.map(pct => ({ value: String(pct), label: `${pct}%` }))} onChange={next => updateFormData(field, Number(next))} disabled={disabled} required={required} aria-invalid={error ? true : undefined} aria-describedby={describedBy(errorId)} triggerClassName={`${fieldControlHeight} ub-tabular ${error ? fieldControlError : ""}`} />
 
       <FieldError id={errorId}>{error}</FieldError>
     </div>

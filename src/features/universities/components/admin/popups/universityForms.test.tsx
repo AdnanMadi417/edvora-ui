@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateBranch from "./CreateBranch";
@@ -46,7 +47,7 @@ it("submits a complete branch using the existing institution ID and payload", as
     within(dialog).getByRole("textbox", { name: "Location" }),
     "Shah Alam"
   );
-  await userEvent.selectOptions(
+  await selectOption(userEvent,
     within(dialog).getByRole("combobox", { name: "State" }),
     "state-1"
   );

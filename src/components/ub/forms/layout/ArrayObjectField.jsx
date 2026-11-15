@@ -1,5 +1,7 @@
 // components/form/ArrayObjectField.jsx
 import React, { useId } from "react";
+import Combobox from "../selection/Combobox";
+import { normalizeSelectOptions } from "../selection/normalizeSelectOptions";
 import { Plus, Trash2 } from "lucide-react";
 import {
   buttonBase,
@@ -15,9 +17,7 @@ import {
 } from "components/ub/recipes";
 import {
   FieldError,
-  SelectChevron,
   describedBy,
-  selectControl,
 } from "components/ub/forms/layout/FieldChrome";
 
 // Remove-row icon button: neutral at rest, danger tint on hover (brief §4.1:
@@ -200,27 +200,7 @@ const ArrayObjectField = ({
 
                   {f.type === "select" ? (
                     <div className="relative">
-                      <select
-                        {...a11y}
-                        value={item?.[f.key] ?? ""}
-                        onChange={(e) =>
-                          handleChange(index, f.key, e.target.value)
-                        }
-                        className={`${controlClass} ${selectControl}`}
-                      >
-                        {(f.options || []).map((opt) => {
-                          const optValue =
-                            typeof opt === "object" ? opt.value : opt;
-                          const optLabel =
-                            typeof opt === "object" ? opt.label : opt;
-                          return (
-                            <option key={optValue} value={optValue}>
-                              {optLabel}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      <SelectChevron />
+                      <Combobox compact {...a11y} ariaLabel={f.label} value={String(item?.[f.key] ?? "")} onChange={value => handleChange(index, f.key, value ?? "")} options={normalizeSelectOptions(f.options || [])} triggerClassName={controlClass} />
                     </div>
                   ) : (
                     <input

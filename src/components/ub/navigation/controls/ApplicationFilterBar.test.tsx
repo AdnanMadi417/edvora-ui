@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -35,7 +36,7 @@ it("applies filters together and discards unapplied changes when closed", async 
   render(<Harness />);
   const trigger = screen.getByRole("button", { name: "Filters" });
   await user.click(trigger);
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "University" }),
     "APU"
   );
@@ -49,7 +50,7 @@ it("applies filters together and discards unapplied changes when closed", async 
   expect(screen.getByRole("combobox", { name: "University" })).toHaveValue(
     "all"
   );
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "University" }),
     "APU"
   );

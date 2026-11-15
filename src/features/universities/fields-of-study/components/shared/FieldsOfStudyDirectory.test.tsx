@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FieldsOfStudyDirectory from "./FieldsOfStudyDirectory";
@@ -41,7 +42,7 @@ it("applies status filters only after confirmation", async () => {
   const user = userEvent.setup();
   render(<FieldsOfStudyDirectory />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Status" }),
     "active"
   );

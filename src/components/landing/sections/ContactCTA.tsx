@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, type FieldErrors, type Resolver } from "react-hook-form";
+import { Controller, useForm, type FieldErrors, type Resolver } from "react-hook-form";
 import { CalendarClock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import clsx from "clsx";
 import { contact, site } from "lib/content";
@@ -12,7 +12,7 @@ import SectionHeading from "../ui/SectionHeading";
 import Button, { ButtonLink } from "../ui/Button";
 import Card from "../ui/Card";
 import { fieldControl, fieldControlError } from "components/ub/recipes";
-import { SelectChevron, selectControl } from "components/ub/forms/layout/FieldChrome";
+import Combobox from "components/ub/forms/selection/Combobox";
 
 // Minimal zod resolver (avoids @hookform/resolvers, whose current types need TS 5).
 const contactResolver: Resolver<ContactInput> = async (values) => {
@@ -52,6 +52,7 @@ export default function ContactCTA() {
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
+    control: formControl,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -100,19 +101,9 @@ export default function ContactCTA() {
                   <input id="contact-company" autoComplete="organization" className={clsx(control("company"), "h-[50px]")} aria-invalid={!!errors.company} aria-describedby={describedBy("company")} {...register("company")} />
                 </Field>
                 <Field id="contact-budget" label="Budget range" error={errors.budget?.message}>
-                  <div className="relative">
-                  <select id="contact-budget" defaultValue="" className={clsx(control("budget"), "h-[50px]", selectControl)} aria-invalid={!!errors.budget} aria-describedby={describedBy("budget")} {...register("budget")}>
-                    <option value="" disabled>
-                      Select a range
-                    </option>
-                    {contact.budgets.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
-                  <SelectChevron />
-                  </div>
+                  <Controller name="budget" control={formControl} render={({ field }) => (
+                    <Combobox compact id="contact-budget" ariaLabel="Budget range" ref={field.ref} name={field.name} value={field.value ?? ""} onChange={value => field.onChange(value ?? "")} onBlur={field.onBlur} placeholder="Select a range" options={contact.budgets.map(budget => ({ value: budget, label: budget }))} aria-invalid={!!errors.budget} aria-describedby={describedBy("budget")} triggerClassName={clsx(control("budget"), "h-[50px]")} />
+                  )} />
                 </Field>
                 <div className="sm:col-span-2">
                   <Field id="contact-details" label="Project details" error={errors.details?.message}>

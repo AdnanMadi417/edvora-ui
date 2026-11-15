@@ -13,7 +13,7 @@ export const focusRingInset = "focus-visible:outline focus-visible:outline-2 foc
 
 const transition = "transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200 ease-[ease] motion-reduce:transition-none";
 
-// ── Buttons (brief §4.1): all pills; sm 32 · md 40 · lg 48 ────────────────
+// ── Buttons: compact mobile controls, stepped tablet and desktop sizes ──
 
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "positive" | "destructive" | "inverse";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -36,16 +36,16 @@ export const buttonVariants: Record<ButtonVariant, string> = {
 };
 
 export const buttonSizes: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-ub-label-md",
-  md: "h-[50px] px-[23px] text-[14px]",
-  lg: "h-[50px] px-[23px] text-[14px]",
+  sm: "h-11 px-3 text-[13px] md:h-8 [@media(pointer:coarse)]:min-h-11",
+  md: "h-11 px-4 text-[13px] md:h-12 md:px-5 md:text-[14px] xl:h-[50px] xl:px-[23px]",
+  lg: "h-12 px-5 text-[14px] md:h-[50px] md:px-[23px] xl:h-[52px] xl:px-6",
 };
 
-/** Circular icon buttons: 32 / 40 / 48 (brief §4.1). Always give them an aria-label. */
+/** Responsive circular controls; coarse pointers retain a 44px touch target. */
 export const iconButtonSizes: Record<ButtonSize, string> = {
-  sm: "h-8 w-8",
-  md: "h-10 w-10",
-  lg: "h-12 w-12",
+  sm: "h-11 w-11 md:h-8 md:w-8 [@media(pointer:coarse)]:min-h-11 [@media(pointer:coarse)]:min-w-11",
+  md: "h-11 w-11 md:h-12 md:w-12 xl:h-[50px] xl:w-[50px]",
+  lg: "h-12 w-12 md:h-[50px] md:w-[50px] xl:h-[52px] xl:w-[52px]",
 };
 
 /** Outlined secondary-style destructive action (outside dialogs). */
@@ -61,13 +61,13 @@ export const fieldOptional = "font-normal text-ub-text-tertiary";
 export const fieldHelper = "mt-1.5 text-[12px] text-ub-text-tertiary";
 export const fieldError = "mt-1.5 flex items-start gap-1.5 text-[12px] text-[var(--ub-field-error)]";
 
-/** Official-site field treatment: pill, inset outline, 50px height. */
+/** Brand field treatment: pill, inset outline, responsive control height. */
 export const fieldControl =
   `w-full rounded-[33px] border-0 bg-[var(--ub-field-bg)] px-[17px] text-[13px] font-normal text-[var(--ub-field-text)] ${transition} ` +
   "shadow-[inset_0_0_0_1px_var(--ub-field-ring)] placeholder:text-[var(--ub-field-placeholder)] outline-none " +
   "enabled:hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:outline-none " +
   "disabled:cursor-not-allowed disabled:opacity-60";
-export const fieldControlHeight = "h-[50px]";
+export const fieldControlHeight = "h-11 md:h-12 xl:h-[50px]";
 /** The field look for a control built from several parts (dial code + number,
  *  text + remove button): pill, field fill, inset outline, shared hover/focus rings. */
 export const fieldGroup =

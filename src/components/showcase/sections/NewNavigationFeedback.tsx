@@ -1,9 +1,10 @@
 "use client";
 
+import Combobox from "components/ub/forms/selection/Combobox";
 import { useState } from "react";
 import { Bell, BookOpen, Copy, FilePenLine, FileText, House, MessageCircle, MoreHorizontal, Share2, Trash2, Users, Wallet } from "lucide-react";
 import clsx from "clsx";
-import { buttonBase, buttonSizes, buttonVariants, fieldControl, fieldControlHeight, fieldLabel, iconButtonSizes } from "components/ub/recipes";
+import { buttonBase, buttonSizes, buttonVariants, fieldControl, fieldLabel, iconButtonSizes } from "components/ub/recipes";
 import NavbarBottom, { type NavbarBottomItem } from "components/ub/navigation/layout/NavbarBottom";
 import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import Pagination from "components/ub/navigation/controls/Pagination";
@@ -28,6 +29,8 @@ const btn = (variant: keyof typeof buttonVariants) => clsx(buttonBase, buttonSiz
 const PROGRESS_STATES = ["determinate", "indeterminate"] as const;
 
 export default function NewNavigationFeedback() {
+  const [institution, setInstitution] = useState("sunway");
+  const [intake, setIntake] = useState("sep");
   const [activeNav, setActiveNav] = useState("/partner/applications");
   const [page, setPage] = useState(5);
   const [compactPage, setCompactPage] = useState(2);
@@ -254,20 +257,13 @@ export default function NewNavigationFeedback() {
               <label htmlFor="nf-institution" className={fieldLabel}>
                 Institution
               </label>
-              <select id="nf-institution" className={clsx(fieldControl, fieldControlHeight)} defaultValue="sunway">
-                <option value="sunway">Sunway University</option>
-                <option value="taylors">Taylor&apos;s University</option>
-                <option value="ucsi">UCSI University</option>
-              </select>
+              <Combobox id="nf-institution" ariaLabel="Institution" compact value={institution} onChange={value => setInstitution(value ?? "")} options={[{value:"sunway",label:"Sunway University"},{value:"taylors",label:"Taylor's University"},{value:"ucsi",label:"UCSI University"}]} />
             </div>
             <div>
               <label htmlFor="nf-intake" className={fieldLabel}>
                 Intake
               </label>
-              <select id="nf-intake" className={clsx(fieldControl, fieldControlHeight)} defaultValue="sep">
-                <option value="sep">Sep 2026</option>
-                <option value="jan">Jan 2027</option>
-              </select>
+              <Combobox id="nf-intake" ariaLabel="Intake" compact value={intake} onChange={value => setIntake(value ?? "")} options={[{value:"sep",label:"Sep 2026"},{value:"jan",label:"Jan 2027"}]} />
             </div>
           </div>
         </Drawer>

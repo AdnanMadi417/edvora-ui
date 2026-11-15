@@ -1,5 +1,5 @@
 import React, { useId } from "react";
-import { ChevronDown } from "lucide-react";
+import Combobox from "components/ub/forms/selection/Combobox";
 import { DIAL_CODES } from "constants/lists";
 import { fieldControlError, fieldGroup, fieldWrapper } from "components/ub/recipes";
 import { FieldError, FieldLabel, describedBy } from "components/ub/forms/layout/FieldChrome";
@@ -49,17 +49,7 @@ export default function PhoneInputField({
       {/* Phone numbers always read left to right, dial code first. */}
       <div dir="ltr" className={`${group} ${error ? fieldControlError : ""}`}>
         <span className="relative flex shrink-0">
-        <select
-          value={dialCode}
-          onChange={(e) => updateFormData(dialCodeField, e.target.value)}
-          aria-label="Country dialling code"
-          className="cursor-pointer appearance-none rounded-s-[33px] bg-transparent ps-[17px] pe-8 text-inherit outline-none [&>option]:text-ub-text-primary"
-        >
-          {DIAL_CODES.map((d) => (
-            <option key={d.label} value={d.code}>{d.label}</option>
-          ))}
-        </select>
-        <ChevronDown aria-hidden="true" strokeWidth={1.75} className="pointer-events-none absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-ub-icon-default" />
+          <Combobox compact ariaLabel="Country dialling code" value={dialCode} options={DIAL_CODES.map(d => ({ value: d.code, label: d.label }))} onChange={value => updateFormData(dialCodeField, value ?? "+60")} triggerClassName="!h-full !w-28 !rounded-none !rounded-s-[33px] !bg-transparent !outline-none" className="h-full" />
         </span>
         <span aria-hidden="true" className="my-3 w-px shrink-0 bg-[var(--ub-field-ring)]" />
         <input

@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -39,9 +40,10 @@ describe("UnsharePartnersModal", () => {
     mockedUseUnsharePartners.mockReset();
   });
 
-  it("lists every other manager, inactive ones marked, and never the source", () => {
+  it("lists every other manager, inactive ones marked, and never the source", async () => {
     setup();
 
+    await userEvent.click(screen.getByRole("combobox"));
     const options = screen.getAllByRole("option").map((o) => o.textContent);
     expect(options).toContain("Ahmad Razak");
     expect(options).toContain("Chen Wei (inactive)");
@@ -60,7 +62,7 @@ describe("UnsharePartnersModal", () => {
     };
     const { unshare, onClose, onUnshared } = setup(jest.fn().mockResolvedValue(result));
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Remove shared access/ }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -84,7 +86,7 @@ describe("UnsharePartnersModal", () => {
       })
     );
 
-    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await selectOption(user, screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Remove shared access/ }));
 
     await waitFor(() =>

@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RegisterUniversity from "./RegisterUniversity";
@@ -32,7 +33,7 @@ it("validates and preserves university details across steps, then submits the co
     screen.getByRole("textbox", { name: "University name" }),
     "Sunway University"
   );
-  await userEvent.selectOptions(
+  await selectOption(userEvent,
     screen.getByRole("combobox", { name: "University type" }),
     "type-1"
   );

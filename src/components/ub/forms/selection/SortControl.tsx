@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
-import { fieldControl } from "components/ub/recipes";
-import { SelectChevron, selectControl } from "../layout/FieldChrome";
+import Combobox from "./Combobox";
 
 const SORT_OPTIONS = [
   { label: "Commission: high to low", value: "commission_desc" },
@@ -32,21 +31,7 @@ export default function SortControl({
         Sort by
       </label>
       <div className="relative min-w-0 flex-1">
-        <select
-          id={id}
-          value={value === "all" ? "" : value}
-          onChange={(e) => onChange(e.target.value || "all")}
-          className={`${fieldControl} h-10 ${selectControl} text-ub-body-sm`}
-          disabled={disabled}
-        >
-          <option value="">Default sort</option>
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <SelectChevron />
+        <Combobox compact id={id} ariaLabel="Sort by" value={value === "all" ? "" : value} onChange={next => onChange(next || "all")} options={[{ value: "", label: "Default sort" }, ...SORT_OPTIONS]} disabled={disabled} />
       </div>
     </div>
   );

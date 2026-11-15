@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -61,10 +62,11 @@ describe("AdditionalManagersSection", () => {
     mockedUseAdditionalManagers.mockReset();
   });
 
-  it("shows current chips and offers only active managers that are neither primary nor already added", () => {
+  it("shows current chips and offers only active managers that are neither primary nor already added", async () => {
     setup();
 
     expect(screen.getByText("Ahmad Razak")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("combobox"));
     const options = screen.getAllByRole("option").map((o) => o.textContent);
     expect(options).toContain("Chen Wei");
     expect(options).not.toContain("Sarah Lim"); // primary
@@ -76,7 +78,7 @@ describe("AdditionalManagersSection", () => {
     const user = userEvent.setup();
     const { addManager, onChanged } = setup();
 
-    await user.selectOptions(screen.getByRole("combobox", { name: /Add an account manager/ }), "m-c");
+    await selectOption(user, screen.getByRole("combobox", { name: /Add an account manager/ }), "m-c");
     await user.click(screen.getByRole("button", { name: /Add manager/ }));
 
     await waitFor(() => expect(onChanged).toHaveBeenCalled());

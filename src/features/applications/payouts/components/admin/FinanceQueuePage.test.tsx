@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FinanceQueuePage from "./FinanceQueuePage";
@@ -134,7 +135,7 @@ it("normalizes settled visibility when applying settled status", async () => {
   render(<FinanceQueuePage />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
   await user.click(screen.getByRole("checkbox", { name: "Hide settled" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Payment status" }),
     "nobody"
   );

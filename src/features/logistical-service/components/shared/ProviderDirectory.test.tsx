@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProviderDirectory from "./ProviderDirectory";
@@ -73,11 +74,11 @@ it("applies status and location filters together", async () => {
   const user = userEvent.setup();
   render(<ProviderDirectory />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Status" }),
     "active"
   );
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Main location" }),
     "Selangor"
   );

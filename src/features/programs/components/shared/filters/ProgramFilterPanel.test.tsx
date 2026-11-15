@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProgramFilterPanel from "./ProgramFilterPanel";
@@ -33,7 +34,7 @@ it("keeps draft filters until Apply and restores focus when dismissed", async ()
   await user.click(trigger);
   const drawer = screen.getByRole("dialog", { name: "Filter programs" });
   expect(drawer).toHaveAttribute("aria-modal", "true");
-  await user.selectOptions(
+  await selectOption(user,
     within(drawer).getByRole("combobox", { name: "Location" }),
     "kl"
   );
@@ -45,7 +46,7 @@ it("keeps draft filters until Apply and restores focus when dismissed", async ()
   expect(trigger).toHaveFocus();
   await user.click(trigger);
   expect(screen.getByRole("combobox", { name: "Location" })).toHaveValue("all");
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Location" }),
     "kl"
   );

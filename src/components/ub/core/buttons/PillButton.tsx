@@ -9,7 +9,7 @@ type PillButtonProps = {
   text?: string;
   /** Design-system variant (brief §4.1). Defaults to "secondary" when no legacy colour props are passed. */
   variant?: ButtonVariant;
-  /** Defaults to "lg" (48px), the marketing-CTA size this component has always had. */
+  /** Defaults to the responsive large CTA size. */
   size?: ButtonSize;
   /** Legacy colour overrides — still honoured when passed. Prefer `variant`. */
   bgColor?: string;

@@ -423,23 +423,23 @@ const EditKnowledgeHubProgramDetails = ({
   return (
     <>
       <div className="mt-5 min-w-0 max-w-6xl mx-auto overflow-clip rounded-ub-xl border border-ub-border bg-ub-surface">
-          <div className="flex justify-between border-b border-ub-border p-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-ub-md bg-ub-tone-brand-bg">
-                <GraduationCap className="h-8 w-8 text-ub-tone-brand-text" />
+          <div className="flex flex-col gap-4 border-b border-ub-border p-4 md:flex-row md:items-center md:justify-between md:p-6">
+            <div className="flex min-w-0 items-start gap-3 md:items-center md:gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-ub-md bg-ub-tone-brand-bg md:h-14 md:w-14">
+                <GraduationCap className="h-6 w-6 text-ub-tone-brand-text md:h-8 md:w-8" />
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold">
+              <div className="min-w-0">
+                <h3 className="break-words text-base font-semibold md:text-lg">
                   {program?.name ?? "Not Provided"}
                 </h3>
-                <p className="text-sm text-ub-text-secondary">
+                <p className="break-words text-sm text-ub-text-secondary">
                   {program?.university?.name ?? "Not Provided"}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-6">
+            <div className="flex shrink-0 items-center self-end gap-2 md:self-auto md:gap-6">
               <div className="relative">
                 <Button
                   onClick={() =>
@@ -829,7 +829,7 @@ const EditKnowledgeHubProgramDetails = ({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 border-t px-6 py-5 border-ub-border">
+          <div className="grid grid-cols-2 gap-2 border-t border-ub-border px-4 py-4 sm:flex sm:justify-end sm:px-6 sm:py-5">
             <Button
               onClick={handleBack}
               disabled={updateProgrLoading}

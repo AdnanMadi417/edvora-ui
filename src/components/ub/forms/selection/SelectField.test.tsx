@@ -8,9 +8,9 @@ import { normalizeCommissionCurrency } from "../../../../features/programs/utils
 const currencyOptions = CURRENCY.map((c) => ({ value: c.value, label: c.label }));
 
 function shown(container: HTMLElement) {
-  const select = container.querySelector("select") as HTMLSelectElement;
-  const option = select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
-  return { value: select.value, label: option?.text ?? "(none)", disabled: option?.disabled ?? false };
+  const trigger = container.querySelector('[role="combobox"]') as HTMLButtonElement;
+  return { value: trigger.value, label: trigger.querySelector("span[title]")?.textContent ?? trigger.querySelector("span")?.textContent };
+
 }
 
 function renderField(stored: string) {
@@ -33,7 +33,7 @@ describe("SelectField with the CURRENCY options (UBX-395)", () => {
     ["USD", "USD"],
   ])("shows %s when the stored value is the canonical %s", (stored, label) => {
     const { container } = renderField(stored);
-    expect(shown(container)).toMatchObject({ value: stored, label, disabled: false });
+    expect(shown(container)).toMatchObject({ value: stored, label });
   });
 
   it("shows the placeholder when nothing is stored", () => {
@@ -44,7 +44,7 @@ describe("SelectField with the CURRENCY options (UBX-395)", () => {
   it("does not silently fall back to USD for an unmatched legacy value", () => {
     // Before the guard, React picked the first enabled option (USD) here.
     const { container } = renderField("rm");
-    expect(shown(container)).toEqual({ value: "rm", label: "rm (not an available option)", disabled: true });
+    expect(shown(container)).toEqual({ value: "rm", label: "rm (not an available option)" });
   });
 
   it.each(["rm", "usd", "RM", "USD", "MYR", ""])(
@@ -53,7 +53,7 @@ describe("SelectField with the CURRENCY options (UBX-395)", () => {
       const normalized = normalizeCommissionCurrency(stored);
       const { container } = renderField(normalized);
       const expected = stored.toUpperCase() === "USD" ? "USD" : "RM";
-      expect(shown(container)).toMatchObject({ value: expected, label: expected, disabled: false });
+      expect(shown(container)).toMatchObject({ value: expected, label: expected });
     }
   );
 });
@@ -71,7 +71,7 @@ describe("SelectInput guard", () => {
         updateFormData={() => {}}
       />
     );
-    expect(shown(container)).toEqual({ value: "rm", label: "rm (not an available option)", disabled: true });
+    expect(shown(container)).toEqual({ value: "rm", label: "rm (not an available option)" });
   });
 
   it("still selects a matching option normally", () => {
@@ -86,6 +86,6 @@ describe("SelectInput guard", () => {
         updateFormData={() => {}}
       />
     );
-    expect(shown(container)).toMatchObject({ value: "USD", label: "USD", disabled: false });
+    expect(shown(container)).toMatchObject({ value: "USD", label: "USD" });
   });
 });

@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import StatementPage from "./StatementPage";
@@ -58,7 +59,7 @@ it("applies status filters only after confirmation", async () => {
   const user = userEvent.setup();
   render(<StatementPage />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Commission status" }),
     "nobody"
   );

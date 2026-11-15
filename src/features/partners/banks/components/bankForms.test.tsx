@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateBankPage from "./CreateBankPage";
@@ -27,7 +28,7 @@ it("creates a bank from the redesigned form with the original payload and redire
   mockCreate.mockResolvedValue({ id: "bank-1" });
   render(<CreateBankPage basePath="/data-entry/banks" />);
   expect(screen.getByRole("button", { name: "Add bank" })).toBeDisabled();
-  await userEvent.selectOptions(
+  await selectOption(userEvent,
     screen.getByRole("combobox", { name: "Country" }),
     "MY"
   );
@@ -55,7 +56,7 @@ it("keeps the create form open and identifies duplicate bank codes", async () =>
     response: { data: { code: "bank_already_exists" } },
   });
   render(<CreateBankPage />);
-  await userEvent.selectOptions(
+  await selectOption(userEvent,
     screen.getByRole("combobox", { name: "Country" }),
     "MY"
   );

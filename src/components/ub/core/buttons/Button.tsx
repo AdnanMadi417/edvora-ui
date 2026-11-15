@@ -9,7 +9,7 @@ type ButtonProps = {
   text?: string;
   /** Design-system variant (brief §4.1). Defaults to "secondary" when no legacy colour props are passed. */
   variant?: ButtonVariant;
-  /** sm 32 · md 40 (default) · lg 48. */
+  /** Responsive size scale; md by default. */
   size?: ButtonSize;
   /** Legacy colour overrides — still honoured when passed. Prefer `variant`. */
   bgColor?: string;

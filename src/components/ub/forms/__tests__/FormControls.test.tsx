@@ -55,13 +55,13 @@ it("connects errors to selects and keeps disabled controls closed", async () => 
   expect(input).toHaveAccessibleDescription("Choose an institution");
   rerender(<SelectExample disabled />);
   expect(input).toBeDisabled();
-  await userEvent.click(screen.getByRole("button", { name: "Show options" }));
+  await userEvent.click(input);
   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 });
 
 it("multi-select supports searching, multiple keyboard choices and Escape focus return", async () => {
   render(<SelectExample multiple />);
-  const trigger = screen.getByRole("button", { name: "Institution" });
+  const trigger = screen.getByRole("combobox", { name: "Institution" });
   await userEvent.click(trigger);
   await userEvent.keyboard("{ArrowDown}{Enter}{ArrowDown}{Enter}{ArrowDown}");
   expect(screen.getByText("2 selected")).toBeInTheDocument();
@@ -71,7 +71,8 @@ it("multi-select supports searching, multiple keyboard choices and Escape focus 
   );
   await userEvent.keyboard("{Escape}");
   expect(trigger).toHaveFocus();
-  expect(trigger).toHaveTextContent("Public, Private");
+  expect(trigger).toHaveTextContent("Public");
+  expect(trigger).toHaveTextContent("Private");
 });
 
 it("form toggles share the switch, announce state and respond to Space", async () => {

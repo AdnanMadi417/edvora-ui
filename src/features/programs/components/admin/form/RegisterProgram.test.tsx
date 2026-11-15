@@ -82,7 +82,7 @@ async function fillProgramme(container: HTMLElement) {
     await userEvent.click(
       within(
         container.querySelector(`[data-field="${field}"]`) as HTMLElement
-      ).getByRole("button")
+      ).getByRole("combobox")
     );
     await userEvent.click(screen.getByRole("option", { name }));
   }

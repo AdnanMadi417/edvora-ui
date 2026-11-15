@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import BanksTable from "./BanksTable";
@@ -50,11 +51,11 @@ it("applies country and inactive-only filters from the drawer", async () => {
   const user = userEvent.setup();
   render(<BanksTable />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Country" }),
     "MY"
   );
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Status" }),
     "inactive"
   );

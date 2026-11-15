@@ -2,8 +2,8 @@
 
 import { useId } from "react";
 import clsx from "clsx";
-import { CalendarDays, ChevronDown } from "lucide-react";
-import { focusRing } from "components/ub/recipes";
+import { CalendarDays } from "lucide-react";
+import Combobox from "components/ub/forms/selection/Combobox";
 
 export type DashboardPeriod = "week" | "month" | "intake" | "year";
 
@@ -27,8 +27,7 @@ export interface PeriodSelectProps {
 }
 
 /**
- * Period dropdown for dashboards and cards. A native select styled as a
- * pill, so keyboard, screen readers and mobile pickers work everywhere.
+ * Searchable period picker shared with the rest of the app.
  */
 export default function PeriodSelect({ value, onChange, options = ["week", "month", "intake", "year"], label = "Period", size = "sm", disabled, className }: PeriodSelectProps) {
   const id = useId();
@@ -37,25 +36,7 @@ export default function PeriodSelect({ value, onChange, options = ["week", "mont
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
-      <CalendarDays aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ub-icon" />
-      <select
-        id={id}
-        value={value}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value as DashboardPeriod)}
-        className={clsx(
-          "cursor-pointer appearance-none rounded-ub-full border border-ub-border bg-ub-surface ps-9 pe-9 text-ub-label-md text-ub-text-primary transition-colors duration-ub-fast hover:border-ub-border-hover disabled:cursor-not-allowed disabled:text-ub-text-disabled",
-          size === "sm" ? "h-8" : "h-10",
-          focusRing,
-        )}
-      >
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {PERIOD_LABELS[o]}
-          </option>
-        ))}
-      </select>
-      <ChevronDown aria-hidden="true" className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ub-icon" />
+      <Combobox compact id={id} ariaLabel={label} value={value} onChange={next => onChange(next as DashboardPeriod)} options={options.map(period => ({ value: period, label: PERIOD_LABELS[period] }))} disabled={disabled} leadingIcon={<CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0 text-ub-icon" />} triggerClassName={size === "sm" ? "!h-8" : "h-10"} />
     </div>
   );
 }

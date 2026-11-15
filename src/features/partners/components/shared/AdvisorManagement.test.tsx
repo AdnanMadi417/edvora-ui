@@ -1,3 +1,4 @@
+import { selectOption } from "testUtils/selectOption";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AdvisorDirectoryToolbar from "./AdvisorDirectoryToolbar";
@@ -27,11 +28,11 @@ it("applies filter drafts only after confirmation", async () => {
     />
   );
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Account manager" }),
     "manager"
   );
-  await user.selectOptions(
+  await selectOption(user,
     screen.getByRole("combobox", { name: "Advisor category" }),
     "active"
   );

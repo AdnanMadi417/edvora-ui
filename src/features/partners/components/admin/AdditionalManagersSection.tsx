@@ -11,11 +11,7 @@ import type {
   PartnerDetails,
 } from "features/partners/types";
 import type { AccountManager } from "features/account-managers/types";
-import { fieldControl, fieldControlHeight } from "components/ub/recipes";
-import {
-  SelectChevron,
-  selectControl,
-} from "components/ub/forms/layout/FieldChrome";
+import Combobox from "components/ub/forms/selection/Combobox";
 
 interface Props {
   partner: PartnerDetails;
@@ -160,25 +156,7 @@ export default function AdditionalManagersSection({
       {!isMember && (
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative w-full sm:w-72">
-            <select
-              aria-label="Add an account manager"
-              value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
-              disabled={loading || options.length === 0}
-              className={`${fieldControl} ${fieldControlHeight} ${selectControl}`}
-            >
-              <option value="">
-                {options.length === 0
-                  ? "No other active manager available"
-                  : "Select an account manager..."}
-              </option>
-              {options.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name || m.email}
-                </option>
-              ))}
-            </select>
-            <SelectChevron />
+            <Combobox compact ariaLabel="Add an account manager" value={selectedId} onChange={value => setSelectedId(value ?? "")} disabled={loading || options.length === 0} placeholder={options.length === 0 ? "No other active manager available" : "Select an account manager..."} options={options.map(manager => ({ value: manager.id, label: manager.name || manager.email }))} triggerClassName="h-[50px]" />
           </div>
           <Button
             onClick={handleAdd}

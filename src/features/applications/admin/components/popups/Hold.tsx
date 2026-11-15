@@ -43,7 +43,7 @@ export default function HoldPopup({
   const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
-    if (isOpen) setStatus(currentStatus);
+    if (isOpen) setStatus(Object.keys(statusMap).find(key => key === currentStatus || statusMap[key] === currentStatus) ?? "1");
   }, [isOpen, currentStatus]);
 
 
@@ -83,15 +83,15 @@ export default function HoldPopup({
       submitLabel="Confirm"
       submitIcon={<CheckCircle className="h-4 w-4" aria-hidden="true" />}
       submitting={isConfirming}
-      submitDisabled={status === currentStatus}
+      submitDisabled={!statusMap[status] || status === currentStatus || statusMap[status] === currentStatus}
     >
       <div className="grid gap-4">
         <Alert tone="warning">The Advisor and the team will see the new status straight away.</Alert>
         <p className="flex items-center gap-2 text-ub-label-md text-ub-text-secondary">
-          {currentStatus === "1" && <CheckCircle className="h-4 w-4" aria-hidden="true" />}
-          {currentStatus === "2" && <Pause className="h-4 w-4" aria-hidden="true" />}
-          {currentStatus === "3" && <XCircle className="h-4 w-4" aria-hidden="true" />}
-          <span>Application status: {statusMap[currentStatus || "1"]}</span>
+          {(currentStatus === "1" || currentStatus === "active") && <CheckCircle className="h-4 w-4" aria-hidden="true" />}
+          {(currentStatus === "2" || currentStatus === "hold") && <Pause className="h-4 w-4" aria-hidden="true" />}
+          {(currentStatus === "3" || currentStatus === "cancel") && <XCircle className="h-4 w-4" aria-hidden="true" />}
+          <span>Application status: {statusMap[currentStatus || "1"] ?? currentStatus}</span>
         </p>
         <Combobox label="Lifecycle status" options={statusOptions} value={status ?? null} onChange={(v) => setStatus(v ?? "")} required />
       </div>
