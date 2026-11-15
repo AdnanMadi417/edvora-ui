@@ -144,7 +144,7 @@ export default function DocumentTypesDirectory() {
             setPage(1);
           }}
           manualSort
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No document types found",
             description: "Try another name, code, or description.",

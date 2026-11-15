@@ -18,13 +18,13 @@ export interface AppShellProps {
   /** Sidebar routes for this role (already filtered for visibility). */
   routes: IRoute[];
   children: ReactNode;
-  /** Bottom-nav items below 768px (2–4). Defaults to the first three routes; a "Menu" button opens the full drawer. */
+  /** Bottom-nav items below 768px (2–4). Defaults to the first three feature routes; a "Menu" button opens the full drawer. */
   bottomNavItems?: NavbarBottomItem[];
 }
 
-/** First three top-level routes as bottom-nav items (a group links to its first child). Three plus Menu keeps labels readable at 375px. */
+/** Notifications live in the header bell. Use the first three other routes below (groups link to their first child). */
 function defaultBottomItems(routes: IRoute[]): NavbarBottomItem[] {
-  return routes.slice(0, 3).map((route) => {
+  return routes.filter((route) => route.path !== "/notifications").slice(0, 3).map((route) => {
     const target = route.children?.length ? route.children[0] : route;
     return { href: (target.layout ?? "") + target.path, label: route.name, icon: route.icon ?? Circle };
   });

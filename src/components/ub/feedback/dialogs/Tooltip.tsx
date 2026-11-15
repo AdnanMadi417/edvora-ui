@@ -1,50 +1,80 @@
 "use client";
 
-import React from "react";
+import React, { useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { tooltip } from "components/ub/recipes";
 
 interface TooltipProps {
   content: string;
   children: React.ReactNode;
   className?: string;
-  /**
-   * Which side of the trigger the tooltip pops out on. Defaults to "top".
-   * Prefer "left"/"right" for triggers inside dense table rows, where a
-   * top/bottom tooltip is tall enough to overlap a neighboring row.
-   * "left"/"right" are the start/end sides in LTR and mirror in RTL.
-   */
+  /** Left/right follow the text direction. */
   position?: "top" | "bottom" | "left" | "right";
 }
 
-const CENTER_X = "start-1/2 -translate-x-1/2 rtl:translate-x-1/2";
-const CENTER_Y = "top-1/2 -translate-y-1/2";
-
-const POSITION_CLASSES: Record<NonNullable<TooltipProps["position"]>, string> = {
-  top: `bottom-full mb-2 ${CENTER_X}`,
-  bottom: `top-full mt-2 ${CENTER_X}`,
-  left: `end-full me-2 ${CENTER_Y}`,
-  right: `start-full ms-2 ${CENTER_Y}`,
-};
-
-const ARROW_CLASSES: Record<NonNullable<TooltipProps["position"]>, string> = {
-  top: `top-full ${CENTER_X} border-t-ub-tooltip`,
-  bottom: `bottom-full ${CENTER_X} border-b-ub-tooltip`,
-  left: `start-full ${CENTER_Y} ltr:border-l-ub-tooltip rtl:border-r-ub-tooltip`,
-  right: `end-full ${CENTER_Y} ltr:border-r-ub-tooltip rtl:border-l-ub-tooltip`,
-};
-
-/** Neutral-900 tooltip, max width 280 (brief §4.7). Shows on hover and keyboard focus. */
+/** Portalled so long hints cannot widen a table or be clipped by its scroll area. */
 export default function Tooltip({ content, children, className, position = "top" }: TooltipProps) {
+  const id = useId();
+  const trigger = useRef<HTMLSpanElement>(null);
+  const hint = useRef<HTMLSpanElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [coordinates, setCoordinates] = useState<{ left: number; top: number } | null>(null);
+  const open = hovered || focused;
+
+  useLayoutEffect(() => {
+    if (!open || !trigger.current || !hint.current) return;
+    const update = () => {
+      const anchor = trigger.current?.getBoundingClientRect();
+      const box = hint.current?.getBoundingClientRect();
+      if (!anchor || !box) return;
+      const rtl = getComputedStyle(trigger.current).direction === "rtl";
+      const side = rtl && position === "left" ? "right" : rtl && position === "right" ? "left" : position;
+      let left = anchor.left + (anchor.width - box.width) / 2;
+      let top = anchor.top - box.height - 8;
+      if (side === "bottom") top = anchor.bottom + 8;
+      if (side === "left" || side === "right") {
+        left = side === "left" ? anchor.left - box.width - 8 : anchor.right + 8;
+        top = anchor.top + (anchor.height - box.height) / 2;
+      }
+      setCoordinates({
+        left: Math.max(12, Math.min(left, window.innerWidth - box.width - 12)),
+        top: Math.max(12, Math.min(top, window.innerHeight - box.height - 12)),
+      });
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open, position, content]);
+
   return (
-    <span className={`group/tooltip relative inline-flex ${className ?? ""}`}>
+    <span
+      ref={trigger}
+      className={`relative inline-flex min-w-0 max-w-full ${className ?? ""}`}
+      aria-describedby={open ? id : undefined}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
+      onKeyDown={(event) => { if (event.key === "Escape" && open) { event.stopPropagation(); setHovered(false); setFocused(false); } }}
+    >
       {children}
-      <span
-        role="tooltip"
-        className={`${tooltip} absolute z-50 w-max whitespace-normal text-start font-normal opacity-0 transition-opacity duration-ub-fast ease-ub-standard motion-reduce:transition-none group-focus-within/tooltip:opacity-100 group-hover/tooltip:opacity-100 ${POSITION_CLASSES[position]}`}
-      >
-        {content}
-        <span aria-hidden className={`absolute border-4 border-transparent ${ARROW_CLASSES[position]}`} />
-      </span>
+      {open && createPortal(
+        <span
+          ref={hint}
+          id={id}
+          role="tooltip"
+          className={`${tooltip} fixed z-[1100] w-max whitespace-normal break-words text-start font-normal`}
+          style={{ left: coordinates?.left ?? 0, top: coordinates?.top ?? 0, visibility: coordinates ? "visible" : "hidden", maxWidth: "min(280px, calc(100vw - 24px))" }}
+        >
+          {content}
+        </span>,
+        document.body
+      )}
     </span>
   );
 }

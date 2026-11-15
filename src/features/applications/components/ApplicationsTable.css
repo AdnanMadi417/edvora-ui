@@ -1,0 +1,62 @@
+@media (max-width: 767px) {
+  .ub-applications-table tbody > tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 12px;
+  }
+
+
+  .ub-applications-table tbody > tr > td {
+    min-width: 0;
+    padding: 0;
+  }
+
+
+  .ub-applications-table td[data-column="owner"],
+  .ub-applications-table td[data-column="updated"],
+  .ub-applications-table td[data-column="actions"] {
+    display: none;
+  }
+
+  .ub-applications-table td[data-column] > span[aria-hidden="true"] {
+    display: none;
+  }
+
+  .ub-applications-table td[data-column] > span:last-child {
+    display: block;
+    width: 100%;
+    text-align: start;
+  }
+
+  .ub-applications-table td[data-column="student"] a > span {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .ub-applications-table td[data-column="programme"] > span:last-child > span > span,
+  .ub-applications-table td[data-column="status"] > span:last-child > span > span {
+    max-width: 100%;
+  }
+
+  .ub-applications-table td[data-column="programme"] .line-clamp-2 {
+    -webkit-line-clamp: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .ub-applications-table table {
+    table-layout: fixed;
+    min-width: 1000px;
+  }
+
+  .ub-applications-table td[data-column] {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .ub-applications-table td[data-column="student"] a > span {
+    padding: 0;
+  }
+}

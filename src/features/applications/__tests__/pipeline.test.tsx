@@ -24,17 +24,17 @@ const props = {
   onViewCommission: jest.fn(),
 };
 
-it("shows exact totals and labels commission as a stage rather than payout-ready applications", () => {
+it("keeps stage counts and filters without duplicating the summary cards", () => {
   render(<PipelineCard {...props} selectedId={null} onSelect={jest.fn()} />);
-  const stats = screen.getByLabelText("Application statistics");
-  expect(within(stats).getByText("18")).toBeInTheDocument();
-  expect(within(stats).getByText("2")).toBeInTheDocument();
-  expect(within(stats).getByText("6")).toBeInTheDocument();
-  expect(within(stats).getByText("In commission stage")).toBeInTheDocument();
+  expect(screen.queryByLabelText("Application statistics")).not.toBeInTheDocument();
+  const filters = screen.getByRole("group", { name: "Filter applications by stage" });
+  expect(within(filters).getByText("12")).toBeInTheDocument();
+  expect(within(filters).getByText("6")).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: /Partner commission invoicing/ })).toBeInTheDocument();
   expect(screen.queryByText(/999/)).not.toBeInTheDocument();
 });
 
-it("toggles stage selection and clears it from the All stages action", async () => {
+it("toggles a stage on and off without extra pipeline controls", async () => {
   function Harness() {
     const [selected, setSelected] = useState<string | null>(null);
     return (
@@ -46,10 +46,10 @@ it("toggles stage selection and clears it from the All stages action", async () 
   const stage = screen.getByRole("button", { name: /Application submission/ });
   await user.click(stage);
   expect(stage).toHaveAttribute("aria-pressed", "true");
-  expect(screen.getByRole("status")).toHaveTextContent(
-    "Showing Application submission"
-  );
-  await user.click(screen.getByRole("button", { name: "All stages" }));
+  expect(screen.queryByText("Your pipeline")).not.toBeInTheDocument();
+  expect(screen.queryByText("Showing all stages")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /View commission/ })).not.toBeInTheDocument();
+  await user.click(stage);
   expect(stage).toHaveAttribute("aria-pressed", "false");
 });
 
@@ -72,7 +72,5 @@ it("shows loading and error states without presenting missing stage counts as ze
     />
   );
   expect(screen.getAllByRole("alert").length).toBeGreaterThan(0);
-  expect(
-    screen.getByRole("button", { name: "View commission stage" })
-  ).toBeDisabled();
+  expect(screen.queryByRole("group", { name: "Filter applications by stage" })).not.toBeInTheDocument();
 });

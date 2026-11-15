@@ -135,7 +135,7 @@ export default function LogisticsServicesDirectory({
           getRowId={(service) => service.id}
           caption="Logistics service types"
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           loading={loadingLogisticServices}
           error={errorLogisticServices}
           onRetry={refetchLogisticServices}

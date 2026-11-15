@@ -259,7 +259,7 @@ export default function AgencyMembersTable({
             />
           }
         >
-          <table className="w-full min-w-[800px] md:min-w-0">
+          <table className="ub-legacy-table w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
@@ -348,7 +348,7 @@ export default function AgencyMembersTable({
                         )
                       }
                     >
-                      <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
+                      <td data-label="Name" data-primary className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                             {member.name?.slice(0, 2).toUpperCase() ?? "?"}
@@ -361,13 +361,13 @@ export default function AgencyMembersTable({
                         </div>
                       </td>
 
-                      <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
+                      <td data-label="Email" className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
                         <div className="truncate text-sm text-ub-text-secondary">
                           {member.email}
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td data-label="Commission" data-mobile-secondary className="px-6 py-4">
                         {member.commission_visible ? (
                           <Tooltip
                             position="right"
@@ -387,7 +387,7 @@ export default function AgencyMembersTable({
                         )}
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td data-label="Status" data-mobile-secondary className="px-6 py-4">
                         {member.is_active ? (
                           <StatusBadge
                             variant="success"
@@ -405,7 +405,7 @@ export default function AgencyMembersTable({
                         )}
                       </td>
 
-                      <td
+                      <td data-label="Actions"
                         colSpan={2}
                         className="px-4 py-4"
                         onClick={(e) => e.stopPropagation()}
@@ -441,7 +441,7 @@ export default function AgencyMembersTable({
                         </TableActions>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td data-label="" className="px-4 py-4">
                         <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                       </td>
                     </AnimatedTableRow>

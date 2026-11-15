@@ -102,6 +102,7 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "1",
+      mobileSecondary: true,
       header: "Contact info",
       cell: (partner) => (
         <>
@@ -116,6 +117,7 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "2",
+      mobileSecondary: true,
       header: "Applications",
       cell: (partner) => (
         <>
@@ -127,6 +129,7 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "3",
+      mobileSecondary: true,
       header: "Status",
       cell: (partner) => (
         <>
@@ -165,6 +168,7 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "4",
+      mobileSecondary: true,
       header: "Registered",
       cell: (partner) => (
         <>
@@ -209,7 +213,7 @@ export default function AccountManagerPartnersList() {
           error={error}
           onRetry={refetch}
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No advisors found",
             description: "Try another search or adjust your filters.",

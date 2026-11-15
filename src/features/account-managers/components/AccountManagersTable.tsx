@@ -198,6 +198,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "email",
+      mobileSecondary: true,
       header: "Email",
       cell: (m) => (
         <span className="break-all text-ub-text-secondary" title={m.email}>
@@ -207,6 +208,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "advisors",
+      mobileSecondary: true,
       header: "Assigned advisors",
       cell: (m) => (
         <div className="flex flex-wrap gap-2">
@@ -228,6 +230,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "status",
+      mobileSecondary: true,
       header: "Status",
       cell: (m) => (
         <StatusBadge variant={m.is_active ? "success" : "neutral"}>
@@ -365,7 +368,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
           error={error}
           onRetry={refetch}
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No account managers found",
             description: "Try another search or adjust your filters.",

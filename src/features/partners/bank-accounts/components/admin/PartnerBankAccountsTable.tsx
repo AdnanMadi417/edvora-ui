@@ -152,7 +152,7 @@ export default function PartnerBankAccountsTable() {
             />
           }
         >
-            <table className="w-full min-w-[800px] md:min-w-0">
+            <table className="ub-legacy-table w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-ub-border bg-ub-surface-subtle">
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Advisor</th>
@@ -187,15 +187,15 @@ export default function PartnerBankAccountsTable() {
                         className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                         onClick={() => router.push(`/admin/advisors/${row.partner_id}`)}
                       >
-                        <td className="px-6 py-4 text-sm font-medium text-ub-text-primary">
+                        <td data-label="Advisor" data-primary className="px-6 py-4 text-sm font-medium text-ub-text-primary">
                           <p>{row.partner_name}</p>
                           <p className="text-xs text-ub-text-secondary">{row.partner_email}</p>
                         </td>
-                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{bankName}</td>
-                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_holder_name}</td>
-                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_number}</td>
-                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.currency}</td>
-                        <td className="w-8 pr-4 py-4">
+                        <td data-label="Bank" className="px-6 py-4 text-sm text-ub-text-secondary">{bankName}</td>
+                        <td data-label="Account holder" className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_holder_name}</td>
+                        <td data-label="Account number" className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_number}</td>
+                        <td data-label="Currency" className="px-6 py-4 text-sm text-ub-text-secondary">{row.currency}</td>
+                        <td data-label="" className="w-8 pr-4 py-4">
                           <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </AnimatedTableRow>

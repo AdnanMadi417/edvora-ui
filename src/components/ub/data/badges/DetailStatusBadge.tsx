@@ -12,9 +12,9 @@ interface DetailStatusBadgeProps {
 export default function DetailStatusBadge({ variant, children, className }: DetailStatusBadgeProps) {
   const tone = STATUS_BADGE_TONE[variant];
   return (
-    <span className={`${tagBase} ${tagTones[tone]} ${className ?? ""}`}>
+    <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${tagBase} ${tagTones[tone]} ${className ?? ""}`}>
       <span aria-hidden className={`h-1.5 w-1.5 shrink-0 rounded-ub-full ${tagDot[tone]}`} />
-      <span className="min-w-0 truncate">{children}</span>
+      <span data-ub-badge-label className="min-w-0 truncate">{children}</span>
     </span>
   );
 }

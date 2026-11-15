@@ -129,6 +129,7 @@ export default function StatementPage() {
       ? [
           {
             key: "partner_name",
+      mobileSecondary: true,
             header: "Team member",
             cell: (item: PartnerStatementItem) => (
               <p className="max-w-[180px] break-words">
@@ -140,6 +141,7 @@ export default function StatementPage() {
       : []),
     {
       key: "program",
+      mobileSecondary: true,
       header: "University / program",
       cell: (item) => (
         <div className="max-w-xs space-y-1">
@@ -169,6 +171,7 @@ export default function StatementPage() {
     },
     {
       key: "status",
+      mobileSecondary: true,
       header: "Status",
       cell: (item) => (
         <span className="flex max-w-[220px] flex-col items-start gap-1">
@@ -179,6 +182,7 @@ export default function StatementPage() {
     },
     {
       key: "since_date",
+      mobileSecondary: true,
       header: "Status since",
       cell: (item) => (
         <span className="whitespace-nowrap">
@@ -188,6 +192,7 @@ export default function StatementPage() {
     },
     {
       key: "payout_reference",
+      mobileSecondary: true,
       header: "Payout reference",
       width: "180px",
       cell: (item) => (
@@ -294,7 +299,7 @@ export default function StatementPage() {
           error={error}
           onRetry={refetch}
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No commissions found",
             description: search

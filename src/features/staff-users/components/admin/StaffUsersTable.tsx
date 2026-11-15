@@ -148,6 +148,7 @@ export default function StaffUsersTable() {
     },
     {
       key: "email",
+      mobileSecondary: true,
       header: "Email",
       cell: (user) => (
         <span className="break-all text-ub-text-secondary" title={user.email}>
@@ -164,6 +165,7 @@ export default function StaffUsersTable() {
     },
     {
       key: "status",
+      mobileSecondary: true,
       header: "Status",
       cell: (user) => (
         <StatusBadge variant={user.is_active ? "success" : "neutral"}>
@@ -310,7 +312,7 @@ export default function StaffUsersTable() {
           error={error}
           onRetry={refetch}
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No staff users found",
             description: "Try another search or adjust your filters.",

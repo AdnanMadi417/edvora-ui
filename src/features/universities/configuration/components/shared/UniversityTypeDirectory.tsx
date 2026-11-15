@@ -72,6 +72,7 @@ export default function UniversityTypeDirectory({
     },
     {
       key: "required",
+      mobileSecondary: true,
       header: "Required fields",
       sortable: true,
       sortValue: requiredCount,
@@ -79,6 +80,7 @@ export default function UniversityTypeDirectory({
     },
     {
       key: "optional",
+      mobileSecondary: true,
       header: "Optional fields",
       sortable: true,
       sortValue: (type) => type.required_fields.length - requiredCount(type),
@@ -90,6 +92,7 @@ export default function UniversityTypeDirectory({
     },
     {
       key: "requirements",
+      mobileSecondary: true,
       header: "Required at submission",
       cell: (type) => (
         <div className="min-w-[200px] max-w-[280px] space-y-1">
@@ -237,8 +240,8 @@ export default function UniversityTypeDirectory({
             setPage(1);
           }}
           manualSort
-          mobileLayout="scroll"
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          mobileLayout="stacked"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No university types found",
             description:

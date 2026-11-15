@@ -114,9 +114,9 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
         </span>
       ),
     },
-    { key: "method", header: "Payment Method", cell: (item) => item.payment_method_name },
+    { key: "method", mobileSecondary: true, header: "Payment Method", cell: (item) => item.payment_method_name },
     { key: "paid", header: "Paid At", cell: (item) => <AppDate value={item.paid_at} format="short" className="whitespace-nowrap" /> },
-    { key: "apps", header: "Applications", cell: (item) => formatApplicants(item.applications) },
+    { key: "apps", mobileSecondary: true, header: "Applications", cell: (item) => formatApplicants(item.applications) },
     {
       key: "amount",
       header: "Amount Sent",
@@ -134,7 +134,7 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
         </span>
       ),
     },
-    { key: "by", header: "Recorded By", cell: (item) => item.recorded_by_name },
+    { key: "by", mobileSecondary: true, header: "Recorded By", cell: (item) => item.recorded_by_name },
     {
       key: "actions",
       header: "Actions",

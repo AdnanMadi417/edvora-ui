@@ -43,6 +43,8 @@ export interface PaginationProps {
   siblingCount?: number;
   /** Just Previous / "Page x of y" / Next. Full mode also falls back to this below sm. */
   compact?: boolean;
+  /** Disable navigation while the page is loading. */
+  disabled?: boolean;
   "aria-label"?: string;
   previousLabel?: string;
   nextLabel?: string;
@@ -66,6 +68,7 @@ export default function Pagination({
   onPageChange,
   siblingCount = 1,
   compact = false,
+  disabled = false,
   "aria-label": ariaLabel = "Pagination",
   previousLabel = "Previous",
   nextLabel = "Next",
@@ -74,12 +77,12 @@ export default function Pagination({
   const total = Math.max(1, Math.floor(pageCount));
   const current = Math.min(Math.max(1, page), total);
   const go = (p: number) => {
-    if (p >= 1 && p <= total && p !== current) onPageChange(p);
+    if (!disabled && p >= 1 && p <= total && p !== current) onPageChange(p);
   };
 
   return (
     <nav aria-label={ariaLabel} className={clsx("ub-tabular flex items-center justify-between gap-3 sm:justify-center", className)}>
-      <button type="button" className={navButton} onClick={() => go(current - 1)} disabled={current <= 1}>
+      <button type="button" className={navButton} onClick={() => go(current - 1)} disabled={disabled || current <= 1}>
         <ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
         {previousLabel}
       </button>
@@ -92,6 +95,7 @@ export default function Pagination({
                 <button
                   type="button"
                   onClick={() => go(item)}
+                  disabled={disabled}
                   aria-label={`Page ${item}`}
                   aria-current={item === current ? "page" : undefined}
                   className={clsx(pageButton, item === current ? pageCurrent : pageIdle)}
@@ -112,7 +116,7 @@ export default function Pagination({
         Page <span className="font-medium text-ub-text-primary">{current}</span> of {total}
       </span>
 
-      <button type="button" className={navButton} onClick={() => go(current + 1)} disabled={current >= total}>
+      <button type="button" className={navButton} onClick={() => go(current + 1)} disabled={disabled || current >= total}>
         {nextLabel}
         <ChevronRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
       </button>

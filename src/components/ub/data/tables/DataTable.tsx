@@ -39,6 +39,8 @@ export interface DataTableColumn<T> {
   width?: string;
   /** Label in the stacked mobile layout when `header` isn't plain text. */
   mobileLabel?: string;
+  /** Secondary information shown only in desktop columns. */
+  mobileSecondary?: boolean;
 }
 
 export interface DataTableEmptyState {
@@ -54,7 +56,7 @@ export interface DataTableProps<T> {
   getRowId: (row: T) => string;
   /** Accessible table name (visually hidden caption). */
   caption: string;
-  /** comfortable 56px (default, Advisors) · compact 44px (team owners, Institution portal). */
+  /** compact 44px (default) · comfortable 56px. */
   density?: DataTableDensity;
 
   loading?: boolean;
@@ -84,9 +86,9 @@ export interface DataTableProps<T> {
   /** Footer slot, typically <TablePagination />. */
   footer?: ReactNode;
 
-  /** table (default; scrolls horizontally below 768px) · cards: stacked cards at every width (Knowledge Hub, mobile-first lists). */
+  /** table (default; compact summaries below 768px) · cards: stacked at every width. */
   layout?: DataTableLayout;
-  /** Mobile table presentation. Defaults to horizontal scrolling, like Applications. */
+  /** Mobile presentation. Compact stacked summaries by default. */
   mobileLayout?: "stacked" | "scroll";
   scrollClassName?: string;
   /** Return true, or a reason string to disable the row's checkbox (shown as its tooltip). */
@@ -238,7 +240,7 @@ export function DataTablePrimaryCell({ name, reference, avatarSrc }: DataTablePr
 
 // ── DataTable ────────────────────────────────────────────────────────────
 
-// Tables scroll on phones by default; stacked rows and card layouts remain explicit options.
+// Compact summaries on phones; desktop columns scroll inside the table container.
 const rowHeight: Record<DataTableDensity, string> = { comfortable: "md:h-14", compact: "md:h-11" };
 
 export default function DataTable<T>({
@@ -246,7 +248,7 @@ export default function DataTable<T>({
   rows,
   getRowId,
   caption,
-  density = "comfortable",
+  density = "compact",
   loading,
   skeletonRows = 5,
   error,
@@ -264,7 +266,7 @@ export default function DataTable<T>({
   manualSort,
   footer,
   layout = "table",
-  mobileLayout = "scroll",
+  mobileLayout = "stacked",
   scrollClassName,
   isRowSelectable,
   totalCount,
@@ -301,6 +303,10 @@ export default function DataTable<T>({
   const pageState = pageSelectionState(selected, selectableIds);
   const showData = !loading && !error && sortedRows.length > 0;
   const colCount = columns.length + (selectable ? 1 : 0);
+  const minTableWidth = Math.max(
+    640,
+    columns.reduce((width, col) => width + (col.width?.endsWith("px") ? parseFloat(col.width) : 160), 0) + (selectable ? 48 : 0)
+  );
   const cards = layout === "cards";
   const count = allMatchingSelected && totalCount ? totalCount : selected.length;
 
@@ -377,7 +383,7 @@ export default function DataTable<T>({
 
   return (
     <div
-      className={className}
+      className={clsx("ub-data-table", className)}
       onKeyDown={(e) => {
         if (e.key === "Escape" && selectable && count > 0) {
           e.stopPropagation();
@@ -413,7 +419,13 @@ export default function DataTable<T>({
       )}
 
       <TableWrapper footer={footer} scrollClassName={scrollClassName} scrollLabel={mobileScroll ? `${caption}: scroll to see all columns and rows` : undefined}>
-        <table className={t.table} aria-busy={loading || undefined}
+        <table
+          className={t.table}
+          data-layout={layout}
+          data-mobile-layout={mobileLayout}
+          data-selectable={selectable || undefined}
+          style={{ "--ub-table-min-width": `${minTableWidth}px` } as React.CSSProperties}
+          aria-busy={loading || undefined}
           onPointerDownCapture={(event) => { pointerGesture.current = { x: event.clientX, y: event.clientY, moved: false }; }}
           onPointerMoveCapture={(event) => {
             const gesture = pointerGesture.current;
@@ -503,7 +515,13 @@ export default function DataTable<T>({
                         const mobileLabel = col.mobileLabel ?? (typeof col.header === "string" ? col.header : col.key);
                         const content = <TableRowActionLabel.Provider value={label}>{col.cell(row, index)}</TableRowActionLabel.Provider>;
                         return (
-                          <td key={col.key} className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "md:text-end") : !cards && "md:text-start", pin(ci === 0))}>
+                          <td
+                            key={col.key}
+                            data-column={col.key}
+                            data-primary={ci === 0 || undefined}
+                            data-mobile-secondary={col.mobileSecondary || undefined}
+                            className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "md:text-end") : !cards && "md:text-start", pin(ci === 0))}
+                          >
                             <span aria-hidden="true" className={t.label}>
                               {mobileLabel}
                             </span>

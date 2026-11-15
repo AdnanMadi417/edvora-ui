@@ -26,7 +26,7 @@ export default function StageTag({ stageId, actionNeeded = false, size = "md", d
   const color = !stage ? { tone: "neutral" as const } : stage.hue === "success" ? { tone: "success" as const } : { hue: stage.hue };
 
   return (
-    <span className={clsx("inline-flex flex-wrap items-center gap-1.5", className)}>
+    <span data-ub-badge-group className={clsx("inline-flex flex-wrap items-center gap-1.5", className)}>
       <Tag {...color} size={size} dot={dot}>
         {label}
       </Tag>

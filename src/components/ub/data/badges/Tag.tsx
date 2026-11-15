@@ -73,7 +73,7 @@ export default function Tag({ children, tone = "neutral", hue, size = "md", vari
   const dotColor = solid ? "bg-current" : hue ? tagHueDot[hue] : tagDot[tone];
 
   return (
-    <span className={`${tagBase} ${size === "sm" ? `${tagSm} gap-1` : ""} ${colors} ${className ?? ""}`} {...rest}>
+    <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${tagBase} ${size === "sm" ? `${tagSm} gap-1` : ""} ${colors} ${className ?? ""}`} {...rest}>
       {icon ? (
         <span aria-hidden="true" className="flex shrink-0 items-center [&>svg]:h-3 [&>svg]:w-3">
           {icon}
@@ -81,7 +81,7 @@ export default function Tag({ children, tone = "neutral", hue, size = "md", vari
       ) : (
         dot && <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-ub-full ${dotColor}`} />
       )}
-      {children}
+      <span data-ub-badge-label>{children}</span>
     </span>
   );
 }

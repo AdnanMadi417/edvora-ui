@@ -48,7 +48,7 @@ export default function UniversitiesDataTable(props: Props) {
       width: "320px",
       sortable: true,
       cell: (university) => (
-        <div className="flex min-w-[240px] max-w-[360px] items-start gap-3 py-3 text-start">
+        <div className="flex min-w-[240px] max-w-[360px] items-start gap-3 py-1 text-start">
           <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-ub-md border border-ub-border bg-ub-tone-brand-bg">
             <PresignedImage
               fileKey={university.logo_file_key}
@@ -69,7 +69,7 @@ export default function UniversitiesDataTable(props: Props) {
             <p className="text-ub-body-sm text-ub-text-secondary">
               {university.country || "Country to be confirmed"}
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="hidden flex-wrap gap-1.5 md:flex">
               <Tag hue="indigo" size="sm">
                 {university.is_public ? "Public" : "Private"}
               </Tag>
@@ -85,6 +85,7 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "university_type_name",
+      mobileSecondary: true,
       header: "University type",
       sortable: true,
       cell: (university) => (
@@ -95,6 +96,7 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "intake_months",
+      mobileSecondary: true,
       header: "Intakes",
       cell: (university) =>
         university.intake_months?.length ? (
@@ -102,7 +104,7 @@ export default function UniversitiesDataTable(props: Props) {
             months={university.intake_months}
             size="sm"
             maxVisible={4}
-            className="!grid grid-cols-[max-content_max-content] !gap-x-4 !gap-y-2"
+            className="!flex flex-wrap md:!grid md:grid-cols-[max-content_max-content] !gap-x-4 !gap-y-2"
           />
         ) : (
           "To be confirmed"
@@ -110,6 +112,7 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "has_language_center",
+      mobileSecondary: true,
       header: "Language center",
       sortable: true,
       cell: (university) => (
@@ -120,6 +123,7 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "is_active",
+      mobileSecondary: true,
       header: "Status",
       sortable: true,
       cell: (university) => (
@@ -191,8 +195,8 @@ export default function UniversitiesDataTable(props: Props) {
         sort={props.sort}
         onSortChange={props.onSortChange}
         manualSort
-        mobileLayout="scroll"
-        scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+        mobileLayout="stacked"
+        scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
         loading={props.loading}
         error={props.error}
         onRetry={props.onRetry}

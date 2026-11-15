@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import ApplicationsTable, { applicationsCsv, type ApplicationListRow } from "features/applications/components/ApplicationsTable";
+import { render, screen } from "@testing-library/react";
+import ApplicationsTable, { type ApplicationListRow } from "features/applications/components/ApplicationsTable";
 
 jest.mock("services/documentService", () => ({ getDocumentDownloadUrl: jest.fn().mockResolvedValue("x") }));
 beforeAll(() => {
@@ -26,16 +26,12 @@ describe("ApplicationsTable", () => {
     expect(screen.getByRole("columnheader", { name: /Advisor \/ manager/ })).toBeInTheDocument();
   });
 
-  it("staff can select rows and get the export action", () => {
-    render(<ApplicationsTable rows={ROWS} hrefFor={(id) => id} statusLabel={label} needsAction={() => false} selectable defaultDensity="compact" />);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Select Nur Aisyah" }));
-    expect(screen.getByRole("button", { name: "Export 1 as CSV" })).toBeInTheDocument();
-  });
-
-  it("CSV quotes values and uses status labels", () => {
-    const csv = applicationsCsv(ROWS, (s) => s.toUpperCase());
-    expect(csv.split("\n")[0]).toContain('"Student","Passport number"');
-    expect(csv).toContain('"Chinedu, Okafor"');
-    expect(csv).toContain('"CORRECTION REQUESTED"');
+  it("shows application details without selection or export actions", () => {
+    render(<ApplicationsTable rows={ROWS} hrefFor={(id) => id} ownership="advisor-and-manager" statusLabel={label} needsAction={() => false} />);
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Actions" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Export/ })).not.toBeInTheDocument();
+    expect(screen.getByText("BSc Computing")).toBeInTheDocument();
+    expect(screen.getByText("Farid")).toBeInTheDocument();
   });
 });

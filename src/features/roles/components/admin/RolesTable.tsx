@@ -132,7 +132,7 @@ export default function RolesTable() {
             />
           }
         >
-          <table className="w-full min-w-[800px] md:min-w-0">
+          <table className="ub-legacy-table w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
@@ -199,7 +199,7 @@ export default function RolesTable() {
                           router.push(`/admin/roles/${role.id}`);
                       }}
                     >
-                      <td className="min-w-[200px] px-6 py-4">
+                      <td data-label="Role" data-primary className="min-w-[200px] px-6 py-4">
                         <Link
                           href={`/admin/roles/${role.id}`}
                           className="text-sm font-medium text-ub-text-primary hover:underline"
@@ -208,13 +208,13 @@ export default function RolesTable() {
                         </Link>
                       </td>
 
-                      <td className="min-w-[160px] px-6 py-4">
+                      <td data-label="Code" className="min-w-[160px] px-6 py-4">
                         <code className="rounded bg-ub-surface-subtle px-1.5 py-0.5 text-xs text-ub-text-secondary">
                           {role.code}
                         </code>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td data-label="Type" data-mobile-secondary className="px-6 py-4">
                         {role.is_system ? (
                           <StatusBadge variant="neutral">System</StatusBadge>
                         ) : (
@@ -222,7 +222,7 @@ export default function RolesTable() {
                         )}
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td data-label="Actions" className="px-4 py-4">
                         <TableActions label={role.name}>
                           {!role.is_system && (
                             <TableAction

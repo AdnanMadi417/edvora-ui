@@ -105,12 +105,14 @@ export default function BanksTable({
     },
     {
       key: "code",
+      mobileSecondary: true,
       header: "Bank code",
       sortable: true,
       cell: (bank) => <span className="break-all ub-tabular">{bank.code}</span>,
     },
     {
       key: "swift_code",
+      mobileSecondary: true,
       header: "SWIFT code",
       cell: (bank) => (
         <span className="break-all ub-tabular">
@@ -120,6 +122,7 @@ export default function BanksTable({
     },
     {
       key: "is_active",
+      mobileSecondary: true,
       header: "Status",
       cell: (bank) => (
         <Tag hue={bank.is_active ? "teal" : "grey"}>
@@ -236,7 +239,7 @@ export default function BanksTable({
           }}
           manualSort
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No banks found",
             description:

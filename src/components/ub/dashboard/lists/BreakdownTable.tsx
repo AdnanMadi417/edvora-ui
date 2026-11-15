@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import { tableHead } from "components/ub/recipes";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
 import DeltaPill from "../shared/DeltaPill";
 import WidgetStatus, { resolveWidgetState } from "../shared/WidgetStatus";
 import type { WidgetStateProps } from "../types";
@@ -35,29 +36,31 @@ export default function BreakdownTable({ rows, caption, labelHeader = "Name", va
   const resolved = resolveWidgetState(state, rows.length > 0);
   if (resolved !== "ready") return <WidgetStatus state={resolved} skeleton="list" emptyMessage={emptyMessage} errorMessage={errorMessage} onRetry={onRetry} className={className} />;
   return (
-    <div className={clsx("overflow-x-auto rounded-ub-md border border-ub-border", className)}>
-      <table className="w-full text-start text-ub-body-sm">
-        <caption className="sr-only">{caption}</caption>
-        <thead className={tableHead}>
-          <tr>
-            <th scope="col" className="h-9 px-3 text-start font-medium">{labelHeader}</th>
-            <th scope="col" className="h-9 px-3 text-end font-medium">{valueHeader}</th>
-            <th scope="col" className="h-9 px-3 text-end font-medium">{growthHeader}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.key} className="border-t border-ub-border">
-              <th scope="row" className="h-11 px-3 text-start font-normal">
-                <span className="block truncate text-ub-label-md text-ub-text-primary">{r.label}</span>
-                {r.meta && <span className="block truncate text-ub-caption text-ub-text-tertiary">{r.meta}</span>}
-              </th>
-              <td className="ub-tabular h-11 px-3 text-end text-ub-text-primary">{r.value}</td>
-              <td className="h-11 px-3 text-end">{typeof r.growth === "number" ? <DeltaPill value={r.growth} goodWhen={r.goodWhen} comparedTo={comparedTo} /> : <span className="text-ub-text-tertiary">—</span>}</td>
+    <div className={clsx("min-w-0", className)}>
+      <TableWrapper>
+        <table className="w-full table-fixed text-start text-ub-body-sm">
+          <caption className="sr-only">{caption}</caption>
+          <thead className={tableHead}>
+            <tr>
+              <th scope="col" className="h-11 w-1/2 px-3 text-start font-medium">{labelHeader}</th>
+              <th scope="col" className="h-11 px-3 text-end font-medium">{valueHeader}</th>
+              <th scope="col" className="h-11 px-3 text-end font-medium">{growthHeader}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key} className="border-t border-ub-border">
+                <th scope="row" className="h-11 px-3 text-start font-normal">
+                  <span className="block truncate text-ub-label-md text-ub-text-primary">{r.label}</span>
+                  {r.meta && <span className="block truncate text-ub-caption text-ub-text-tertiary">{r.meta}</span>}
+                </th>
+                <td className="ub-tabular h-11 px-3 text-end text-ub-text-primary">{r.value}</td>
+                <td className="h-11 px-3 text-end">{typeof r.growth === "number" ? <DeltaPill value={r.growth} goodWhen={r.goodWhen} comparedTo={comparedTo} /> : <span className="text-ub-text-tertiary">—</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableWrapper>
     </div>
   );
 }

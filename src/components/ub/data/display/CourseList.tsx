@@ -8,7 +8,9 @@
 // in MYR and USD. No real "language centers" backend/types module exists
 // yet (grepped — nothing in this repo or unibexs-backend), so this shape
 // is modeled directly off that sample rather than an existing type.
-import { card, tableHead, tableRow, tableScroll } from "components/ub/recipes";
+import { card, tableHead, tableRow } from "components/ub/recipes";
+
+import TableWrapper from "components/ub/data/tables/TableWrapper";
 
 export interface CourseLevel {
   level_name: string;
@@ -46,33 +48,35 @@ export default function CourseList({ courses }: CourseListProps) {
             </p>
           </div>
 
-          <div className={`mt-3 rounded-ub-md border border-ub-border ${tableScroll}`}>
-            <table className="w-full min-w-[420px] text-start">
-              <thead className={tableHead}>
-                <tr>
-                  <th scope="col" className="h-10 px-3 text-start font-medium">Level</th>
-                  <th scope="col" className="h-10 px-3 text-start font-medium">Duration</th>
-                  <th scope="col" className="h-10 px-3 text-end font-medium">Price (MYR)</th>
-                  <th scope="col" className="h-10 px-3 text-end font-medium">Price (USD)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {course.levels.map((level) => (
-                  <tr key={`${course.name}-${level.level}`} className={tableRow}>
-                    <td className="h-11 px-3 text-ub-body-sm text-ub-text-primary">
-                      {level.level}. {level.level_name}
-                    </td>
-                    <td className="h-11 px-3 text-ub-body-sm text-ub-text-secondary">{level.duration}</td>
-                    <td className="ub-tabular h-11 px-3 text-end text-ub-body-sm text-ub-text-primary">
-                      {formatPrice(level.price_myr, "RM")}
-                    </td>
-                    <td className="ub-tabular h-11 px-3 text-end text-ub-body-sm text-ub-text-primary">
-                      {formatPrice(level.price_usd, "USD")}
-                    </td>
+          <div className="mt-3">
+            <TableWrapper>
+              <table className="ub-legacy-table w-full min-w-[640px] text-start">
+                <thead className={tableHead}>
+                  <tr>
+                    <th scope="col" className="h-10 px-3 text-start font-medium">Level</th>
+                    <th scope="col" className="h-10 px-3 text-start font-medium">Duration</th>
+                    <th scope="col" className="h-10 px-3 text-end font-medium">Price (MYR)</th>
+                    <th scope="col" className="h-10 px-3 text-end font-medium">Price (USD)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {course.levels.map((level) => (
+                    <tr key={`${course.name}-${level.level}`} className={tableRow}>
+                      <td data-label="Level" data-primary className="h-11 px-3 text-ub-body-sm text-ub-text-primary">
+                        {level.level}. {level.level_name}
+                      </td>
+                      <td data-label="Duration" className="h-11 px-3 text-ub-body-sm text-ub-text-secondary">{level.duration}</td>
+                      <td data-label="Price (MYR)" className="ub-tabular h-11 px-3 text-end text-ub-body-sm text-ub-text-primary">
+                        {formatPrice(level.price_myr, "RM")}
+                      </td>
+                      <td data-label="Price (USD)" className="ub-tabular h-11 px-3 text-end text-ub-body-sm text-ub-text-primary">
+                        {formatPrice(level.price_usd, "USD")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableWrapper>
           </div>
 
           {course.notes && <p className="mt-2 text-ub-caption text-ub-text-tertiary">{course.notes}</p>}

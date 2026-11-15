@@ -135,14 +135,14 @@ describe("Details row navigation", () => {
 });
 
 describe("Mobile table layout", () => {
-  it("defaults to an accessible scrolling table like Applications", () => {
-    render(<DataTable caption="Staff users" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
+  it("keeps horizontal scrolling available explicitly", () => {
+    render(<DataTable caption="Staff users" mobileLayout="scroll" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
     expect(screen.getByRole("region", { name: "Staff users: scroll to see all columns and rows" })).toHaveAttribute("tabindex", "0");
     expect(screen.getByRole("table")).toHaveClass("min-w-[1000px]");
   });
 
-  it("keeps stacked presentation available explicitly", () => {
-    render(<DataTable caption="Staff users" mobileLayout="stacked" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
+  it("defaults to compact stacked summaries on phones", () => {
+    render(<DataTable caption="Staff users" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
     expect(screen.queryByRole("region")).not.toBeInTheDocument();
     expect(screen.getByRole("table")).not.toHaveClass("min-w-[1000px]");
   });
@@ -164,4 +164,12 @@ it("does not activate the details link after a swipe across the row", () => {
   fireEvent.click(amount, { detail: 1 });
   expect(clicked).toHaveBeenCalledTimes(1);
   window.PointerEvent = previous;
+});
+
+it("marks secondary columns for mobile hiding without a more-details control", () => {
+  setup({ columns: [...COLUMNS, { key: "extra", header: "More info", mobileSecondary: true, cell: () => "Secondary detail" }] });
+  expect(screen.queryByRole("button", { name: /more details/i })).not.toBeInTheDocument();
+  expect(screen.getAllByText("Secondary detail")[0].closest("td")).toHaveAttribute("data-mobile-secondary", "true");
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select Nur Aisyah Binti Kamal" }));
+  expect(screen.getByRole("checkbox", { name: "Select Nur Aisyah Binti Kamal" })).toBeChecked();
 });

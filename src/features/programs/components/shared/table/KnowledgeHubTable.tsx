@@ -91,7 +91,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       header: "Program",
       width: "320px",
       cell: (program) => (
-        <div className="min-w-0 max-w-[320px] space-y-1.5 py-3 text-start md:min-w-[240px]">
+        <div className="ub-program-summary min-w-0 max-w-[320px] space-y-1 py-1 text-start md:min-w-[240px]">
           <Tooltip content={program.name} className="w-full min-w-0">
             <span className="line-clamp-2 break-words text-ub-label-md leading-snug text-ub-text-primary">
               {program.name}
@@ -132,32 +132,34 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       ),
     },
     {
-      key: "commission",
-      header: "Commission",
+      key: "financials",
+      header: "Financials",
+      mobileLabel: "Commission",
+      width: "240px",
       cell: (program) => (
-        <span className="ub-tabular whitespace-nowrap text-ub-heading-sm text-ub-tone-success-text">
-          {money(program.commission_amount, program.commission_currency)}
-        </span>
-      ),
-    },
-    {
-      key: "tuition",
-      header: "First-year tuition",
-      cell: (program) => (
-        <span className="ub-tabular whitespace-nowrap">
-          {money(program.first_year_tuition, program.yearly_fee_currency)}
+        <span className="ub-tabular block space-y-1">
+          <span className="block">
+            <span className="hidden text-ub-caption text-ub-text-secondary md:inline">Commission: </span>
+            <span className="text-ub-label-md text-ub-tone-success-text">
+              {money(program.commission_amount, program.commission_currency)}
+            </span>
+          </span>
+          <span className="hidden text-ub-caption text-ub-text-secondary md:block">
+            First-year tuition: <span className="text-ub-text-primary">{money(program.first_year_tuition, program.yearly_fee_currency)}</span>
+          </span>
         </span>
       ),
     },
     {
       key: "intakes",
+      mobileSecondary: true,
       header: "Intakes",
       cell: (program) =>
         program.intake_months?.length ? (
           <IntakeMonthsChips
             months={program.intake_months}
             size="sm"
-            className="!grid grid-cols-[max-content_max-content] justify-items-start !gap-x-4 !gap-y-2"
+            className="!flex flex-wrap md:!grid md:grid-cols-[max-content_max-content] justify-items-start !gap-x-4 !gap-y-2"
             maxVisible={3}
           />
         ) : (
@@ -166,6 +168,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "requirements",
+      mobileSecondary: true,
       header: "Requirements",
       cell: (program) => (
         <div className="space-y-2">
@@ -243,13 +246,9 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       aria-busy={props.isFetching || props.isSelectingAll}
       className="min-w-0"
     >
-      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
-        Swipe across for more columns. Scroll within the table for more
-        programs.
-      </p>
       <DataTable
-        mobileLayout="scroll"
-        scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
+        mobileLayout="stacked"
+        scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
         columns={columns}
         rows={props.programs}
         getRowId={(program) => program.id}

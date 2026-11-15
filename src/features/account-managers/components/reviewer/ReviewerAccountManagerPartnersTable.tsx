@@ -171,7 +171,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
             />
           }
         >
-          <table className="w-full min-w-[800px] md:min-w-0">
+          <table className="ub-legacy-table w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
@@ -224,7 +224,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                   className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                   onClick={() => router.push(`/reviewer/advisors/${partner.id}`)}
                 >
-                  <td className="min-w-[220px] px-6 py-4">
+                  <td data-label="Advisor" data-primary className="min-w-[220px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                         <PresignedImage
@@ -242,12 +242,12 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td data-label="Contact info" className="px-6 py-4">
                     <div className="truncate text-sm text-ub-text-primary">{partner.phone || "—"}</div>
                     <div className="truncate text-xs text-ub-text-secondary">{partner.email || "—"}</div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td data-label="Status" data-mobile-secondary className="px-6 py-4">
                     {partner.is_active ? (
                       <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                     ) : (
@@ -255,7 +255,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                     )}
                   </td>
 
-                  <td className="px-4 py-4">
+                  <td data-label="" className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </AnimatedTableRow>

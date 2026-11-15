@@ -52,7 +52,7 @@ describe("getDaysLabel", () => {
 describe("DaysTag", () => {
   it("renders the label with the level", () => {
     render(<DaysTag mode="deadline" days={-2} />);
-    const tag = screen.getByText("Overdue by 2 days");
+    const tag = screen.getByText("Overdue by 2 days").closest("[data-level]");
     expect(tag).toHaveAttribute("data-level", "red");
   });
 });

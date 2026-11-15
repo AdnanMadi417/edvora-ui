@@ -1,13 +1,6 @@
 "use client";
-import TableActions, {
-  TableAction,
-} from "components/ub/data/tables/TableActions";
-
-import { useMemo, useState, type ReactNode } from "react";
-import { ClipboardList, Download, Eye } from "lucide-react";
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
-import IconButton from "components/ub/core/buttons/IconButton";
-import Button from "components/ub/core/buttons/Button";
+import { useMemo, type ReactNode } from "react";
+import { ClipboardList } from "lucide-react";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DataTable, {
   type DataTableColumn,
@@ -17,6 +10,7 @@ import PresignedImage from "components/ub/data/media/PresignedImage";
 import Tag from "components/ub/data/badges/Tag";
 import { Avatar } from "components/ub/data/media/Avatar";
 import StatusTag from "components/ub/dashboard/shared/StatusTag";
+import "./ApplicationsTable.css";
 
 /** The fields every role's list endpoint returns (admin adds account_manager_name). */
 export interface ApplicationListRow {
@@ -53,64 +47,13 @@ export interface ApplicationsTableProps {
   needsAction: (status: string) => boolean;
   /** Row density. Compact by default. */
   defaultDensity?: DataTableDensity;
-  /** Staff: select rows on the page and export them as CSV. */
-  selectable?: boolean;
-  /** Changes when filters change, so the selection clears. */
-  selectionResetKey?: string;
   footer?: ReactNode;
   emptyAction?: ReactNode;
 }
 
-const csvCell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-
-/** Pure: CSV for the selected rows (client-side; no bulk endpoint needed). */
-export function applicationsCsv(
-  rows: ApplicationListRow[],
-  statusLabel: (s: string) => string
-): string {
-  const header = [
-    "Student",
-    "Passport number",
-    "Programme",
-    "Institution",
-    "Advisor",
-    "Account manager",
-    "Stage",
-    "Status",
-    "Updated",
-  ];
-  const lines = rows.map((r) =>
-    [
-      r.student_name,
-      r.passport_number,
-      r.program_name,
-      r.university_name,
-      r.partner_name,
-      r.account_manager_name,
-      r.stage,
-      statusLabel(r.status),
-      r.updated_at,
-    ]
-      .map(csvCell)
-      .join(",")
-  );
-  return [header.map(csvCell).join(","), ...lines].join("\n");
-}
-
-function download(csv: string, filename: string) {
-  const url = URL.createObjectURL(
-    new Blob([csv], { type: "text/csv;charset=utf-8" })
-  );
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 function StudentCell({ row }: { row: ApplicationListRow }) {
   return (
-    <span className="flex min-w-0 max-w-[280px] items-center gap-3 py-2 md:min-w-[150px]">
+    <span className="flex min-w-0 w-full items-center gap-3 py-2">
       <PresignedImage
         fileKey={row.student_photo_file_key ?? undefined}
         alt=""
@@ -136,8 +79,7 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
 
 /**
  * Application Tracker table (brief §6), shared by the Advisor, account
- * manager and admin lists. Each row opens the application in a new tab;
- * staff can select rows and export them.
+ * manager and admin lists. Each row opens the application in a new tab.
  */
 export default function ApplicationsTable({
   rows,
@@ -149,13 +91,9 @@ export default function ApplicationsTable({
   statusLabel,
   needsAction,
   defaultDensity = "compact",
-  selectable = false,
-  selectionResetKey,
   footer,
   emptyAction,
 }: ApplicationsTableProps) {
-  const [selected, setSelected] = useState<string[]>([]);
-
   const columns = useMemo<DataTableColumn<ApplicationListRow>[]>(() => {
     const cols: DataTableColumn<ApplicationListRow>[] = [
       {
@@ -164,14 +102,15 @@ export default function ApplicationsTable({
         cell: (r) => <StudentCell row={r} />,
         sortable: true,
         sortValue: (r) => r.student_name,
-        width: "22%",
+        width: ownership === "none" ? "26%" : "22%",
       },
       {
         key: "programme",
         header: "Programme",
         mobileLabel: "Programme",
+        width: ownership === "none" ? "32%" : "24%",
         cell: (r) => (
-          <span className="block min-w-0 max-w-[300px] md:min-w-[150px]">
+          <span className="block min-w-0 w-full">
             <span
               className="line-clamp-2 text-ub-body-sm text-ub-text-primary"
               title={r.program_name}
@@ -190,10 +129,12 @@ export default function ApplicationsTable({
     if (ownership !== "none") {
       cols.push({
         key: "owner",
+      mobileSecondary: true,
+        width: "18%",
         header:
           ownership === "advisor-and-manager" ? "Advisor / manager" : "Advisor",
         cell: (r) => (
-          <span className="block min-w-0 max-w-[170px]">
+          <span className="block min-w-0 w-full">
             <span className="block truncate" title={r.partner_name ?? undefined}>{r.partner_name ?? "—"}</span>
             {ownership === "advisor-and-manager" && (
               <span className="block truncate text-ub-caption text-ub-text-tertiary">
@@ -209,19 +150,19 @@ export default function ApplicationsTable({
     cols.push(
       {
         key: "status",
+        mobileSecondary: true,
+        width: ownership === "none" ? "28%" : "24%",
         header: "Stage / status",
         cell: (r) => (
-          <span className="flex min-w-0 max-w-[200px] flex-col md:min-w-[150px] items-start gap-1">
-            <span className="truncate text-ub-caption text-ub-text-tertiary">
+          <span className="flex w-full min-w-0  flex-col items-start gap-1">
+            <span className="block w-full truncate text-ub-caption text-ub-text-tertiary" title={r.stage}>
               {r.stage}
             </span>
-            <span className="flex flex-wrap items-center gap-1.5">
+            <span className="flex w-full min-w-0 flex-wrap items-center gap-1.5">
               <StatusTag
                 status={r.status}
                 label={statusLabel(r.status)}
                 size="sm"
-                // Long statuses wrap on phones instead of running past the card.
-                className="max-w-full !h-auto min-h-5 py-0.5 !whitespace-normal text-start md:!h-5 md:!whitespace-nowrap md:py-0"
               />
               {needsAction(r.status) && (
                 <Tag tone="attention" size="sm">
@@ -236,50 +177,30 @@ export default function ApplicationsTable({
       },
       {
         key: "updated",
+      mobileSecondary: true,
+        width: ownership === "none" ? "14%" : "12%",
         header: "Updated",
         cell: (r) => (
           <AppDate
             value={r.updated_at}
             format="relative"
-            className="whitespace-nowrap text-ub-text-secondary"
+            className="text-ub-text-secondary"
           />
         ),
         sortable: true,
         sortValue: (r) => new Date(r.updated_at),
       }
     );
-    // The only row action is CSV export, which comes with selection (staff).
-    if (selectable) cols.push({
-      key: "actions",
-      header: "Actions",
-      cell: (row) => (
-        <TableActions>
-          {selectable && (
-            <TableAction
-              label={"Export application as CSV"}
-              icon={<Download className="h-4 w-4" />}
-              onSelect={() =>
-                download(
-                  applicationsCsv([row], statusLabel),
-                  `application-${row.id}.csv`
-                )
-              }
-            />
-          )}
-        </TableActions>
-      ),
-    });
     return cols;
-  }, [ownership, statusLabel, needsAction, selectable]);
+  }, [ownership, statusLabel, needsAction]);
 
   return (
     <>
       <DataTable<ApplicationListRow>
-        // Phones: one stacked card per application, so the status is visible
-        // without swiping. From 768px it's a table that scrolls within 65% of
-        // the screen height.
+        className="ub-applications-table"
+        // Phones show compact summaries; other fields remain on the detail page.
         mobileLayout="stacked"
-        scrollClassName="md:max-h-[65dvh] md:overflow-y-auto md:overscroll-contain"
+        scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
         caption="Applications"
         columns={columns}
         rows={rows}
@@ -297,26 +218,6 @@ export default function ApplicationsTable({
           icon: <ClipboardList aria-hidden="true" />,
           action: emptyAction,
         }}
-        selectable={selectable}
-        selectedIds={selected}
-        onSelectionChange={setSelected}
-        selectionResetKey={selectionResetKey}
-        bulkActions={(ids, clear) => (
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Download className="h-4 w-4" aria-hidden="true" />}
-            text={`Export ${ids.length} as CSV`}
-            onClick={() => {
-              const chosen = rows.filter((r) => ids.includes(r.id));
-              download(
-                applicationsCsv(chosen, statusLabel),
-                `applications-${new Date().toISOString().slice(0, 10)}.csv`
-              );
-              clear();
-            }}
-          />
-        )}
         footer={footer}
       />
     </>

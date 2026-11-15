@@ -23,9 +23,9 @@ interface StatusBadgeProps {
 /** Tinted tag: 24px high, radius 6, label-sm — never a pill. */
 export default function StatusBadge({ variant, icon, children, className }: StatusBadgeProps) {
   return (
-    <span className={`${tagBase} ${tagTones[STATUS_BADGE_TONE[variant]]} ${className ?? ""}`}>
-      {icon}
-      {children}
+    <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${tagBase} ${tagTones[STATUS_BADGE_TONE[variant]]} ${className ?? ""}`}>
+      {icon && <span className="flex shrink-0 items-center">{icon}</span>}
+      <span data-ub-badge-label>{children}</span>
     </span>
   );
 }

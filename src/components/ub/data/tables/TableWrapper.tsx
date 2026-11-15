@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { tableContainer, tableScroll } from "components/ub/recipes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import "./TableStyles.css";
 import { focusRing } from "components/ub/recipes";
 
 interface TableWrapperProps {
@@ -42,19 +43,21 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
 
     updateScrollState();
     el.addEventListener("scroll", updateScrollState);
-    const resizeObserver = new ResizeObserver(updateScrollState);
-    resizeObserver.observe(el);
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateScrollState);
+    resizeObserver?.observe(el);
+    window.addEventListener("resize", updateScrollState);
 
     return () => {
       el.removeEventListener("scroll", updateScrollState);
-      resizeObserver.disconnect();
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateScrollState);
     };
   }, [children]);
 
   return (
     <div className={`min-w-0 max-w-full ${tableContainer}`}>
       <div className="relative">
-        <div ref={scrollRef} style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y pinch-zoom", overscrollBehaviorY: "auto" }} className={`${tableScroll} ${scrollClassName ?? "max-h-[65dvh] overflow-y-auto overscroll-contain"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
+        <div ref={scrollRef} style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y pinch-zoom", overscrollBehaviorY: "auto" }} className={`${tableScroll} ${scrollClassName ?? "max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
           {children}
         </div>
         {canScrollStart && (
@@ -74,8 +77,8 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
         <div className="flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-3 py-2">
           <span className="text-ub-caption text-ub-text-tertiary">More columns <span className="hidden sm:inline">— scroll horizontally</span></span>
           <div className="flex gap-1">
-            <button type="button" aria-label="Scroll to previous columns" disabled={!canScrollStart} onClick={() => move(false)} className={`grid h-9 w-9 place-items-center rounded-ub-full text-ub-text-link hover:bg-ub-selected disabled:opacity-30 ${focusRing}`}><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
-            <button type="button" aria-label="Scroll to next columns" disabled={!canScrollEnd} onClick={() => move(true)} className={`grid h-9 w-9 place-items-center rounded-ub-full text-ub-text-link hover:bg-ub-selected disabled:opacity-30 ${focusRing}`}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
+            <button type="button" aria-label="Scroll to previous columns" disabled={!canScrollStart} onClick={() => move(false)} className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
+            <button type="button" aria-label="Scroll to next columns" disabled={!canScrollEnd} onClick={() => move(true)} className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
           </div>
         </div>
       )}

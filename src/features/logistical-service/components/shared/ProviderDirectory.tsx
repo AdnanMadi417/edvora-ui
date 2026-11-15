@@ -105,7 +105,7 @@ export default function ProviderDirectory({
       ),
     },
     {
-      key: "services",
+      key: "services", mobileSecondary: true,
       header: "Services",
       cell: (provider) => (
         <div className="flex max-w-xs flex-wrap gap-2">
@@ -125,6 +125,7 @@ export default function ProviderDirectory({
     },
     {
       key: "is_active",
+      mobileSecondary: true,
       header: "Status",
       cell: (provider) => (
         <Tag hue={provider.is_active ? "teal" : "grey"}>
@@ -230,7 +231,7 @@ export default function ProviderDirectory({
             setPage(1);
           }}
           manualSort
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No providers found",
             description: "Try another search or clear your filters.",

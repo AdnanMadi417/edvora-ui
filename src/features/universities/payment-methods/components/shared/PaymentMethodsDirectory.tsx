@@ -70,6 +70,7 @@ export default function PaymentMethodsDirectory({
     },
     {
       key: "description",
+      mobileSecondary: true,
       header: "Description",
       sortable: true,
       sortValue: (method) => descriptionText(method.description),
@@ -170,7 +171,7 @@ export default function PaymentMethodsDirectory({
             setPage(1);
           }}
           manualSort
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No payment methods found",
             description: "Try another name or description.",

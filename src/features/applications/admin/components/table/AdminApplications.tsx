@@ -324,15 +324,6 @@ const ModernApplicationsTable = () => {
           statusLabel={statusLabel}
           needsAction={needsAction}
           defaultDensity="compact"
-          selectable={true}
-          selectionResetKey={[
-            selectedLifecycle,
-            selectedStages,
-            selectedStageStatus,
-            selectedUniversity,
-            debouncedSearch,
-            currentPage,
-          ].join("|")}
           footer={
             <TablePagination
               currentPage={currentPage}

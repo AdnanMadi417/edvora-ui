@@ -209,11 +209,13 @@ export default function FinanceQueuePage() {
     { key: "student", header: "Student", cell: (item) => item.student_name },
     {
       key: "advisor",
+      mobileSecondary: true,
       header: "Advisor",
       cell: (item) => item.partner_name ?? "—",
     },
     {
       key: "programme",
+      mobileSecondary: true,
       header: "University / Program",
       width: "260px",
       cell: (item) => (
@@ -282,6 +284,7 @@ export default function FinanceQueuePage() {
     },
     {
       key: "days",
+      mobileSecondary: true,
       header: "Days Waiting",
       cell: (item) => {
         const overdue =
@@ -547,7 +550,7 @@ export default function FinanceQueuePage() {
           getRowHref={(item) => `/admin/applications/${item.application_id}`}
           manualSort
           getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           loading={status === "loading"}
           error={
             status === "error"

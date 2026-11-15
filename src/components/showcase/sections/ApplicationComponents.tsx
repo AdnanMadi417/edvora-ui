@@ -105,7 +105,7 @@ export default function ApplicationComponents() {
           { name: "selectable / selectionResetKey", type: "boolean / string", default: "false", description: "Staff selection with Export as CSV; clears when filters change." },
         ]}
       >
-        <ApplicationsTable rows={LIST_ROWS} hrefFor={() => "#c-applicationstable"} ownership="advisor-and-manager" statusLabel={(s) => s} needsAction={(s) => s === "Correction Requested"} defaultDensity="compact" selectable />
+        <ApplicationsTable rows={LIST_ROWS} hrefFor={() => "#c-applicationstable"} ownership="advisor-and-manager" statusLabel={(s) => s} needsAction={(s) => s === "Correction Requested"} defaultDensity="compact" />
       </Demo>
 
       <Demo

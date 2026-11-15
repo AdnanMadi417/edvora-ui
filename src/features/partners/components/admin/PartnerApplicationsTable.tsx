@@ -152,7 +152,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
             />
           }
         >
-          <table className="w-full min-w-[800px] md:min-w-0">
+          <table className="ub-legacy-table w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
@@ -207,7 +207,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                     className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                     onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
                   >
-                    <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
+                    <td data-label="Student" data-primary className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
                       <div className="flex items-center gap-2">
                         <PresignedImage
                           fileKey={app.student_photo_file_key}
@@ -226,18 +226,18 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                       </div>
                     </td>
 
-                    <td className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
+                    <td data-label="Programme" className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
                       <div className="truncate text-sm text-ub-text-primary">{app.program_name}</div>
                       <div className="truncate text-xs text-ub-text-secondary">{app.university_name}</div>
                     </td>
 
-                    <td className="max-w-[140px] px-6 py-4">
+                    <td data-label="Status" data-mobile-secondary className="max-w-[140px] px-6 py-4">
                       <StatusBadge variant={statusVariant}>
                         <span className="truncate max-w-[110px]">{app.status}</span>
                       </StatusBadge>
                     </td>
 
-                    <td className="px-4 py-4">
+                    <td data-label="" className="px-4 py-4">
                       <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                     </td>
                   </AnimatedTableRow>

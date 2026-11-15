@@ -364,15 +364,6 @@ const PartnerApplications = () => {
           ownership="advisor"
           statusLabel={statusLabel}
           needsAction={needsPartnerAction}
-          selectable={false}
-          selectionResetKey={[
-            selectedLifecycle,
-            selectedStages,
-            selectedStageStatus,
-            selectedUniversity,
-            debouncedSearch,
-            currentPage,
-          ].join("|")}
           footer={
             <TablePagination
               currentPage={currentPage}

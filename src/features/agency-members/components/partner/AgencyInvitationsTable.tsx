@@ -275,7 +275,7 @@ export default function AgencyInvitationsTable() {
             />
           }
         >
-          <table className="w-full min-w-[800px] md:min-w-0">
+          <table className="ub-legacy-table w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
@@ -357,19 +357,19 @@ export default function AgencyInvitationsTable() {
                       key={invitation.id}
                       className="transition-colors hover:bg-ub-surface-subtle"
                     >
-                      <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
+                      <td data-label="Name" data-primary className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                         <div className="truncate text-sm font-medium text-ub-text-primary">
                           {invitation.name}
                         </div>
                       </td>
 
-                      <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
+                      <td data-label="Email" className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
                         <div className="truncate text-sm text-ub-text-secondary">
                           {invitation.email}
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td data-label="Status" data-mobile-secondary className="px-6 py-4">
                         <Tooltip
                           content={PROGRESS_TOOLTIPS[invitation.progress]}
                           position="right"
@@ -383,7 +383,7 @@ export default function AgencyInvitationsTable() {
                         </Tooltip>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td data-label="Invited" data-mobile-secondary className="px-6 py-4">
                         <div className="text-sm text-ub-text-primary">
                           <AppDate
                             value={invitation.created_at}
@@ -393,7 +393,7 @@ export default function AgencyInvitationsTable() {
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td data-label="Actions" className="px-4 py-4">
                         <TableActions label={invitation.email}>
                           {RESENDABLE_PROGRESS.includes(
                             invitation.progress
