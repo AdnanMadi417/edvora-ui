@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import MarkAllAsReadButton from "./MarkAllAsReadButton";
 
 import { useAllNotifications, useMarkAsRead, useMarkAllAsRead } from "../hooks";
-import { getNotificationIconConfig, getSenderName, getNotificationPhotoKey } from "../utils/notificationIcons";
+import { getNotificationIconConfig, getNotificationPhotoKey } from "../utils/notificationIcons";
 import type { Notification } from "../types";
 import { useMe } from "hooks/useMe";
-import { unibexsVoice } from "lib/unibexsVoice";
+import { getNotificationSummary } from "../utils/notificationSummary";
 import NotificationAvatar from "./NotificationAvatar";
 
 const PREVIEW_LIMIT = 5;
@@ -173,7 +173,7 @@ function PreviewContent({
         ) : (
           notifications.map((notification, index) => {
             const config = getNotificationIconConfig(notification);
-            const sender = getSenderName(notification, { forAdvisor });
+            const summary = getNotificationSummary(notification, { forAdvisor });
             return (
               <button
                 key={notification.id}
@@ -192,10 +192,10 @@ function PreviewContent({
                   size="sm"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm leading-snug text-ub-text-primary">
-                    <span className="font-semibold">{sender}</span>
-                    {notification.title && <span className="ml-1 font-normal text-ub-text-secondary">{forAdvisor ? unibexsVoice(notification.title) : notification.title}</span>}
+                  <p className="line-clamp-2 text-ub-label-md text-ub-text-primary">
+                    {summary.heading}
                   </p>
+                  {summary.message && <p className="mt-0.5 line-clamp-2 text-ub-body-sm text-ub-text-secondary">{summary.message}</p>}
                   <p className="mt-0.5 text-xs font-medium text-ub-text-link">{timeAgo(notification.created_at)}</p>
                 </div>
                 <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-ub-action-primary" />

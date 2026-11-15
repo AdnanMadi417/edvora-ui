@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowRight, Bell, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertTriangle, Bell, ExternalLink, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,9 +10,7 @@ import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import {
   getNotificationIconConfig,
-  getSenderName,
   getNotificationPhotoKey,
-  getNotificationStageStatus,
 } from "../utils/notificationIcons";
 import { getNotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus, Notification } from "../types";
@@ -25,7 +23,7 @@ import EmptyData from "components/ub/feedback/states/EmptyData";
 import Skeleton from "components/ub/feedback/states/Skeleton";
 import Button from "components/ub/core/buttons/Button";
 import { useMe } from "hooks/useMe";
-import { unibexsVoice } from "lib/unibexsVoice";
+import { getNotificationSummary } from "../utils/notificationSummary";
 
 const PAGE_SIZE = 20;
 // Unread notifications load in batches of this size via "Load more" (rather
@@ -39,25 +37,6 @@ function timeAgo(dateStr: string): string {
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  account_manager: "Account manager",
-  admin: "Admin",
-  finance: "Finance",
-  reviewer: "Reviewer",
-  data_entry: "Data entry",
-  partner: "Advisor",
-};
-
-/** The event without the student's name, which the first line already shows:
- *  "moved Sara Ochieng's application to X" → "moved the application to X". */
-function eventText(title: string, student?: string): string {
-  if (!student) return title;
-  const name = student.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return title
-    .replace(new RegExp(`${name}['’]s application`), "the application")
-    .replace(new RegExp(`\\s+(for|about)\\s+${name}$`), "");
 }
 
 interface NotificationsProps {
@@ -273,14 +252,8 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
             {displayed.map((notification, index) => {
               const isUnread = notification.read_at === null;
               const config = getNotificationIconConfig(notification);
-              const sender = getSenderName(notification, { forAdvisor });
               const href = getNotificationHref(notification, applicationBasePath, partnerBasePath);
-              // Advisors hear one voice: no staff roles, and backend copy reads as Unibexs.
-              const say = (text: string | null | undefined) => (forAdvisor ? unibexsVoice(text) : text);
-              const university = notification.data?.university_name;
-              const { stage, status } = getNotificationStageStatus(notification);
-              const student = notification.data?.student_name as string | undefined;
-              const role = forAdvisor ? undefined : ROLE_LABELS[(notification.data?.actor_role as string) ?? ""];
+              const summary = getNotificationSummary(notification, { forAdvisor });
 
               return (
                 <div
@@ -301,41 +274,14 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                     badgeBg={config.badgeBg}
                   />
 
-                  {/* Content: student and task first, then who did what. */}
                   <div className="min-w-0 flex-1">
-                    {student ? (
-                      <p className="truncate text-ub-label-md text-ub-text-primary">
-                        {student}
-                        {university && <span className="font-normal text-ub-text-secondary"> · {university}</span>}
+                    <p className={`break-words text-ub-label-md text-ub-text-primary ${href ? "line-clamp-2" : ""}`}>
+                      {summary.heading}
+                    </p>
+                    {summary.message && (
+                      <p className={`mt-0.5 break-words text-ub-body-sm text-ub-text-secondary ${href ? "line-clamp-2" : ""}`}>
+                        {summary.message}
                       </p>
-                    ) : (
-                      <p className="text-ub-body-sm text-ub-text-primary">
-                        <span className="font-semibold">{sender}</span> {say(notification.title)}
-                      </p>
-                    )}
-                    {notification.body && (
-                      <p className="mt-0.5 text-ub-body-sm text-ub-text-primary">{say(notification.body)}</p>
-                    )}
-                    {student && (
-                      <p className="mt-1 text-ub-caption text-ub-text-secondary">
-                        <span className="font-medium">{sender}</span>
-                        {role && <span>, {role}</span>} {eventText(say(notification.title) ?? "", student)}
-                      </p>
-                    )}
-                    {(stage || status) && (
-                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                        {stage && (
-                          <span className="inline-flex items-center rounded-ub-full bg-ub-surface-subtle px-2 py-0.5 text-ub-caption text-ub-text-secondary">
-                            {say(stage)}
-                          </span>
-                        )}
-                        {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-ub-text-tertiary rtl:-scale-x-100" aria-hidden="true" />}
-                        {status && (
-                          <span className="inline-flex items-center rounded-ub-full bg-ub-tone-brand-bg px-2 py-0.5 text-ub-caption text-ub-tone-brand-text">
-                            {say(status)}
-                          </span>
-                        )}
-                      </div>
                     )}
                     <p className={`mt-1 text-ub-caption ${isUnread ? "font-medium text-ub-text-link" : "text-ub-text-tertiary"}`}>
                       {timeAgo(notification.created_at)}
