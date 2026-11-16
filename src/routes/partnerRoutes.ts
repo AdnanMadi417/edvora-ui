@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap, Receipt, Home } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap, Receipt, Languages, Home } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 import { FEATURES } from "../config/featureFlags";
@@ -38,12 +38,11 @@ const partnerRoutes: IRoute[] = [
 
   {
     name: "Knowledge Hub",
+    parentLink: true,
     layout: "/partner",
     path: "/knowledge-hub",
     icon: BookOpen,
-    // Programs and the partner Universities list are the only two entries in
-    // this group, so with Universities hidden the group collapses back to the
-    // flat link it was before that page landed — no one-item dropdown.
+    // University-linked directories share the university browsing feature flag.
     ...(FEATURES.partnerUniversities
       ? {
           children: [
@@ -59,6 +58,7 @@ const partnerRoutes: IRoute[] = [
               path: "/universities",
               icon: Landmark,
             },
+            { name: "Language Centers", layout: "/partner", path: "/language-centers", icon: Languages },
           ],
         }
       : {}),

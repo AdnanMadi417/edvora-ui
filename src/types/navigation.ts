@@ -6,6 +6,8 @@ export interface IRoute {
   path: string;
   icon?: LucideIcon;
   children?: IRoute[];
+  /** Group label navigates to its path; a separate chevron toggles the submenu. */
+  parentLink?: boolean;
   /** Used by utils/navigation.ts's findCurrentRoute for recursive route matching; no route currently sets this. */
   items?: IRoute[];
   /** Used by utils/navigation.ts's getActiveNavbar to toggle the Navbar's secondary row; no route currently sets this. */

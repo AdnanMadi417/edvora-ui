@@ -356,6 +356,7 @@ const ProgramsTable = () => {
         <div className="min-w-0 p-3 sm:p-6">
 
           <KnowledgeHubTable
+            basePath="/admin"
             bulkActions={bulkActions}
             programs={programs}
             loading={loading}

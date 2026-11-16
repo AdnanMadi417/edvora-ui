@@ -7,6 +7,7 @@ import {
   BookOpen,
   GraduationCap,
   Landmark,
+  Languages,
   SlidersHorizontal,
   Layers,
   CreditCard,
@@ -63,6 +64,7 @@ const AdminRoutes: IRoute[] = [
   },
   {
     name: "Knowledge Hub",
+    parentLink: true,
     layout: "/admin",
     path: "/knowledge-hub",
     icon: BookOpen,
@@ -79,6 +81,7 @@ const AdminRoutes: IRoute[] = [
         path: "/universities",
         icon: Landmark,
       },
+      { name: "Language Centers", layout: "/admin", path: "/language-centers", icon: Languages },
     ],
   },
   {

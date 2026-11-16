@@ -50,3 +50,52 @@ it("preserves off-page selection and keeps business amounts and management actio
   expect(select).toHaveBeenCalledTimes(1);
   expect(select).toHaveBeenCalledWith(sampleProgram.id);
 });
+
+it.each(["/admin", "/data-entry"] as const)(
+  "provides role-correct university and language-center quick links for %s",
+  (basePath) => {
+    render(
+      <KnowledgeHubTable
+        basePath={basePath}
+        programs={[sampleProgram]}
+        loading={false}
+        isFetching={false}
+        error={null}
+        refetch={jest.fn()}
+        currentPage={1}
+        onPageChange={jest.fn()}
+        itemsPerPage={20}
+        total={1}
+        selectedPrograms={{}}
+        onSelectProgram={jest.fn()}
+        selectedCount={0}
+        isSelectingAll={false}
+        onSelectAll={jest.fn()}
+        onRowClick={jest.fn()}
+        editHref={(id) => `${basePath}/knowledge-hub/${id}/edit`}
+      />
+    );
+    const university = screen.getByRole("link", {
+      name: `University: ${sampleProgram.university.name}`,
+    });
+    const centers = screen.getByRole("link", {
+      name: `Language centers for ${sampleProgram.university.name}`,
+    });
+    expect(university).toHaveAttribute(
+      "href",
+      `${basePath}/universities/${encodeURIComponent(
+        sampleProgram.university.id
+      )}`
+    );
+    expect(centers).toHaveAttribute(
+      "href",
+      `${basePath}/language-centers?university_id=${encodeURIComponent(
+        sampleProgram.university.id
+      )}`
+    );
+    expect(university.closest("[data-column]")).toBe(
+      centers.closest("[data-column]")
+    );
+    expect(university.parentElement?.closest("a")).toBeNull();
+  }
+);

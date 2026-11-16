@@ -4,6 +4,7 @@ import {
   BookOpen,
   GraduationCap,
   Landmark,
+  Languages,
   SlidersHorizontal,
   Layers,
   CreditCard,
@@ -25,6 +26,7 @@ const dataEntryRoutes: IRoute[] = [
   },
   {
     name: "Knowledge Hub",
+    parentLink: true,
     layout: "/data-entry",
     path: "/knowledge-hub",
     icon: BookOpen,
@@ -41,6 +43,7 @@ const dataEntryRoutes: IRoute[] = [
         path: "/universities",
         icon: Landmark,
       },
+      { name: "Language Centers", layout: "/data-entry", path: "/language-centers", icon: Languages },
     ],
   },
   {

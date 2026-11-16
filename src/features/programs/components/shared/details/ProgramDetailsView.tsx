@@ -1,4 +1,5 @@
 "use client";
+import Section from "components/ub/data/cards/DetailsSection";
 
 import { useId, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -53,44 +54,6 @@ interface Props {
   breadcrumbs?: ReactNode;
   actions: ReactNode;
   onCopyError?: () => void;
-}
-
-function Section({
-  id,
-  title,
-  description,
-  children,
-}: {
-  id: string;
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  const reducedMotion = useReducedMotion();
-  return (
-    <motion.section
-      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE, delay: reducedMotion ? 0 : 0.08 }}
-      tabIndex={-1}
-      id={id}
-      aria-labelledby={`${id}-title`}
-      className="scroll-mt-24 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs focus:outline-none sm:p-6"
-    >
-      <h2
-        id={`${id}-title`}
-        className="text-ub-heading-md text-ub-text-primary"
-      >
-        {title}
-      </h2>
-      {description && (
-        <p className="mt-1 text-ub-body-sm text-ub-text-secondary">
-          {description}
-        </p>
-      )}
-      <div className="mt-5">{children}</div>
-    </motion.section>
-  );
 }
 
 export default function ProgramDetailsView({
@@ -261,13 +224,26 @@ export default function ProgramDetailsView({
               key={section}
               href={`#${sectionId(section)}`}
               onClick={(event) => {
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                if (
+                  event.metaKey ||
+                  event.ctrlKey ||
+                  event.shiftKey ||
+                  event.altKey
+                )
+                  return;
                 const target = document.getElementById(sectionId(section));
                 if (!target) return;
                 event.preventDefault();
-                window.history.pushState(window.history.state, "", `#${sectionId(section)}`);
+                window.history.pushState(
+                  window.history.state,
+                  "",
+                  `#${sectionId(section)}`
+                );
                 target.focus({ preventScroll: true });
-                target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+                target.scrollIntoView({
+                  behavior: reducedMotion ? "auto" : "smooth",
+                  block: "start",
+                });
               }}
               className={`shrink-0 rounded-ub-full transition-colors duration-200 motion-reduce:transition-none px-4 py-2 text-ub-label-md text-ub-text-secondary hover:bg-ub-action-ghost-hover hover:text-ub-text-link ${focusRing}`}
             >
@@ -547,7 +523,6 @@ export default function ProgramDetailsView({
               {actions}
             </div>
           </div>
-
         </aside>
       </div>
     </motion.div>

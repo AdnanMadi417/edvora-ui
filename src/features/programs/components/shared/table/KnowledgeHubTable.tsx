@@ -5,8 +5,12 @@ import TableActions, {
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import Link from "next/link";
+import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
 import type { ReactNode } from "react";
 import {
+  Landmark,
+  Languages,
   CopyPlus,
   Eye,
   EyeOff,
@@ -30,6 +34,7 @@ import { getIeltsLabel } from "constants/lists";
 import type { Program } from "features/programs/types";
 
 interface KnowledgeHubTableProps {
+  basePath?: "/admin" | "/data-entry";
   bulkActions?: ReactNode;
   programs: Program[];
   loading: boolean;
@@ -132,6 +137,42 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       ),
     },
     {
+      key: "related",
+      header: "Quick links",
+      width: "190px",
+      cell: (program) =>
+        program.university?.id ? (
+          <div className="flex flex-wrap items-center gap-1">
+            <Link
+              href={`${
+                props.basePath ?? "/admin"
+              }/universities/${encodeURIComponent(program.university.id)}`}
+              aria-label={`University: ${program.university.name}`}
+              className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.tertiary} !px-2`}
+            >
+              <Landmark className="h-4 w-4 shrink-0" aria-hidden="true" />
+              University
+            </Link>
+            <Link
+              href={`${
+                props.basePath ?? "/admin"
+              }/language-centers?university_id=${encodeURIComponent(
+                program.university.id
+              )}`}
+              aria-label={`Language centers for ${program.university.name}`}
+              className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.tertiary} !px-2`}
+            >
+              <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Language centers
+            </Link>
+          </div>
+        ) : (
+          <span className="text-ub-body-sm text-ub-text-tertiary">
+            University unavailable
+          </span>
+        ),
+    },
+    {
       key: "financials",
       header: "Financials",
       mobileLabel: "Commission",
@@ -139,13 +180,18 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       cell: (program) => (
         <span className="ub-tabular block space-y-1">
           <span className="block">
-            <span className="hidden text-ub-caption text-ub-text-secondary md:inline">Commission: </span>
+            <span className="hidden text-ub-caption text-ub-text-secondary md:inline">
+              Commission:{" "}
+            </span>
             <span className="text-ub-label-md text-ub-tone-success-text">
               {money(program.commission_amount, program.commission_currency)}
             </span>
           </span>
           <span className="hidden text-ub-caption text-ub-text-secondary md:block">
-            First-year tuition: <span className="text-ub-text-primary">{money(program.first_year_tuition, program.yearly_fee_currency)}</span>
+            First-year tuition:{" "}
+            <span className="text-ub-text-primary">
+              {money(program.first_year_tuition, program.yearly_fee_currency)}
+            </span>
           </span>
         </span>
       ),

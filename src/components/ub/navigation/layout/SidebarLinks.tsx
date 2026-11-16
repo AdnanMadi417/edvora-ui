@@ -19,9 +19,11 @@ const navItemBase =
   "ub-sidebar-item relative flex h-10 w-full items-center gap-3 rounded-ub-md px-3 text-start text-ub-label-md transition-colors duration-ub-fast ease-ub-standard " +
   focusRingInset;
 const navItemActive = "bg-ub-action-primary text-ub-action-primary-text";
-const navItemInactive = "text-ub-text-secondary hover:bg-ub-nav-hover hover:text-ub-text-primary";
+const navItemInactive =
+  "text-ub-text-secondary hover:bg-ub-nav-hover hover:text-ub-text-primary";
 // A parent whose child is the current page: tinted, not filled.
-const navItemParentActive = "bg-ub-selected text-ub-text-selected hover:bg-ub-selected";
+const navItemParentActive =
+  "bg-ub-selected text-ub-text-selected hover:bg-ub-selected";
 
 const CHILD_ROW_HEIGHT = 40;
 const CHILD_GAP = 4;
@@ -33,9 +35,20 @@ export interface SidebarTip {
 }
 
 /** True when the desktop sidebar is showing as the 72px icon rail. */
-const isRail = (collapsed: boolean) => collapsed && typeof window !== "undefined" && window.matchMedia("(min-width: 1200px)").matches;
+const isRail = (collapsed: boolean) =>
+  collapsed &&
+  typeof window !== "undefined" &&
+  window.matchMedia("(min-width: 1200px)").matches;
 
-export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]; onLinkClick?: () => void; onTip?: (tip: SidebarTip | null) => void }) {
+export default function Links({
+  routes,
+  onLinkClick,
+  onTip,
+}: {
+  routes: IRoute[];
+  onLinkClick?: () => void;
+  onTip?: (tip: SidebarTip | null) => void;
+}) {
   const pathname = usePathname();
   const baseId = useId();
   const { collapsed, setCollapsed } = useSidebarCollapsed();
@@ -65,14 +78,16 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
   const getActiveChild = (route: IRoute) =>
     route.children
       ?.filter((child) => matchesPath(pathname, child.layout + child.path))
-      .sort((a, b) => (b.layout + b.path).length - (a.layout + a.path).length)[0];
+      .sort(
+        (a, b) => (b.layout + b.path).length - (a.layout + a.path).length
+      )[0];
 
   useEffect(() => {
     routes.forEach((route, index) => {
       const parentPath = route.layout + route.path;
       const hasActiveChild =
-        route.children?.some(
-          (child) => matchesPath(pathname, child.layout + child.path)
+        route.children?.some((child) =>
+          matchesPath(pathname, child.layout + child.path)
         ) ?? false;
 
       if (matchesPath(pathname, parentPath) || hasActiveChild) {
@@ -97,13 +112,68 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
         const content = (
           <>
             {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden />}
-            <span className="ub-sidebar-label min-w-0 flex-1 truncate">{route.name}</span>
+            <span className="ub-sidebar-label min-w-0 flex-1 truncate">
+              {route.name}
+            </span>
           </>
         );
 
         return (
           <li key={index}>
-            {hasChildren ? (
+            {hasChildren && route.parentLink ? (
+              <div
+                className={clsx(
+                  "relative rounded-ub-md",
+                  isActive && navItemParentActive
+                )}
+              >
+                <Link
+                  href={fullPath}
+                  data-tour-id={route.path.replace(/^\//, "")}
+                  aria-current={pathname === fullPath ? "page" : undefined}
+                  {...tipHandlers(route.name)}
+                  onClick={() => {
+                    onTip?.(null);
+                    setExpandedIndex(index);
+                    onLinkClick?.();
+                  }}
+                  className={clsx(
+                    navItemBase,
+                    "pe-12",
+                    isActive ? navItemParentActive : navItemInactive
+                  )}
+                >
+                  {content}
+                </Link>
+                <button
+                  type="button"
+                  aria-label={`${isExpanded ? "Collapse" : "Expand"} ${
+                    route.name
+                  }`}
+                  aria-expanded={isExpanded}
+                  aria-controls={submenuId}
+                  className={clsx(
+                    "ub-sidebar-expanded-only absolute end-0 top-0 grid h-10 w-10 place-items-center rounded-ub-md text-ub-icon hover:bg-ub-nav-hover",
+                    focusRingInset
+                  )}
+                  onClick={() => {
+                    if (isRail(collapsed)) {
+                      onTip?.(null);
+                      setCollapsed(false);
+                      setExpandedIndex(index);
+                    } else setExpandedIndex(isExpanded ? null : index);
+                  }}
+                >
+                  <ChevronDown
+                    aria-hidden
+                    className={clsx(
+                      "h-4 w-4 transition-transform motion-reduce:transition-none",
+                      isExpanded && "rotate-180"
+                    )}
+                  />
+                </button>
+              </div>
+            ) : hasChildren ? (
               <button
                 type="button"
                 data-tour-id={route.path.replace(/^\//, "")}
@@ -120,14 +190,17 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
                   setExpandedIndex(isExpanded ? null : index);
                 }}
                 {...tipHandlers(route.name)}
-                className={clsx(navItemBase, isActive ? navItemParentActive : navItemInactive)}
+                className={clsx(
+                  navItemBase,
+                  isActive ? navItemParentActive : navItemInactive
+                )}
               >
                 {content}
                 <ChevronDown
                   aria-hidden
                   className={clsx(
                     "ub-sidebar-expanded-only h-4 w-4 shrink-0 transition-transform duration-ub-base ease-ub-standard motion-reduce:transition-none",
-                    isExpanded && "rotate-180",
+                    isExpanded && "rotate-180"
                   )}
                 />
               </button>
@@ -141,7 +214,10 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
                   onLinkClick?.();
                 }}
                 {...tipHandlers(route.name)}
-                className={clsx(navItemBase, isActive ? navItemActive : navItemInactive)}
+                className={clsx(
+                  navItemBase,
+                  isActive ? navItemActive : navItemInactive
+                )}
               >
                 {content}
               </Link>
@@ -153,7 +229,13 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
                 aria-hidden={!isExpanded}
                 className="ub-sidebar-expanded-only ms-5 flex flex-col gap-1 overflow-hidden border-s border-ub-border ps-3 transition-[max-height,margin] duration-ub-slow ease-ub-standard motion-reduce:transition-none"
                 style={{
-                  maxHeight: isExpanded ? `${route.children!.length * (CHILD_ROW_HEIGHT + CHILD_GAP) + CHILD_GAP}px` : "0px",
+                  maxHeight: isExpanded
+                    ? `${
+                        route.children!.length *
+                          (CHILD_ROW_HEIGHT + CHILD_GAP) +
+                        CHILD_GAP
+                      }px`
+                    : "0px",
                   marginTop: isExpanded ? CHILD_GAP : 0,
                 }}
               >
@@ -170,10 +252,18 @@ export default function Links({ routes, onLinkClick, onTip }: { routes: IRoute[]
                         aria-current={isChildActive ? "page" : undefined}
                         tabIndex={isExpanded ? undefined : -1}
                         onClick={onLinkClick}
-                        className={clsx(navItemBase, "gap-2 text-ub-body-sm", isChildActive ? navItemActive : navItemInactive)}
+                        className={clsx(
+                          navItemBase,
+                          "gap-2 text-ub-body-sm",
+                          isChildActive ? navItemActive : navItemInactive
+                        )}
                       >
-                        {ChildIcon && <ChildIcon className="h-4 w-4 shrink-0" aria-hidden />}
-                        <span className="min-w-0 flex-1 truncate">{child.name}</span>
+                        {ChildIcon && (
+                          <ChildIcon className="h-4 w-4 shrink-0" aria-hidden />
+                        )}
+                        <span className="min-w-0 flex-1 truncate">
+                          {child.name}
+                        </span>
                       </Link>
                     </li>
                   );

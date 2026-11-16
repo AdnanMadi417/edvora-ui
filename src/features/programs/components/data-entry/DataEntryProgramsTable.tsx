@@ -328,6 +328,7 @@ const DataEntryProgramsTable = () => {
         <div className="min-w-0 p-3 sm:p-6">
 
           <KnowledgeHubTable
+            basePath="/data-entry"
             bulkActions={bulkActions}
             programs={programs}
             loading={loading}

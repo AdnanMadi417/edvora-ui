@@ -16,3 +16,4 @@ import "./staff";
 import "./roles";
 import "./accountManagers";
 import "./logistics";
+import "./languageCenters";
