@@ -30,8 +30,10 @@ it("shows scoped readable details without a table or advisor management actions"
     <UniversityLanguageCenters universityId="uni-1" basePath="/partner" />
   );
   await screen.findByRole("heading", { name: "English Center" });
-  await waitFor(() => expect(screen.getByText(center.description)).toBeVisible());
-  expect(screen.getByText(center.email)).toBeVisible();
+  await waitFor(() =>
+    expect(screen.getByText(center.description)).toBeVisible()
+  );
+  expect(screen.queryByText(center.email)).not.toBeInTheDocument();
   expect(screen.queryByText("Other Center")).not.toBeInTheDocument();
   expect(screen.queryByText("Inactive Center")).not.toBeInTheDocument();
   expect(screen.queryByRole("table")).not.toBeInTheDocument();
@@ -63,5 +65,7 @@ it("handles a failed load with retry and an empty state", async () => {
   );
   await screen.findByText("Load failed");
   await user.click(screen.getByRole("button", { name: "Try again" }));
-  await waitFor(() => expect(screen.getByText("No language centers available")).toBeVisible());
+  await waitFor(() =>
+    expect(screen.getByText("No language centers available")).toBeVisible()
+  );
 });

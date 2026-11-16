@@ -1,5 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { emptyConfiguration } from "features/universities/language-centers/configuration";
+import { saveCentreConfiguration } from "features/universities/language-centers/hooks/useCentreConfiguration";
+import { selectOption } from "testUtils/selectOption";
 import UniversityDirectory from "./UniversityDirectory";
 import { useUniversities } from "features/universities/hooks";
 import { sampleUniversities } from "components/showcase/fixtures/universities";
@@ -17,6 +20,7 @@ jest.mock("components/ub/feedback/notifications/ToastContext", () => ({
   useToast: () => ({ showToast: jest.fn() }),
 }));
 beforeAll(() => {
+  window.scrollTo = jest.fn();
   global.ResizeObserver = class {
     observe() {}
     unobserve() {}
@@ -24,6 +28,7 @@ beforeAll(() => {
   } as unknown as typeof ResizeObserver;
 });
 beforeEach(() => {
+  localStorage.clear();
   (useUniversities as jest.Mock).mockReturnValue({
     universities: [
       ...sampleUniversities,
@@ -49,9 +54,7 @@ it("excludes hidden institutions and management controls from partners", async (
   expect(
     screen.queryByRole("link", { name: "Create university" })
   ).not.toBeInTheDocument();
-  expect(
-    queryRowAction("Delete university")
-  ).not.toBeInTheDocument();
+  expect(queryRowAction("Delete university")).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole("button", { name: "Filters" }));
   expect(
     screen.queryByRole("combobox", { name: "Visibility" })
@@ -66,10 +69,40 @@ it("keeps editing and visibility actions for data-entry without deletion", () =>
   expect(screen.getAllByRole("link", { name: "Edit university" })).toHaveLength(
     3
   );
+  expect(rowAction("Unhide university")).toBeInTheDocument();
+  expect(queryRowAction("Delete university")).not.toBeInTheDocument();
+});
+
+it("filters locally configured language centres for advisors", async () => {
+  const first = sampleUniversities[0];
+  const second = {
+    ...first,
+    id: "without-centre",
+    name: "University without centre",
+    has_language_center: false,
+  };
+  (useUniversities as jest.Mock).mockReturnValue({
+    universities: [{ ...first, has_language_center: false }, second],
+    loading: false,
+    error: null,
+    refetch: jest.fn(),
+  });
+  saveCentreConfiguration(first.id, {
+    ...emptyConfiguration(),
+    enabled: true,
+    name: "English Academy",
+  });
+  const user = userEvent.setup();
+  render(<UniversityDirectory role="partner" />);
+  await user.click(screen.getByRole("button", { name: "Filters" }));
+  await selectOption(
+    user,
+    screen.getByRole("combobox", { name: "Has Language Centre" }),
+    "true"
+  );
+  await user.click(screen.getByRole("button", { name: "Apply filters" }));
   expect(
-    rowAction("Unhide university")
-  ).toBeInTheDocument();
-  expect(
-    queryRowAction("Delete university")
+    screen.queryByText("University without centre")
   ).not.toBeInTheDocument();
+  expect(screen.getAllByText(first.name).length).toBeGreaterThan(0);
 });

@@ -3,6 +3,12 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import SectionCard from "components/ub/data/cards/SectionCard";
+import CentreConfigurationSection from "features/universities/language-centers/components/CentreConfigurationSection";
+import { configurationErrors } from "features/universities/language-centers/configuration";
+import {
+  useCentreConfiguration,
+  saveCentreConfiguration,
+} from "features/universities/language-centers/hooks/useCentreConfiguration";
 import InstitutionTypeField from "components/ub/forms/choices/InstitutionTypeField";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -194,6 +200,9 @@ const UniversityEdit = ({
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
 
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
+  const centre = useCentreConfiguration(id);
+  const [centreErrors, setCentreErrors] = useState<Record<string, string>>({});
+
   const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
   const [paymentRows, setPaymentRows] = useState<PaymentRow[]>([]);
   const [addPaymentForm, setAddPaymentForm] =
@@ -250,7 +259,9 @@ const UniversityEdit = ({
         ? String(university.university_type_id)
         : "",
       is_public: university.is_public ?? false,
-      has_language_center: university.has_language_center ?? false,
+      has_language_center: centre.exists
+        ? centre.initialValue.enabled
+        : university.has_language_center ?? false,
       is_hidden: university.is_hidden ?? false,
     };
 
@@ -266,7 +277,7 @@ const UniversityEdit = ({
         .then((url) => setLogo((prev) => ({ ...prev, existingUrl: url })))
         .catch(() => setLogo((prev) => ({ ...prev, existingUrl: "" })));
     }
-  }, [university, branches]);
+  }, [university, branches, centre.exists, centre.initialValue]);
 
   useEffect(() => {
     if (!universityPaymentMethods) return;
@@ -327,13 +338,14 @@ const UniversityEdit = ({
       );
     });
 
-    return universityChanged || logo.modified || paymentChanged;
+    return universityChanged || logo.modified || paymentChanged || centre.dirty;
   }, [
     formData,
     initialFormData,
     logo.modified,
     paymentRows,
     universityPaymentMethods,
+    centre.dirty,
   ]);
 
   // ─── Branches ─────────────────────────────────────────────────────────────
@@ -477,7 +489,7 @@ const UniversityEdit = ({
 
   const handleSave = async () => {
     if (logo.uploading) {
-      showToast("Please wait for the logo to finish uploading.", "error");
+      showToast("Please wait for the file to finish uploading.", "error");
       return;
     }
 
@@ -490,6 +502,24 @@ const UniversityEdit = ({
       return;
     }
 
+    const centreValue = {
+      ...centre.value,
+      enabled: formData.has_language_center,
+    };
+    const centreValidation = configurationErrors(centreValue);
+    setCentreErrors(centreValidation);
+    if (
+      centre.loading ||
+      centre.error ||
+      Object.keys(centreValidation).length
+    ) {
+      showToast(
+        centre.error ||
+          "Review the Language Centre configuration before saving.",
+        "error"
+      );
+      return;
+    }
     try {
       const logo_file_key = logo.file ? logo.fileKey : logo.existingKey;
       const logo_file_url = logo.file ? logo.fileUrl : logo.existingUrl;
@@ -522,6 +552,7 @@ const UniversityEdit = ({
         await Promise.all(changedRows.map(savePaymentRow));
       }
 
+      saveCentreConfiguration(id, centreValue);
       showToast("University updated successfully.", "success");
       router.push(redirectPath);
     } catch (error: unknown) {
@@ -673,18 +704,6 @@ const UniversityEdit = ({
           />
 
           <ToggleInput
-            label="Language center"
-            field="has_language_center"
-            formData={formData}
-            errors={{}}
-            updateFormData={updateFormData}
-            enabledText="Yes"
-            disabledText="No"
-            enabledDescription="This university has a language center."
-            disabledDescription="This university does not have a language center."
-          />
-
-          <ToggleInput
             label="Visibility"
             field="is_hidden"
             formData={formData}
@@ -697,6 +716,19 @@ const UniversityEdit = ({
           />
         </div>
       </SectionCard>
+
+      <CentreConfigurationSection
+        enabled={formData.has_language_center}
+        onEnabledChange={(enabled) =>
+          updateFormData("has_language_center", enabled)
+        }
+        value={centre.value}
+        onChange={centre.setValue}
+        loading={centre.loading}
+        error={centre.error}
+        onRetry={centre.retry}
+        errors={centreErrors}
+      />
 
       {/* Branches */}
       <section
@@ -714,7 +746,9 @@ const UniversityEdit = ({
         </div>
 
         {errors.branches && (
-          <p className="mb-3 text-xs text-ub-tone-danger-text">{errors.branches}</p>
+          <p className="mb-3 text-xs text-ub-tone-danger-text">
+            {errors.branches}
+          </p>
         )}
 
         <div className="grid grid-cols-1 gap-4">
@@ -978,6 +1012,7 @@ const UniversityEdit = ({
           onClick={handleSave}
           disabled={
             logo.uploading ||
+            centre.loading ||
             updateLoading ||
             !isFormChanged ||
             (isFormChanged && !isFormValid)

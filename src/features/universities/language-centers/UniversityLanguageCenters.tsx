@@ -8,9 +8,41 @@ import Tag from "components/ub/data/badges/Tag";
 import { parseApiError } from "utils/parseApiError";
 import { languageCentersApi } from "./api";
 import type { LanguageCenter } from "./types";
+import { useCentreConfiguration } from "./hooks/useCentreConfiguration";
+import CentreConfigurationView from "./components/CentreConfigurationView";
+
+export default function UniversityLanguageCenters(props: {
+  universityId: string;
+  basePath: string;
+  canManage?: boolean;
+}) {
+  const centre = useCentreConfiguration(props.universityId);
+  if (centre.loading) return <p role="status">Loading Language Centre…</p>;
+  if (centre.error)
+    return (
+      <div role="alert" className="space-y-3">
+        <p>{centre.error}</p>
+        <Button text="Try again" onClick={centre.retry} />
+      </div>
+    );
+  if (!centre.exists) return <LegacyUniversityLanguageCenters {...props} />;
+  return (
+    <div className="space-y-4">
+      {centre.value.enabled ? (
+        <CentreConfigurationView value={centre.value} />
+      ) : (
+        <DetailsSection title="Language Centre">
+          <p className="text-ub-body-sm text-ub-text-secondary">
+            No language centre is available at this university.
+          </p>
+        </DetailsSection>
+      )}
+    </div>
+  );
+}
 
 /** Readable university profile section; management remains in the directory. */
-export default function UniversityLanguageCenters({
+function LegacyUniversityLanguageCenters({
   universityId,
   basePath,
   canManage = false,
@@ -109,20 +141,18 @@ export default function UniversityLanguageCenters({
                 </p>
               )}
               <dl className="mt-4 grid gap-x-6 gap-y-4 sm:grid-cols-2">
-                {[
-                  ["Location", center.location],
-                  ["Contact email", center.email || "Not provided"],
-                  ["Contact phone", center.phone || "Not provided"],
-                ].map(([label, value]) => (
-                  <div className="min-w-0" key={label}>
-                    <dt className="text-ub-label-sm text-ub-text-tertiary">
-                      {label}
-                    </dt>
-                    <dd className="mt-1 break-words text-ub-label-md text-ub-text-primary">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
+                {[["Location", center.location]]
+                  .filter(([, value]) => !!value)
+                  .map(([label, value]) => (
+                    <div className="min-w-0" key={label}>
+                      <dt className="text-ub-label-sm text-ub-text-tertiary">
+                        {label}
+                      </dt>
+                      <dd className="mt-1 break-words text-ub-label-md text-ub-text-primary">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
               </dl>
             </article>
           ))}

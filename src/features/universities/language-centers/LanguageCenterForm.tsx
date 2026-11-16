@@ -73,78 +73,67 @@ export default function LanguageCenterForm({
         }
       }}
     >
-      {failure && (
-        <p role="alert" className="mb-4 text-ub-tone-danger-text">
-          {failure}
-        </p>
-      )}
-      <Input
-        id="lc-name"
-        label="Center name"
-        required
-        value={data.name}
-        onChange={(value) => update("name", value)}
-        error={errors.name}
-        disabled={saving}
-      />
-      <Combobox
-        id="lc-university_id"
-        label="University"
-        required
-        options={universities.map((university) => ({
-          value: university.id,
-          label: university.name,
-          description: university.is_active ? undefined : "Inactive university",
-        }))}
-        value={data.university_id || null}
-        onChange={(value) => update("university_id", value ?? "")}
-        error={errors.university_id}
-        disabled={saving}
-      />
-      <Input
-        id="lc-location"
-        label="Location"
-        required
-        value={data.location}
-        onChange={(value) => update("location", value)}
-        error={errors.location}
-        disabled={saving}
-      />
-      <div className="grid gap-x-4 md:grid-cols-2">
+      <div className="grid gap-4">
+        {failure && (
+          <p role="alert" className="text-ub-tone-danger-text">
+            {failure}
+          </p>
+        )}
         <Input
-          id="lc-email"
-          label="Contact email"
-          type="email"
-          value={data.email}
-          onChange={(value) => update("email", value)}
-          error={errors.email}
+          wrapperClassName="mb-0"
+          id="lc-name"
+          label="Center name"
+          required
+          value={data.name}
+          onChange={(value) => update("name", value)}
+          error={errors.name}
+          disabled={saving}
+        />
+        <Combobox
+          className="!mb-0"
+          id="lc-university_id"
+          label="University"
+          required
+          options={universities.map((university) => ({
+            value: university.id,
+            label: university.name,
+            description: university.is_active
+              ? undefined
+              : "Inactive university",
+          }))}
+          value={data.university_id || null}
+          onChange={(value) => update("university_id", value ?? "")}
+          error={errors.university_id}
           disabled={saving}
         />
         <Input
-          id="lc-phone"
-          label="Contact phone"
-          type="tel"
-          value={data.phone}
-          onChange={(value) => update("phone", value)}
+          wrapperClassName="mb-0"
+          id="lc-location"
+          label="Location"
+          required
+          value={data.location}
+          onChange={(value) => update("location", value)}
+          error={errors.location}
           disabled={saving}
         />
+        <Textarea
+          wrapperClassName="mb-0"
+          label="Description"
+          value={data.description}
+          onChange={(value) => update("description", value)}
+          disabled={saving}
+        />
+        <label className="flex min-h-11 items-center gap-3 text-ub-label-md">
+          <input
+            type="checkbox"
+            className={checkbox}
+            checked={data.is_active}
+            disabled={saving}
+            onChange={(event) => update("is_active", event.target.checked)}
+          />
+          Active center
+        </label>
       </div>
-      <Textarea
-        label="Description"
-        value={data.description}
-        onChange={(value) => update("description", value)}
-        disabled={saving}
-      />
-      <label className="flex min-h-11 items-center gap-3 text-ub-label-md">
-        <input
-          type="checkbox"
-          className={checkbox}
-          checked={data.is_active}
-          disabled={saving}
-          onChange={(event) => update("is_active", event.target.checked)}
-        />
-        Active center
-      </label>
     </FormModal>
   );
 }

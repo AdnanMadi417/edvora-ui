@@ -10,7 +10,7 @@ export default function UniversityIdentity({
   children,
 }: {
   university?: University;
-  href: string;
+  href?: string;
   children?: ReactNode;
 }) {
   return (
@@ -32,12 +32,18 @@ export default function UniversityIdentity({
       </div>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <Link
-            href={href}
-            className="break-words text-ub-label-md text-ub-text-primary hover:text-ub-text-link hover:underline"
-          >
-            {university?.name || "University unavailable"}
-          </Link>
+          {href ? (
+            <Link
+              href={href}
+              className="break-words text-ub-label-md text-ub-text-primary hover:text-ub-text-link hover:underline"
+            >
+              {university?.name || "University unavailable"}
+            </Link>
+          ) : (
+            <span className="break-words text-ub-label-md text-ub-text-primary">
+              {university?.name || "University unavailable"}
+            </span>
+          )}
           {typeof university?.is_public === "boolean" && (
             <Tag size="sm" hue="indigo">
               {university.is_public ? "Public" : "Private"}

@@ -1,5 +1,11 @@
 "use client";
 
+import CentreConfigurationSection from "features/universities/language-centers/components/CentreConfigurationSection";
+import { configurationErrors } from "features/universities/language-centers/configuration";
+import {
+  useCentreConfiguration,
+  saveCentreConfiguration,
+} from "features/universities/language-centers/hooks/useCentreConfiguration";
 import InstitutionTypeField from "components/ub/forms/choices/InstitutionTypeField";
 import React, { useState } from "react";
 import { Plus, GraduationCap, Trash2 } from "lucide-react";
@@ -41,6 +47,10 @@ export default function RegisterUniversity({
   basePath = "/admin/universities",
 }: Props = {}) {
   const { createUniversity, loading } = useCreateUniversity();
+  const centre = useCentreConfiguration();
+  const [centreErrors, setCentreErrors] = useState<Record<string, string>>({});
+  const [createdId, setCreatedId] = useState<string | null>(null);
+
   const { states } = useStates();
   const { universities } = useUniversityTypes();
 
@@ -172,7 +182,7 @@ export default function RegisterUniversity({
 
   const handleCreate = async () => {
     if (logoUploading) {
-      showToast("Please wait for the logo to finish uploading.", "error");
+      showToast("Please wait for the file to finish uploading.", "error");
       return;
     }
 
@@ -183,13 +193,38 @@ export default function RegisterUniversity({
       return;
     }
 
+    const centreValue = {
+      ...centre.value,
+      enabled: formData.has_language_center,
+    };
+    const centreValidation = configurationErrors(centreValue);
+    setCentreErrors(centreValidation);
+    if (Object.keys(centreValidation).length) {
+      setCurrentStep(1);
+      showToast(
+        "Review the Language Centre configuration in Availability.",
+        "error"
+      );
+      return;
+    }
     try {
-      await createUniversity({
-        ...formData,
-        logo_file_key: logoFileKey,
-        logo_file_url: logoFileUrl,
-      });
+      const created = createdId
+        ? null
+        : await createUniversity({
+            ...formData,
+            logo_file_key: logoFileKey,
+            logo_file_url: logoFileUrl,
+          });
 
+      const universityId = createdId || created?.university?.id || created?.id;
+      if (universityId) setCreatedId(universityId);
+      if (centreValue.enabled) {
+        if (!universityId)
+          throw new Error(
+            "University created, but its ID was not returned. Open its edit form to save the Language Centre details."
+          );
+        saveCentreConfiguration(universityId, centreValue);
+      }
       showToast("University created successfully.", "success");
 
       setTimeout(() => {
@@ -310,6 +345,14 @@ export default function RegisterUniversity({
         {
           id: "settings",
           label: "Availability",
+          validate: () => {
+            const validation = configurationErrors({
+              ...centre.value,
+              enabled: formData.has_language_center,
+            });
+            setCentreErrors(validation);
+            return Object.keys(validation).length === 0;
+          },
           description: "Intakes and visibility",
           content: (
             <div className="space-y-4">
@@ -322,18 +365,22 @@ export default function RegisterUniversity({
                 updateFormData={updateFormData}
               />
 
-              <InstitutionTypeField value={formData.is_public} onChange={(value) => updateFormData("is_public", value)} />
+              <InstitutionTypeField
+                value={formData.is_public}
+                onChange={(value) => updateFormData("is_public", value)}
+              />
 
-              <ToggleInput
-                label="Language center"
-                field="has_language_center"
-                formData={formData}
-                errors={{}}
-                updateFormData={updateFormData}
-                enabledText="Yes"
-                disabledText="No"
-                enabledDescription="This university has a language center."
-                disabledDescription="This university does not have a language center."
+              <CentreConfigurationSection
+                enabled={formData.has_language_center}
+                onEnabledChange={(enabled) =>
+                  updateFormData("has_language_center", enabled)
+                }
+                value={centre.value}
+                onChange={centre.setValue}
+                loading={centre.loading}
+                error={centre.error}
+                onRetry={centre.retry}
+                errors={centreErrors}
               />
 
               <ToggleInput

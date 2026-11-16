@@ -7,6 +7,7 @@ import {
   useDeleteUniversity,
   useSetUniversityHidden,
 } from "features/universities/hooks";
+import { useCentreAvailability } from "features/universities/language-centers/hooks/useCentreConfiguration";
 import type { University } from "features/universities/types";
 import {
   sortRows,
@@ -50,12 +51,17 @@ export default function UniversityDirectory({
   const [deleteTarget, setDeleteTarget] = useState<University | null>(null);
   const [paymentTarget, setPaymentTarget] = useState<University | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
-  const { universities, loading, error, refetch } = useUniversities({
+  const {
+    universities: loadedUniversities,
+    loading,
+    error,
+    refetch,
+  } = useUniversities({
     includeInactive: canManage,
     isPublic: bool(filters.isPublic),
-    hasLanguageCenter: bool(filters.hasLanguageCenter),
     isHidden: canManage ? bool(filters.isHidden) : false,
   });
+  const universities = useCentreAvailability(loadedUniversities);
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const { setUniversityHidden } = useSetUniversityHidden();
   const typeOptions = useMemo(
@@ -72,6 +78,8 @@ export default function UniversityDirectory({
   const filtered = universities.filter(
     (university) =>
       (canManage || !university.is_hidden) &&
+      (filters.hasLanguageCenter === "all" ||
+        university.has_language_center === bool(filters.hasLanguageCenter)) &&
       (!search.trim() ||
         `${university.name} ${university.country}`
           .toLowerCase()

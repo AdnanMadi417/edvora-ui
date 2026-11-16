@@ -39,6 +39,16 @@ function collect(children: ReactNode): TableActionProps[] {
     return collect((child.props as { children?: ReactNode }).children);
   });
 }
+/** Keep visible row actions concise; the accessible name retains full context. */
+function actionText(action: TableActionProps, rowLabel: string) {
+  const standardAction = /^(View|Edit|Delete|Hide|Unhide)\b/.exec(action.label);
+  if (standardAction) return standardAction[1];
+  const suffix = ` ${rowLabel}`;
+  return rowLabel && action.label.endsWith(suffix)
+    ? action.label.slice(0, -suffix.length)
+    : action.label;
+}
+
 const trigger = `grid h-10 w-10 shrink-0 place-items-center rounded-ub-full text-ub-text-secondary transition-colors duration-200 hover:bg-ub-selected hover:text-ub-text-link disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
 
 export default function TableActions({
@@ -125,7 +135,7 @@ export default function TableActions({
             <Link
               href={primary.href}
               target={primary.target}
-              title={primary.label}
+              title={actionText(primary, label)}
               aria-label={primary.label}
               className={trigger}
             >
@@ -134,7 +144,7 @@ export default function TableActions({
           ) : (
             <button
               type="button"
-              title={primary.label}
+              title={actionText(primary, label)}
               aria-label={primary.label}
               disabled={primary.disabled}
               onClick={(event) => run(primary, event)}
@@ -213,6 +223,7 @@ export default function TableActions({
                 key={action.label}
                 type="button"
                 role="menuitem"
+                aria-label={action.label}
                 disabled={action.disabled}
                 className={`flex min-h-11 w-full items-center gap-3 rounded-ub-md px-3 py-2 text-start text-ub-body-sm hover:bg-ub-item-hover disabled:cursor-not-allowed disabled:opacity-60 ${
                   action.danger
@@ -225,7 +236,9 @@ export default function TableActions({
                 }}
               >
                 <span className="shrink-0">{action.icon}</span>
-                <span className="min-w-0 break-words">{action.label}</span>
+                <span className="min-w-0 break-words">
+                  {actionText(action, label)}
+                </span>
               </button>
             ))}
           </div>,
@@ -236,8 +249,13 @@ export default function TableActions({
         onClose={() => setOpen(false)}
         title={`${label} actions`}
         actions={(mobile ? actions : secondary).map((action) => ({
-          label: action.label,
-          icon: action.icon ? ({ className }) => <span className={className}>{action.icon}</span> : undefined,
+          label: actionText(action, label),
+          ariaLabel: action.label,
+          icon: action.icon
+            ? ({ className }) => (
+                <span className={className}>{action.icon}</span>
+              )
+            : undefined,
           disabled: action.disabled,
           tone: action.danger ? "danger" : "default",
           onSelect: (event) => run(action, event),

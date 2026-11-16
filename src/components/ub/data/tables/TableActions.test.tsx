@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TableActions, { TableAction, TableRowActionLabel } from "./TableActions";
 
@@ -32,6 +32,9 @@ it("shows labelled secondary actions in a desktop menu and respects disabled sta
     screen.getByRole("button", { name: "More actions for Program A" })
   );
   expect(screen.getByRole("menuitem", { name: "Copy program" })).toBeDisabled();
+  expect(
+    screen.getByRole("menuitem", { name: "Delete program" })
+  ).toHaveTextContent(/^Delete$/);
   expect(remove).not.toHaveBeenCalled();
   await user.click(screen.getByRole("menuitem", { name: "Delete program" }));
   expect(remove).toHaveBeenCalledTimes(1);
@@ -46,8 +49,49 @@ it("includes edit in the mobile action sheet", async () => {
   expect(
     screen.getByRole("dialog", { name: "Program A actions" })
   ).toBeInTheDocument();
-  await user.click(
-    screen.getAllByRole("button", { name: "Edit program" }).slice(-1)[0]
-  );
+  const sheet = screen.getByRole("dialog", { name: "Program A actions" });
+  expect(
+    within(sheet).getByRole("button", { name: "Edit program" })
+  ).toHaveTextContent(/^Edit$/);
+  expect(
+    within(sheet).getByRole("button", { name: "Delete program" })
+  ).toHaveTextContent(/^Delete$/);
+  await user.click(within(sheet).getByRole("button", { name: "Edit program" }));
   expect(edit).toHaveBeenCalledTimes(1);
+});
+
+it("omits long row names while preserving distinct operational actions", async () => {
+  const user = userEvent.setup();
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: () => ({
+      matches: false,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }),
+  });
+  const rowName = "Asia Pacific University Language Center";
+  render(
+    <TableActions label={rowName}>
+      <TableAction label={`View ${rowName}`} />
+      <TableAction label={`Edit ${rowName}`} />
+      <TableAction label={`Delete ${rowName}`} danger />
+      <TableAction label="Assign payment method" />
+    </TableActions>
+  );
+  await user.click(
+    screen.getByRole("button", { name: `More actions for ${rowName}` })
+  );
+  expect(
+    screen.getByRole("menuitem", { name: `View ${rowName}` })
+  ).toHaveTextContent(/^View$/);
+  expect(
+    screen.getByRole("menuitem", { name: `Edit ${rowName}` })
+  ).toHaveTextContent(/^Edit$/);
+  expect(
+    screen.getByRole("menuitem", { name: `Delete ${rowName}` })
+  ).toHaveTextContent(/^Delete$/);
+  expect(
+    screen.getByRole("menuitem", { name: "Assign payment method" })
+  ).toHaveTextContent("Assign payment method");
 });

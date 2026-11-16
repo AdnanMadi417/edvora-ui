@@ -8,6 +8,7 @@ import Loading from "components/ub/feedback/states/Loading";
 import EmptyData from "components/ub/feedback/states/EmptyData";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import { ArrowLeft } from "lucide-react";
+import { useCentreConfiguration } from "features/universities/language-centers/hooks/useCentreConfiguration";
 import UniversityProfileView from "./UniversityProfileView";
 
 export default function UniversityProfile({
@@ -19,6 +20,7 @@ export default function UniversityProfile({
   basePath: string;
   canManage?: boolean;
 }) {
+  const centre = useCentreConfiguration(id);
   const { university, branches, universityLoading, universityError } =
     useUniversityDetails(id);
   const { universityPaymentMethods, loading, error, refetch } =
@@ -41,7 +43,12 @@ export default function UniversityProfile({
     );
   return (
     <UniversityProfileView
-      university={university}
+      university={{
+        ...university,
+        has_language_center: centre.exists
+          ? centre.value.enabled
+          : university.has_language_center,
+      }}
       branches={branches}
       basePath={basePath}
       canManage={canManage}

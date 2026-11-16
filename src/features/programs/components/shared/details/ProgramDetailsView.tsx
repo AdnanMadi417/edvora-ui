@@ -1,4 +1,5 @@
 "use client";
+import DetailsSectionNav from "components/ub/navigation/links/DetailsSectionNav";
 import Section from "components/ub/data/cards/DetailsSection";
 
 import { useId, useState, type ReactNode } from "react";
@@ -215,240 +216,223 @@ export default function ProgramDetailsView({
             </div>
           )}
         </div>
-        <nav
-          aria-label="Program sections"
-          className="flex gap-1 overflow-x-auto overscroll-x-contain border-t border-ub-border px-4 py-2"
-        >
-          {sections.map((section) => (
-            <a
-              key={section}
-              href={`#${sectionId(section)}`}
-              onClick={(event) => {
-                if (
-                  event.metaKey ||
-                  event.ctrlKey ||
-                  event.shiftKey ||
-                  event.altKey
-                )
-                  return;
-                const target = document.getElementById(sectionId(section));
-                if (!target) return;
-                event.preventDefault();
-                window.history.pushState(
-                  window.history.state,
-                  "",
-                  `#${sectionId(section)}`
-                );
-                target.focus({ preventScroll: true });
-                target.scrollIntoView({
-                  behavior: reducedMotion ? "auto" : "smooth",
-                  block: "start",
-                });
-              }}
-              className={`shrink-0 rounded-ub-full transition-colors duration-200 motion-reduce:transition-none px-4 py-2 text-ub-label-md text-ub-text-secondary hover:bg-ub-action-ghost-hover hover:text-ub-text-link ${focusRing}`}
-            >
-              {section}
-            </a>
-          ))}
-        </nav>
+        <DetailsSectionNav
+          label="Program sections"
+          sections={sections.map((section) => ({
+            id: sectionId(section),
+            label: section,
+          }))}
+        />
       </header>
 
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-5">
-          <Section
-            id={sectionId("Overview")}
-            title="Program overview"
-            description="Study details and entry requirements at a glance."
-          >
-            <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-              {facts.map(([label, value]) => (
-                <div key={label}>
-                  <dt className="text-ub-label-sm text-ub-text-tertiary">
-                    {label}
-                  </dt>
-                  <dd className="mt-1 text-ub-label-md capitalize text-ub-text-primary">
-                    {value || "To be confirmed"}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            {program.overview && (
-              <div className="mt-6 border-t border-ub-border pt-5">
-                <RichTextDisplay html={program.overview} />
-              </div>
-            )}
-            {program.curriculum && (
-              <div className="mt-6 border-t border-ub-border pt-5">
-                <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">
-                  Curriculum
-                </h3>
-                <RichTextDisplay html={program.curriculum} />
-              </div>
-            )}
-          </Section>
-
-          <Section
-            id={sectionId("Fees")}
-            title="Tuition & fees"
-            description="Yearly tuition and one-time fees for international students."
-          >
-            <div className="mb-5 flex flex-wrap items-center gap-3">
-              <CurrencyButton
-                value={currency}
-                options={getCurrencyOptions(exchangeRates)}
-                onChange={(value) => {
-                  setCurrency(value);
-                  setCopied(false);
-                }}
-              />
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={copyFees}
-                icon={
-                  copied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )
-                }
-                text={copied ? "Copied" : "Copy fee summary"}
-              />
-              <span role="status" className="sr-only">
-                {copied ? "Fee summary copied to clipboard" : ""}
-              </span>
-            </div>
-            <div className="space-y-5">
-              {[
-                {
-                  title: "Yearly tuition",
-                  rows: [...program.yearly_fees]
-                    .sort((a, b) => a.year - b.year)
-                    .map((item) => ({
-                      label: `Year ${item.year}`,
-                      amount: fee(item.fee, program.yearly_fee_currency),
-                    })),
-                },
-                {
-                  title: "Other fees",
-                  rows: program.one_time_fees.map((item) => ({
-                    label: item.description || "Fee",
-                    amount: fee(item.fee, item.currency),
-                  })),
-                },
-              ].map((group) => (
-                <div
-                  key={group.title}
-                  className="overflow-hidden rounded-ub-md border border-ub-border"
-                >
-                  <h3 className="bg-ub-surface-subtle px-4 py-3 text-ub-label-md text-ub-text-primary">
-                    {group.title}
-                  </h3>
-                  <dl className="divide-y divide-ub-border">
-                    {group.rows.length ? (
-                      group.rows.map((row, index) => (
-                        <div
-                          key={index}
-                          className="flex flex-wrap justify-between gap-3 px-4 py-3 text-ub-body-sm"
-                        >
-                          <dt className="text-ub-text-secondary">
-                            {row.label}
-                          </dt>
-                          <dd className="ub-tabular font-medium text-ub-text-primary">
-                            {row.amount}
-                          </dd>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-4 text-ub-body-sm text-ub-text-tertiary">
-                        No fees available. Contact the university for details.
-                      </div>
-                    )}
-                  </dl>
-                </div>
-              ))}
-            </div>
-          </Section>
-
-          {program.has_scholarship && program.scholarships.length > 0 && (
+          <div>
             <Section
-              id={sectionId("Scholarships")}
-              title="Scholarships & discounts"
-              description={`${program.scholarships.length} available for this program.`}
+              id={sectionId("Overview")}
+              title="Program overview"
+              description="Study details and entry requirements at a glance."
             >
-              <div className="flex snap-x gap-4 overflow-x-auto overscroll-x-contain pb-2">
-                {program.scholarships.map((item, index) => (
-                  <article
-                    key={item.id || index}
-                    className="w-80 max-w-full shrink-0 snap-start rounded-ub-md border border-ub-tag-amber-border bg-ub-tag-amber-bg p-4"
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                {facts.map(([label, value]) => (
+                  <div key={label}>
+                    <dt className="text-ub-label-sm text-ub-text-tertiary">
+                      {label}
+                    </dt>
+                    <dd className="mt-1 text-ub-label-md capitalize text-ub-text-primary">
+                      {value || "To be confirmed"}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              {program.overview && (
+                <div className="mt-6 border-t border-ub-border pt-5">
+                  <RichTextDisplay html={program.overview} />
+                </div>
+              )}
+              {program.curriculum && (
+                <div className="mt-6 border-t border-ub-border pt-5">
+                  <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">
+                    Curriculum
+                  </h3>
+                  <RichTextDisplay html={program.curriculum} />
+                </div>
+              )}
+            </Section>
+          </div>
+
+          <div>
+            <Section
+              id={sectionId("Fees")}
+              title="Tuition & fees"
+              description="Yearly tuition and one-time fees for international students."
+            >
+              <div className="mb-5 flex flex-wrap items-center gap-3">
+                <CurrencyButton
+                  value={currency}
+                  options={getCurrencyOptions(exchangeRates)}
+                  onChange={(value) => {
+                    setCurrency(value);
+                    setCopied(false);
+                  }}
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={copyFees}
+                  icon={
+                    copied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )
+                  }
+                  text={copied ? "Copied" : "Copy fee summary"}
+                />
+                <span role="status" className="sr-only">
+                  {copied ? "Fee summary copied to clipboard" : ""}
+                </span>
+              </div>
+              <div className="space-y-5">
+                {[
+                  {
+                    title: "Yearly tuition",
+                    rows: [...program.yearly_fees]
+                      .sort((a, b) => a.year - b.year)
+                      .map((item) => ({
+                        label: `Year ${item.year}`,
+                        amount: fee(item.fee, program.yearly_fee_currency),
+                      })),
+                  },
+                  {
+                    title: "Other fees",
+                    rows: program.one_time_fees.map((item) => ({
+                      label: item.description || "Fee",
+                      amount: fee(item.fee, item.currency),
+                    })),
+                  },
+                ].map((group) => (
+                  <div
+                    key={group.title}
+                    className="overflow-hidden rounded-ub-md border border-ub-border"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-ub-heading-sm text-ub-text-primary">
-                        {item.name}
-                      </h3>
-                      {item.coverage_percent > 0 && (
-                        <Tag hue="amber">{item.coverage_percent}%</Tag>
+                    <h3 className="bg-ub-surface-subtle px-4 py-3 text-ub-label-md text-ub-text-primary">
+                      {group.title}
+                    </h3>
+                    <dl className="divide-y divide-ub-border">
+                      {group.rows.length ? (
+                        group.rows.map((row, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-wrap justify-between gap-3 px-4 py-3 text-ub-body-sm"
+                          >
+                            <dt className="text-ub-text-secondary">
+                              {row.label}
+                            </dt>
+                            <dd className="ub-tabular font-medium text-ub-text-primary">
+                              {row.amount}
+                            </dd>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-4 text-ub-body-sm text-ub-text-tertiary">
+                          No fees available. Contact the university for details.
+                        </div>
                       )}
-                    </div>
-                    {item.description && (
-                      <div className="mt-3">
-                        <RichTextDisplay html={item.description} />
-                      </div>
-                    )}
-                    {item.max_amount > 0 && (
-                      <p className="mt-3 text-ub-label-md text-ub-tag-amber-text">
-                        Up to{" "}
-                        {formatMoney(item.max_amount, currency, exchangeRates)}
-                      </p>
-                    )}
-                    {!!item.conditions?.length && (
-                      <div className="mt-4 border-t border-ub-tag-amber-border pt-3">
-                        <p className="text-ub-label-sm text-ub-text-secondary">
-                          Conditions
-                        </p>
-                        <ul className="mt-2 list-disc space-y-2 pl-4 text-ub-body-sm text-ub-text-secondary">
-                          {item.conditions.map((condition, i) => (
-                            <li key={i}>{condition}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </article>
+                    </dl>
+                  </div>
                 ))}
               </div>
             </Section>
+          </div>
+
+          {program.has_scholarship && program.scholarships.length > 0 && (
+            <div>
+              <Section
+                id={sectionId("Scholarships")}
+                title="Scholarships & discounts"
+                description={`${program.scholarships.length} available for this program.`}
+              >
+                <div className="flex snap-x gap-4 overflow-x-auto overscroll-x-contain pb-2">
+                  {program.scholarships.map((item, index) => (
+                    <article
+                      key={item.id || index}
+                      className="w-80 max-w-full shrink-0 snap-start rounded-ub-md border border-ub-tag-amber-border bg-ub-tag-amber-bg p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="text-ub-heading-sm text-ub-text-primary">
+                          {item.name}
+                        </h3>
+                        {item.coverage_percent > 0 && (
+                          <Tag hue="amber">{item.coverage_percent}%</Tag>
+                        )}
+                      </div>
+                      {item.description && (
+                        <div className="mt-3">
+                          <RichTextDisplay html={item.description} />
+                        </div>
+                      )}
+                      {item.max_amount > 0 && (
+                        <p className="mt-3 text-ub-label-md text-ub-tag-amber-text">
+                          Up to{" "}
+                          {formatMoney(
+                            item.max_amount,
+                            currency,
+                            exchangeRates
+                          )}
+                        </p>
+                      )}
+                      {!!item.conditions?.length && (
+                        <div className="mt-4 border-t border-ub-tag-amber-border pt-3">
+                          <p className="text-ub-label-sm text-ub-text-secondary">
+                            Conditions
+                          </p>
+                          <ul className="mt-2 list-disc space-y-2 pl-4 text-ub-body-sm text-ub-text-secondary">
+                            {item.conditions.map((condition, i) => (
+                              <li key={i}>{condition}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </Section>
+            </div>
           )}
 
-          <Section
-            id={sectionId("Documents")}
-            title="Application documents"
-            description="Prepare these documents before starting an application."
-          >
-            <div className="space-y-3">
-              {!requiredDocuments.length && (
-                <p className="text-ub-body-sm text-ub-text-secondary">
-                  No documents configured for this program.
-                </p>
-              )}
-              {required.map((doc) => (
-                <DocumentRow key={doc.id} document={doc} required />
-              ))}
-              {optional.length > 0 && (
-                <details className="rounded-ub-md border border-ub-border p-4">
-                  <summary
-                    className={`cursor-pointer rounded-ub-xs text-ub-label-md text-ub-text-secondary ${focusRing}`}
-                  >
-                    Optional documents ({optional.length})
-                  </summary>
-                  <div className="mt-4 space-y-3">
-                    {optional.map((doc) => (
-                      <DocumentRow key={doc.id} document={doc} />
-                    ))}
-                  </div>
-                </details>
-              )}
-            </div>
-          </Section>
+          <div>
+            <Section
+              id={sectionId("Documents")}
+              title="Application documents"
+              description="Prepare these documents before starting an application."
+            >
+              <div className="space-y-3">
+                {!requiredDocuments.length && (
+                  <p className="text-ub-body-sm text-ub-text-secondary">
+                    No documents configured for this program.
+                  </p>
+                )}
+                {required.map((doc) => (
+                  <DocumentRow key={doc.id} document={doc} required />
+                ))}
+                {optional.length > 0 && (
+                  <details className="rounded-ub-md border border-ub-border p-4">
+                    <summary
+                      className={`cursor-pointer rounded-ub-xs text-ub-label-md text-ub-text-secondary ${focusRing}`}
+                    >
+                      Optional documents ({optional.length})
+                    </summary>
+                    <div className="mt-4 space-y-3">
+                      {optional.map((doc) => (
+                        <DocumentRow key={doc.id} document={doc} />
+                      ))}
+                    </div>
+                  </details>
+                )}
+              </div>
+            </Section>
+          </div>
         </div>
 
         <aside

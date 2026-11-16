@@ -15,6 +15,7 @@ jest.mock("./api", () => ({
 }));
 jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: jest.fn() }),
 }));
 jest.mock("components/ub/feedback/notifications/ToastContext", () => ({
   useToast: () => ({ showToast: jest.fn() }),
@@ -79,7 +80,7 @@ it("filters by linked university and status and links to the university profile"
   const user = userEvent.setup();
   render(<LanguageCentersDirectory />);
   expect(
-    await screen.findByRole("button", { name: "English Center" })
+    await screen.findByRole("link", { name: /English Center/ })
   ).toBeInTheDocument();
   expect(
     screen.queryByRole("combobox", { name: "Filter by university" })
@@ -91,17 +92,17 @@ it("filters by linked university and status and links to the university profile"
     "uni-1"
   );
   expect(
-    screen.getByRole("button", { name: "Other Center" })
+    screen.getByRole("link", { name: /Other Center/ })
   ).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Apply filters" }));
   await waitFor(() =>
     expect(
-      screen.queryByRole("button", { name: "Other Center" })
+      screen.queryByRole("link", { name: /Other Center/ })
     ).not.toBeInTheDocument()
   );
-  expect(screen.getByRole("link", { name: "Test University" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: /English Center/ })).toHaveAttribute(
     "href",
-    "/admin/universities/uni-1"
+    "/admin/language-centers/lc-1"
   );
   await user.click(
     screen.getByRole("button", { name: "University filters (1)" })
@@ -120,7 +121,7 @@ it("validates university selection, creates a center and keeps failed edits open
     data: { ...center, id: "new", name: "New Center" },
   });
   render(<LanguageCentersDirectory />);
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
   await user.click(
     screen.getByRole("button", { name: "Create language center" })
   );
@@ -142,7 +143,7 @@ it("validates university selection, creates a center and keeps failed edits open
   );
   await user.click(screen.getByRole("button", { name: "Create center" }));
   expect(
-    await screen.findByRole("button", { name: "New Center" })
+    await screen.findByRole("link", { name: /New Center/ })
   ).toBeInTheDocument();
   expect(languageCentersApi.create).toHaveBeenCalledWith(
     expect.objectContaining({ university_id: "uni-1", name: "New Center" })
@@ -167,13 +168,13 @@ it("requires confirmation to delete and hides deletion for data entry", async ()
   const user = userEvent.setup();
   (languageCentersApi.remove as jest.Mock).mockResolvedValue({});
   const { unmount } = render(<LanguageCentersDirectory />);
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
   await user.click(rowAction("Delete English Center"));
   expect(languageCentersApi.remove).not.toHaveBeenCalled();
   await user.click(screen.getByRole("button", { name: "Delete center" }));
   await waitFor(() =>
     expect(
-      screen.queryByRole("button", { name: "English Center" })
+      screen.queryByRole("link", { name: /English Center/ })
     ).not.toBeInTheDocument()
   );
   expect(languageCentersApi.remove).toHaveBeenCalledWith("lc-1");
@@ -181,7 +182,7 @@ it("requires confirmation to delete and hides deletion for data entry", async ()
   render(
     <LanguageCentersDirectory basePath="/data-entry" allowDelete={false} />
   );
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
   expect(queryRowAction("Delete English Center")).toBeNull();
 });
 it("shows a retry action for a failed directory load", async () => {
@@ -193,7 +194,7 @@ it("shows a retry action for a failed directory load", async () => {
   await screen.findByText("Load failed");
   await user.click(screen.getByRole("button", { name: /retry|try again/i }));
   expect(
-    await screen.findByRole("button", { name: "English Center" })
+    await screen.findByRole("link", { name: /English Center/ })
   ).toBeInTheDocument();
 });
 
@@ -219,24 +220,29 @@ it("lets advisors browse active centers and view details without management acti
     },
   });
   render(<LanguageCentersDirectory basePath="/partner" readOnly />);
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
+  expect(screen.getByRole("article", { name: "English Center" })).toBeVisible();
+  expect(screen.queryByRole("table")).not.toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Create language center" })
   ).not.toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Inactive Center" })
+    screen.queryByRole("link", { name: /Inactive Center/ })
   ).not.toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Unavailable University Center" })
+    screen.queryByRole("link", { name: /Unavailable University Center/ })
   ).not.toBeInTheDocument();
   expect(queryRowAction("Edit English Center")).toBeNull();
   expect(queryRowAction("Delete English Center")).toBeNull();
-  expect(screen.getByRole("link", { name: "Test University" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: /English Center/ })).toHaveAttribute(
     "href",
-    "/partner/universities/uni-1"
+    "/partner/language-centers/lc-1"
   );
-  await user.click(screen.getByRole("button", { name: "English Center" }));
-  expect(await screen.findByText("Contact email")).toBeVisible();
+  expect(screen.getByRole("link", { name: /English Center/ })).toHaveAttribute(
+    "href",
+    "/partner/language-centers/lc-1"
+  );
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Edit center" })
   ).not.toBeInTheDocument();
@@ -248,9 +254,9 @@ it("lets advisors browse active centers and view details without management acti
 it("scopes the university tab to its university and preselects it on creation", async () => {
   const user = userEvent.setup();
   render(<LanguageCentersDirectory fixedUniversityId="uni-1" />);
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
   expect(
-    screen.queryByRole("button", { name: "Other Center" })
+    screen.queryByRole("link", { name: /Other Center/ })
   ).not.toBeInTheDocument();
   expect(
     screen.queryByRole("combobox", { name: "Filter by university" })
@@ -266,7 +272,7 @@ it("scopes the university tab to its university and preselects it on creation", 
 it("filters public/private institutions and clears the filter", async () => {
   const user = userEvent.setup();
   render(<LanguageCentersDirectory />);
-  await screen.findByRole("button", { name: "English Center" });
+  await screen.findByRole("link", { name: /English Center/ });
   await user.click(screen.getByRole("button", { name: "University filters" }));
   await selectOption(
     user,
@@ -274,12 +280,12 @@ it("filters public/private institutions and clears the filter", async () => {
     "private"
   );
   expect(
-    screen.getByRole("button", { name: "Other Center" })
+    screen.getByRole("link", { name: /Other Center/ })
   ).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Apply filters" }));
   await waitFor(() =>
     expect(
-      screen.queryByRole("button", { name: "Other Center" })
+      screen.queryByRole("link", { name: /Other Center/ })
     ).not.toBeInTheDocument()
   );
   expect(
@@ -290,22 +296,73 @@ it("filters public/private institutions and clears the filter", async () => {
   );
   await user.click(screen.getByRole("button", { name: "Clear filters" }));
   expect(
-    await screen.findByRole("button", { name: "Other Center" })
+    await screen.findByRole("link", { name: /Other Center/ })
   ).toBeInTheDocument();
 });
-it("includes linked university information in center details", async () => {
+it("opens the detail page from row space and keeps row actions separate", async () => {
   const user = userEvent.setup();
   render(<LanguageCentersDirectory />);
-  await user.click(
-    await screen.findByRole("button", { name: "English Center" })
+  const link = await screen.findByRole("link", { name: /English Center/ });
+  expect(link).toHaveAttribute("href", "/admin/language-centers/lc-1");
+  expect(within(link).getByLabelText("Test University logo")).toBeVisible();
+  expect(link.querySelector("a, button")).toBeNull();
+  const navigate = jest.fn((event: Event) => event.preventDefault());
+  link.addEventListener("click", navigate);
+  await user.click(within(link.closest("tr")!).getByText("Kuala Lumpur"));
+  expect(navigate).toHaveBeenCalledTimes(1);
+  navigate.mockClear();
+  await user.click(rowAction("Edit English Center"));
+  expect(navigate).not.toHaveBeenCalled();
+  expect(
+    screen.getByRole("dialog", { name: "Edit language center" })
+  ).toBeInTheDocument();
+});
+
+it("keeps search and filters working in the advisor card layout", async () => {
+  const user = userEvent.setup();
+  render(<LanguageCentersDirectory basePath="/partner" readOnly />);
+  await screen.findByRole("article", { name: "English Center" });
+  const search = screen.getByRole("searchbox");
+  await user.type(search, "Missing centre");
+  expect(screen.getByText("No language centers found")).toBeVisible();
+  expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  await user.clear(search);
+  await user.click(screen.getByRole("button", { name: "University filters" }));
+  await selectOption(
+    user,
+    screen.getByRole("combobox", { name: /^Institution type/ }),
+    "public"
   );
-  const details = screen.getByRole("dialog");
-  expect(within(details).getByLabelText("Test University logo")).toBeVisible();
+  await user.click(screen.getByRole("button", { name: "Apply filters" }));
+  expect(screen.getByText("No language centers found")).toBeVisible();
+  expect(screen.queryByRole("table")).not.toBeInTheDocument();
+});
+it("retries failed advisor card loads and paginates cards", async () => {
+  const user = userEvent.setup();
+  (languageCentersApi.list as jest.Mock)
+    .mockRejectedValueOnce(new Error("Card load failed"))
+    .mockResolvedValueOnce({
+      data: {
+        items: Array.from({ length: 11 }, (_, i) => ({
+          ...center,
+          id: `card-${i}`,
+          name: `Language Centre ${i + 1}`,
+        })),
+      },
+    });
+  render(<LanguageCentersDirectory basePath="/partner" readOnly />);
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Card load failed"
+  );
+  await user.click(screen.getByRole("button", { name: "Try again" }));
+  await screen.findByRole("article", { name: "Language Centre 1" });
+  expect(screen.getAllByRole("article")).toHaveLength(10);
+  await user.click(screen.getByRole("button", { name: "Next page" }));
+  expect(screen.getAllByRole("article")).toHaveLength(1);
   expect(
-    within(details).getByRole("link", { name: "Test University" })
-  ).toHaveAttribute("href", "/admin/universities/uni-1");
-  expect(within(details).getByText("Private")).toBeVisible();
+    screen.getByRole("article", { name: "Language Centre 11" })
+  ).toBeVisible();
   expect(
-    within(details).queryByText("University country")
-  ).not.toBeInTheDocument();
+    screen.getByRole("link", { name: /Language Centre 11/ })
+  ).toHaveAttribute("href", "/partner/language-centers/card-10");
 });

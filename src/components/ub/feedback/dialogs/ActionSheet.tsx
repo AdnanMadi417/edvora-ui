@@ -16,6 +16,8 @@ import {
 
 export interface ActionSheetAction {
   label: string;
+  /** Optional contextual name when the visible action label is shortened. */
+  ariaLabel?: string;
   onSelect: (event: React.MouseEvent<HTMLButtonElement>) => void;
   icon?: ComponentType<{
     className?: string;
@@ -118,9 +120,10 @@ export default function ActionSheet({
                 const Icon = action.icon;
                 const danger = action.tone === "danger";
                 return (
-                  <li key={action.label}>
+                  <li key={action.ariaLabel ?? action.label}>
                     <button
                       type="button"
+                      aria-label={action.ariaLabel}
                       disabled={action.disabled}
                       onClick={(event) => select(action, event)}
                       className={clsx(

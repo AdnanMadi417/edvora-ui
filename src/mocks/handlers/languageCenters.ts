@@ -1,3 +1,4 @@
+import { getDemoCentreConfiguration } from "features/universities/language-centers/fixtures/demoData";
 import { mock, httpError } from "../router";
 import { newId, seedId, table } from "../db";
 import { universities } from "./universities";
@@ -11,16 +12,19 @@ const centers = table<LanguageCenter>(
   universities
     .all()
     .filter((university) => university.has_language_center)
-    .map((university, index) => ({
-      id: seedId("lc", index + 1),
-      university_id: university.id,
-      name: `${university.name} Language Center`,
-      location: university.country,
-      email: "",
-      phone: "",
-      description: "",
-      is_active: university.is_active,
-    }))
+    .map((university, index) => {
+      const demo = getDemoCentreConfiguration(university.id);
+      return {
+        id: seedId("lc", index + 1),
+        university_id: university.id,
+        name: demo?.name || `${university.name} Language Center`,
+        location: demo?.location || university.country,
+        email: demo?.email || "",
+        phone: demo?.phone || "",
+        description: demo?.description || "",
+        is_active: university.is_active,
+      };
+    })
 );
 function syncUniversity(id: string) {
   universities.update(id, {

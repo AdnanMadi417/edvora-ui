@@ -43,19 +43,32 @@ it("converts tuition and commission together and copies the displayed fee summar
   expect(text).toContain("Registration: USD 300");
 });
 
-it("links each section and lets optional documents expand", async () => {
+it("shows all sections and lets optional documents expand", async () => {
   const user = userEvent.setup();
   renderDetails();
-  for (const link of within(
+  const links = within(
     screen.getByRole("navigation", { name: "Program sections" })
-  ).getAllByRole("link")) {
+  ).getAllByRole("link");
+  for (const link of links)
     expect(
       document.getElementById(link.getAttribute("href")!.slice(1))
     ).toBeInTheDocument();
-  }
+  await waitFor(() => {
+    expect(
+      screen.getByRole("heading", { name: "Program overview" })
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Tuition & fees" })
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Application documents" })
+    ).toBeVisible();
+  });
   const optional = screen.getByText("Optional documents (1)");
   expect(optional.parentElement).not.toHaveAttribute("open");
   await user.click(optional);
   expect(optional.parentElement).toHaveAttribute("open");
-  await waitFor(() => expect(screen.getByText("Reference letter")).toBeVisible());
+  await waitFor(() =>
+    expect(screen.getByText("Reference letter")).toBeVisible()
+  );
 });

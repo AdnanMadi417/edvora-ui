@@ -149,7 +149,7 @@ export default function UniversityFilterPanel({
     },
     {
       key: "hasLanguageCenter",
-      label: "Language center",
+      label: "Has Language Centre",
       options: LANGUAGE_CENTER_OPTIONS,
       placeholder: "Any language center",
     },

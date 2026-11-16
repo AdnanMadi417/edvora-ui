@@ -2,8 +2,10 @@
 
 import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useId } from "react";
+import { useRouter } from "next/navigation";
+import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 import UniversityLanguageCenters from "features/universities/language-centers/UniversityLanguageCenters";
-import { focusRing } from "components/ub/recipes";
+import DetailsSectionNav from "components/ub/navigation/links/DetailsSectionNav";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   BookOpen,
@@ -47,12 +49,13 @@ export default function UniversityProfileView({
   onRetryPayments,
 }: Props) {
   const id = useId();
+  const router = useRouter();
   const reducedMotion = useReducedMotion();
   const rolePath = basePath.replace(/\/universities$/, "");
   const sections = [
     { key: "overview", label: "Overview" },
     { key: "campuses", label: "Campuses" },
-    { key: "language-centers", label: "Language Centers" },
+    { key: "language-centers", label: "Language Centre" },
     ...(canManage ? [{ key: "payments", label: "Payment methods" }] : []),
   ];
   return (
@@ -62,8 +65,8 @@ export default function UniversityProfileView({
       transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE }}
       className="mx-auto w-full min-w-0 max-w-7xl space-y-5 break-words pb-6"
     >
-      <header className="overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs">
-        <div className="h-1.5 bg-ub-action-primary" />
+      <header className="relative z-10 rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs">
+        <div className="h-1.5 rounded-t-ub-lg bg-ub-action-primary" />
         <div className="p-5 sm:p-7">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:flex-wrap">
             <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto sm:flex-1">
@@ -87,10 +90,23 @@ export default function UniversityProfileView({
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Tag hue={university.is_active ? "teal" : "grey"}>
-                {university.is_active ? "Active" : "Inactive"}
-              </Tag>
+            <div className="flex flex-wrap items-center gap-2">
+              {canManage && (
+                <ActionsDropdown
+                  items={[
+                    {
+                      label: "Edit university",
+                      icon: Pencil,
+                      onClick: () =>
+                        router.push(
+                          `${basePath}/${encodeURIComponent(
+                            university.id
+                          )}/edit`
+                        ),
+                    },
+                  ]}
+                />
+              )}
               {canManage && university.is_hidden && (
                 <Tag hue="amber">Hidden from catalogue</Tag>
               )}
@@ -108,9 +124,9 @@ export default function UniversityProfileView({
                 ? "Public university"
                 : "Private university"}
             </Tag>
-            <Tag hue="sky">
-              {university.university_type_name || "Type not configured"}
-            </Tag>
+            {university.university_type_name && (
+              <Tag hue="sky">{university.university_type_name}</Tag>
+            )}
             {university.has_language_center && (
               <Tag hue="teal">Language center available</Tag>
             )}
@@ -119,42 +135,13 @@ export default function UniversityProfileView({
             {university.name}
           </h2>
         </div>
-        <nav
-          aria-label="University sections"
-          className="flex gap-1 overflow-x-auto overscroll-x-contain border-t border-ub-border px-4 py-2"
-        >
-          {sections.map((section) => (
-            <a
-              key={section.key}
-              href={`#${id}-${section.key}`}
-              className={`shrink-0 rounded-ub-full px-4 py-2 text-ub-label-md text-ub-text-secondary transition-colors hover:bg-ub-action-ghost-hover hover:text-ub-text-link ${focusRing}`}
-              onClick={(event) => {
-                if (
-                  event.metaKey ||
-                  event.ctrlKey ||
-                  event.shiftKey ||
-                  event.altKey
-                )
-                  return;
-                const target = document.getElementById(`${id}-${section.key}`);
-                if (!target) return;
-                event.preventDefault();
-                window.history.pushState(
-                  window.history.state,
-                  "",
-                  `#${id}-${section.key}`
-                );
-                target.focus({ preventScroll: true });
-                target.scrollIntoView({
-                  behavior: reducedMotion ? "auto" : "smooth",
-                  block: "start",
-                });
-              }}
-            >
-              {section.label}
-            </a>
-          ))}
-        </nav>
+        <DetailsSectionNav
+          label="University sections"
+          sections={sections.map((section) => ({
+            id: `${id}-${section.key}`,
+            label: section.label,
+          }))}
+        />
       </header>
 
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -319,7 +306,7 @@ export default function UniversityProfileView({
         </div>
         <aside
           aria-labelledby={`${id}-intakes`}
-          className="min-w-0 space-y-4 xl:sticky xl:top-24"
+          className="order-first min-w-0 space-y-4 xl:sticky xl:top-24 xl:order-none"
         >
           <SectionCard title="Upcoming intakes" as="h2">
             <div id={`${id}-intakes`} className="sr-only">
@@ -333,23 +320,14 @@ export default function UniversityProfileView({
               </p>
             )}
             <div className="mt-5 flex flex-col gap-3 border-t border-ub-border pt-5">
-              {canManage ? (
-                <LinkBtn
-                  href={`${basePath}/${university.id}/edit`}
-                  label="Edit university"
-                  variant="primary"
-                  icon={<Pencil className="h-4 w-4" />}
-                />
-              ) : (
-                <LinkBtn
-                  href={`${rolePath}/knowledge-hub?university_id=${encodeURIComponent(
-                    university.id
-                  )}`}
-                  label="Explore programs"
-                  variant="primary"
-                  icon={<BookOpen className="h-4 w-4" />}
-                />
-              )}
+              <LinkBtn
+                href={`${rolePath}/knowledge-hub?university_id=${encodeURIComponent(
+                  university.id
+                )}`}
+                label="Explore programs"
+                variant="primary"
+                icon={<BookOpen className="h-4 w-4" />}
+              />
             </div>
           </SectionCard>
         </aside>

@@ -1,7 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Eye,
   Languages,
@@ -25,6 +24,9 @@ import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
 import UniversityIdentity from "./UniversityIdentity";
+import LanguageCenterCard from "./components/LanguageCenterCard";
+import Loading from "components/ub/feedback/states/Loading";
+import EmptyData from "components/ub/feedback/states/EmptyData";
 import Tag from "components/ub/data/badges/Tag";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import { ConfirmDialog } from "components/ub/feedback/dialogs/Modal";
@@ -47,6 +49,9 @@ export default function LanguageCentersDirectory({
   fixedUniversityId?: string;
 }) {
   const params = useSearchParams();
+  const router = useRouter();
+  const detailsHref = (center: LanguageCenter) =>
+    `${basePath}/language-centers/${encodeURIComponent(center.id)}`;
   const linkedUniversity =
     fixedUniversityId ?? params.get("university_id") ?? "";
   const [universityId, setUniversityId] = useState(linkedUniversity);
@@ -84,7 +89,6 @@ export default function LanguageCentersDirectory({
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<DataTableSort | null>(null);
   const [form, setForm] = useState<LanguageCenter | "new" | null>(null);
-  const [viewing, setViewing] = useState<LanguageCenter | null>(null);
   const [deleting, setDeleting] = useState<LanguageCenter | null>(null);
   const [busy, setBusy] = useState(false);
   const { showToast } = useToast();
@@ -147,41 +151,17 @@ export default function LanguageCentersDirectory({
       sortable: true,
       width: "52%",
       cell: (center) => {
-        const centerLink = (
-          <button
-            type="button"
-            className="block break-words text-start text-[13px] font-medium leading-5 text-ub-text-link hover:underline"
-            onClick={() => setViewing(center)}
-          >
+        const name = (
+          <span className="block break-words text-start text-[13px] font-medium leading-5 text-ub-text-link">
             {center.name}
-          </button>
+          </span>
         );
-        const identity = fixedUniversityId ? (
-          centerLink
+        return fixedUniversityId ? (
+          name
         ) : (
-          <UniversityIdentity
-            university={universityFor(center.university_id)}
-            href={`${basePath}/universities/${encodeURIComponent(
-              center.university_id
-            )}`}
-          >
-            {centerLink}
+          <UniversityIdentity university={universityFor(center.university_id)}>
+            {name}
           </UniversityIdentity>
-        );
-        return readOnly ? (
-          <div className="flex min-w-0 items-start gap-1">
-            <div className="min-w-0 flex-1">{identity}</div>
-            <IconButton
-              variant="tertiary"
-              size="sm"
-              className="md:hidden"
-              aria-label={`View ${center.name}`}
-              icon={<Eye className="h-4 w-4" />}
-              onClick={() => setViewing(center)}
-            />
-          </div>
-        ) : (
-          identity
         );
       },
     },
@@ -221,7 +201,7 @@ export default function LanguageCentersDirectory({
             size="sm"
             aria-label={`View ${center.name}`}
             icon={<Eye className="h-4 w-4" />}
-            onClick={() => setViewing(center)}
+            onClick={() => router.push(detailsHref(center))}
           />
         ) : (
           <TableActions label={center.name}>
@@ -229,7 +209,7 @@ export default function LanguageCentersDirectory({
               primary={readOnly}
               label={`View ${center.name}`}
               icon={<Eye className="h-4 w-4" />}
-              onSelect={() => setViewing(center)}
+              href={detailsHref(center)}
             />
             {!readOnly && (
               <TableAction
@@ -284,6 +264,21 @@ export default function LanguageCentersDirectory({
       onChange={(value) => setDraftUniversityId(value || "")}
     />
   );
+  const pagination = (
+    <TablePagination
+      currentPage={currentPage}
+      onPageChange={setPage}
+      itemsPerPage={10}
+      itemCount={rows.length}
+      totalCount={matching.length}
+      itemLabel="centers"
+      loading={loading || universitiesLoading}
+    />
+  );
+  const retry = () => {
+    void load();
+    void refetchUniversities();
+  };
   return (
     <section className="min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
       <header
@@ -347,41 +342,68 @@ export default function LanguageCentersDirectory({
         />
       </div>
       <div className={readOnly ? "p-3 md:p-5" : "p-3 md:p-6"}>
-        <DataTable
-          columns={columns}
-          rows={rows}
-          sort={sort}
-          onSortChange={(value) => {
-            setSort(value);
-            setPage(1);
-          }}
-          manualSort
-          getRowId={(center) => center.id}
-          caption="Language centers"
-          loading={loading || universitiesLoading}
-          error={error || universitiesError}
-          onRetry={() => {
-            void load();
-            void refetchUniversities();
-          }}
-          empty={{
-            title: "No language centers found",
-            description: readOnly
-              ? "Try another search or university."
-              : "Try another search or university, or create a language center.",
-          }}
-          footer={
-            <TablePagination
-              currentPage={currentPage}
-              onPageChange={setPage}
-              itemsPerPage={10}
-              itemCount={rows.length}
-              totalCount={matching.length}
-              itemLabel="centers"
-              loading={loading}
+        {readOnly ? (
+          loading || universitiesLoading ? (
+            <Loading text="Loading language centres…" />
+          ) : error || universitiesError ? (
+            <div role="alert" className="space-y-4 p-4">
+              <p className="text-ub-body-sm text-ub-text-secondary">
+                {error || universitiesError}
+              </p>
+              <Button text="Try again" onClick={retry} />
+            </div>
+          ) : !rows.length ? (
+            <EmptyData
+              title="No language centers found"
+              subtitle="Try another search or university."
             />
-          }
-        />
+          ) : (
+            <div className="space-y-5">
+              <div
+                className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                aria-label="Language centres"
+              >
+                {rows.map((center) => (
+                  <LanguageCenterCard
+                    key={center.id}
+                    center={center}
+                    university={universityFor(center.university_id)}
+                    href={detailsHref(center)}
+                  />
+                ))}
+              </div>
+              {pagination}
+            </div>
+          )
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={rows}
+            sort={sort}
+            onSortChange={(value) => {
+              setSort(value);
+              setPage(1);
+            }}
+            manualSort
+            getRowId={(center) => center.id}
+            getRowHref={detailsHref}
+            getRowLabel={(center) => center.name}
+            caption="Language centers"
+            loading={loading || universitiesLoading}
+            error={error || universitiesError}
+            onRetry={() => {
+              void load();
+              void refetchUniversities();
+            }}
+            empty={{
+              title: "No language centers found",
+              description: readOnly
+                ? "Try another search or university."
+                : "Try another search or university, or create a language center.",
+            }}
+            footer={pagination}
+          />
+        )}
       </div>
       {!readOnly && form && (
         <LanguageCenterForm
@@ -483,51 +505,6 @@ export default function LanguageCentersDirectory({
             />
           )}
         </div>
-      </Drawer>
-      <Drawer
-        open={!!viewing}
-        onClose={() => setViewing(null)}
-        title={viewing?.name || "Language center"}
-        footer={
-          !readOnly && (
-            <Button
-              text="Edit center"
-              onClick={() => {
-                setForm(viewing);
-                setViewing(null);
-              }}
-            />
-          )
-        }
-      >
-        {viewing && (
-          <div className="space-y-5">
-            <UniversityIdentity
-              university={universityFor(viewing.university_id)}
-              href={`${basePath}/universities/${encodeURIComponent(
-                viewing.university_id
-              )}`}
-            />
-            <dl className="space-y-5 break-words">
-              {[
-                ["Location", viewing.location],
-                ["Contact email", viewing.email || "Not provided"],
-                ["Contact phone", viewing.phone || "Not provided"],
-                ["Description", viewing.description || "No description added."],
-                ["Status", viewing.is_active ? "Active" : "Inactive"],
-              ].map(([label, value]) => (
-                <div key={String(label)}>
-                  <dt className="text-ub-label-sm text-ub-text-tertiary">
-                    {label}
-                  </dt>
-                  <dd className="mt-1 whitespace-pre-wrap text-ub-body-md text-ub-text-primary">
-                    {value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
       </Drawer>
       <ConfirmDialog
         open={!readOnly && !!deleting}
