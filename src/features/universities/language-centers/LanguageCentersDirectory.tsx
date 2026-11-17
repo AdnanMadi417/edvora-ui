@@ -38,6 +38,7 @@ import { parseApiError } from "utils/parseApiError";
 import LanguageCenterForm from "./LanguageCenterForm";
 import { languageCentersApi } from "./api";
 import type { LanguageCenter, LanguageCenterInput } from "./types";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 export default function LanguageCentersDirectory({
   basePath = "/admin",
@@ -339,14 +340,10 @@ export default function LanguageCentersDirectory({
           }}
           filters={
             (!fixedUniversityId || !readOnly) && (
-              <Button
-                text={
-                  filterCount
-                    ? `University filters (${filterCount})`
-                    : "University filters"
-                }
+              <FilterButton
+                count={filterCount}
+                label="University filters"
                 className="shrink-0"
-                icon={<SlidersHorizontal className="h-4 w-4" />}
                 onClick={() => {
                   setDraftFilters(universityFilters);
                   setDraftUniversityId(universityId);

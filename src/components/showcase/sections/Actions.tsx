@@ -5,6 +5,7 @@ import { Plus, Download, Pencil, Trash2, Send, Eye, CheckCircle2, Clock, AlertTr
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import PillButton from "components/ub/core/buttons/PillButton";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 import NextButton from "components/ub/core/buttons/NextButton";
 import PrevButton from "components/ub/core/buttons/PrevButton";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
@@ -79,6 +80,21 @@ export function Buttons() {
         <IconButton icon={<Pencil className="h-4 w-4" />} aria-label="Edit" title="Edit" onClick={clicked("Edit")} />
         <IconButton icon={<Trash2 className="h-4 w-4" />} aria-label="Delete" title="Delete" variant="destructive" onClick={clicked("Delete")} />
         <IconButton icon={<Send className="h-4 w-4" />} aria-label="Send" title="Send" disabled />
+      </Demo>
+
+      <Demo
+        name="FilterButton"
+        path="components/ub/core/buttons/FilterButton.tsx"
+        description="Opens a filter panel, in the same row as the search field. Icon only with a count badge below 640px; resize to see the label."
+        className="grid gap-4"
+      >
+        <Variant label="No filters, two filters, custom label">
+          <div className="flex flex-wrap items-center gap-3">
+            <FilterButton onClick={clicked("Filters")} />
+            <FilterButton count={2} onClick={clicked("Filters (2)")} />
+            <FilterButton label="University filters" count={1} onClick={clicked("University filters")} />
+          </div>
+        </Variant>
       </Demo>
 
       <Demo name="PillButton" path="components/ub/core/buttons/PillButton.tsx" className="flex flex-wrap items-end gap-4">

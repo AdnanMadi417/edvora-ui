@@ -3,7 +3,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import React, { useEffect, useMemo, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
 import SelectInput from "components/ub/forms/selection/SelectInput";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import Button from "components/ub/core/buttons/Button";
@@ -11,6 +10,7 @@ import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterChip from "components/ub/data/badges/FilterChip";
 import SortButton from "features/programs/components/shared/filters/SortButton";
 import { COURSE_TYPE_OPTIONS } from "features/programs/utils/courseType";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 interface Option {
   label: string;
@@ -240,22 +240,15 @@ export default function ProgramFilterPanel({
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <SearchInput
-          value={searchTerm}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-          className="min-w-0 flex-1 sm:min-w-[220px]"
-        />
-        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
-          <Button
-            onClick={() => setOpen(true)}
-            variant="secondary"
-            icon={<SlidersHorizontal className="h-4 w-4" />}
-            text={
-              activeFilterCount ? `Filters (${activeFilterCount})` : "Filters"
-            }
-            className="min-h-[44px]"
+        {/* Search, filters and sort share one row at every width. */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:min-w-[320px] sm:gap-3">
+          <SearchInput
+            value={searchTerm}
+            onChange={onSearchChange}
+            placeholder={searchPlaceholder}
+            className="min-w-0 flex-1"
           />
+          <FilterButton count={activeFilterCount} onClick={() => setOpen(true)} />
           <SortButton value={sortBy} onChange={onSortChange} />
         </div>
         {resultsCount !== undefined && (

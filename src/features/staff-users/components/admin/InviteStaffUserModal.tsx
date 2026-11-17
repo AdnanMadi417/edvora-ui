@@ -14,6 +14,7 @@ import InputField from "components/ub/forms/text/InputField";
 import SelectField from "components/ub/forms/selection/SelectField";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { FEATURES } from "config/featureFlags";
 
 interface InviteStaffUserModalProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
   { value: "reviewer", label: "Reviewer" },
   { value: "data_entry", label: "Data entry" },
-  { value: "language_centre_admin", label: "Language Centre Admin" },
+  ...(FEATURES.languageCentreAdmins ? [{ value: "language_centre_admin", label: "Language Centre Admin" }] : []),
 ];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

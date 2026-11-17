@@ -37,6 +37,8 @@ import { parseApiError } from "utils/parseApiError";
 import SuspendReactivateStaffUserModal from "./SuspendReactivateStaffUserModal";
 import InviteStaffUserModal from "./InviteStaffUserModal";
 import ResendStaffInvitationOtpModal from "./ResendStaffInvitationOtpModal";
+import FilterButton from "components/ub/core/buttons/FilterButton";
+import { FEATURES } from "config/featureFlags";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -150,7 +152,6 @@ export default function StaffUsersTable() {
     },
     {
       key: "email",
-      mobileSecondary: true,
       header: "Email",
       cell: (user) => (
         <span className="break-all text-ub-text-secondary" title={user.email}>
@@ -210,11 +211,13 @@ export default function StaffUsersTable() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <LinkBtn
-            href="/admin/language-centre-admins"
-            label="Language Centre Admins"
-            icon={<Users className="h-4 w-4" />}
-          />
+          {FEATURES.languageCentreAdmins && (
+            <LinkBtn
+              href="/admin/language-centre-admins"
+              label="Language Centre Admins"
+              icon={<Users className="h-4 w-4" />}
+            />
+          )}
           <Button
             text="Invite staff user"
             variant="primary"
@@ -238,14 +241,8 @@ export default function StaffUsersTable() {
           }}
           resultLabel={`${total} staff users`}
           filters={
-            <Button
-              text={
-                activeFiltersCount
-                  ? `Filters (${activeFiltersCount})`
-                  : "Filters"
-              }
-              variant="secondary"
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={activeFiltersCount}
               onClick={() => {
                 setDraftRole(selectedRole);
                 setDraftStatus(selectedStatus);

@@ -6,7 +6,6 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import SelectField from "components/ub/forms/selection/SelectField";
-import { SlidersHorizontal } from "lucide-react";
 
 import React, { useState } from "react";
 import {
@@ -36,6 +35,7 @@ import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import ResendRegistrationOtpConfirmation from "./ResendRegistrationOtpConfirmation";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -346,10 +346,8 @@ export default function PendingRegistrationOtpsTable() {
             placeholder: "Search by email, name, or company...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text="Registration filters"
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              label="Registration filters"
               onClick={() => {
                 setDraft({ progress: progressFilter, type: partnerTypeFilter });
                 setFiltersOpen(true);

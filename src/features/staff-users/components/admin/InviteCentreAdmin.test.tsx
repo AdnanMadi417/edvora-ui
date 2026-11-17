@@ -7,6 +7,10 @@ import {
 import InviteStaffUserModal from "./InviteStaffUserModal";
 import { readWorkspace } from "features/language-centre-admin/services/centreWorkspace";
 import { selectOption } from "testUtils/selectOption";
+// The centre-admin role sits behind a feature flag (off by default); this test covers it switched on.
+jest.mock("config/featureFlags", () => ({
+  FEATURES: { ...jest.requireActual("config/featureFlags").FEATURES, languageCentreAdmins: true },
+}));
 const mockInvite = jest.fn();
 jest.mock("../../hooks", () => ({
   useInviteStaffUser: () => ({ inviteStaffUser: mockInvite, loading: false }),

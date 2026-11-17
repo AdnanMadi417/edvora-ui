@@ -33,7 +33,9 @@ export default function SortButton({ value, onChange }: SortButtonProps) {
           setDraft(value);
           setOpen(true);
         }}
-        className="min-h-[44px]"
+        title={value === "all" ? "Sort" : "Sort (1)"}
+        textClassName="sr-only sm:not-sr-only"
+        className="min-h-[44px] shrink-0 max-sm:w-11 max-sm:px-0"
       />
       <Drawer
         open={open}

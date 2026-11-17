@@ -46,6 +46,7 @@ import {
 import { useCommissionQueue } from "../../hooks";
 import type { CommissionQueueItem, WaitingOn } from "../../types";
 import BatchPayout, { type BatchPayoutLine } from "./BatchPayout";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const PAGE_SIZE = 20;
 
@@ -390,14 +391,8 @@ export default function FinanceQueuePage() {
               "Search this page by application, student, or advisor...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={
-                activeFiltersCount
-                  ? `Filters (${activeFiltersCount})`
-                  : "Filters"
-              }
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={activeFiltersCount}
               onClick={() => {
                 setDraft({
                   partner: selectedPartner,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
@@ -142,23 +142,16 @@ export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
   return (
     <div className="min-w-0 space-y-4">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <SearchInput
-          value={props.searchTerm}
-          onChange={props.onSearchChange}
-          placeholder="Search applications"
-          className="min-w-0 flex-1 sm:min-w-[220px]"
-        />
-        <Button
-          variant="secondary"
-          icon={<SlidersHorizontal className="h-4 w-4" />}
-          text={
-            props.activeFiltersCount
-              ? `Filters (${props.activeFiltersCount})`
-              : "Filters"
-          }
-          onClick={onToggleFilters}
-          className="min-h-[44px]"
-        />
+        {/* Search and filters share one row at every width. */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:min-w-[280px] sm:gap-3">
+          <SearchInput
+            value={props.searchTerm}
+            onChange={props.onSearchChange}
+            placeholder="Search applications"
+            className="min-w-0 flex-1"
+          />
+          <FilterButton count={props.activeFiltersCount} onClick={onToggleFilters} expanded={showFilters} />
+        </div>
         {props.resultsCount !== undefined && (
           <p role="status" className="text-ub-label-sm text-ub-text-secondary">
             {props.resultsCount.toLocaleString()} applications

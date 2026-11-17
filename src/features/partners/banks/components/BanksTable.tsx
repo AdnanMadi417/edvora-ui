@@ -30,6 +30,7 @@ import { parseApiError } from "utils/parseApiError";
 import { ISO_COUNTRIES, getCountryName } from "constants/lists";
 import { useBanks, useUpdateBank } from "../hooks";
 import type { Bank } from "../types";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 export default function BanksTable({
   basePath = "/admin/advisors/banks",
 }: {
@@ -189,10 +190,8 @@ export default function BanksTable({
             placeholder: "Search by bank name, code, or SWIFT code...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={filterCount ? `Filters (${filterCount})` : "Filters"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={filterCount}
               onClick={() => {
                 setDraft(filters);
                 setOpen(true);

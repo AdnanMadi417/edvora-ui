@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
@@ -9,6 +8,7 @@ import Button from "components/ub/core/buttons/Button";
 import SelectInput from "components/ub/forms/selection/SelectInput";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterChip from "components/ub/data/badges/FilterChip";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 interface Option {
   label: string;
@@ -167,21 +167,16 @@ export default function UniversityFilterPanel({
   return (
     <div className="min-w-0 space-y-4">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <SearchInput
-          value={searchTerm}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-          className="min-w-0 flex-1 sm:min-w-[220px]"
-        />
-        <Button
-          variant="secondary"
-          icon={<SlidersHorizontal className="h-4 w-4" />}
-          text={
-            activeFilterCount ? `Filters (${activeFilterCount})` : "Filters"
-          }
-          onClick={() => setOpen(true)}
-          className="min-h-[44px]"
-        />
+        {/* Search and filters share one row at every width. */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:min-w-[280px] sm:gap-3">
+          <SearchInput
+            value={searchTerm}
+            onChange={onSearchChange}
+            placeholder={searchPlaceholder}
+            className="min-w-0 flex-1"
+          />
+          <FilterButton count={activeFilterCount} onClick={() => setOpen(true)} />
+        </div>
         {resultsCount !== undefined && (
           <p role="status" className="text-ub-label-sm text-ub-text-secondary">
             {resultsCount} universities

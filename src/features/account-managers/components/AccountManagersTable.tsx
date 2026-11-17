@@ -39,6 +39,7 @@ import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import { useRouter } from "next/navigation";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -199,7 +200,6 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "email",
-      mobileSecondary: true,
       header: "Email",
       cell: (m) => (
         <span className="break-all text-ub-text-secondary" title={m.email}>
@@ -300,14 +300,8 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
           }}
           resultLabel={`${total} account managers`}
           filters={
-            <Button
-              text={
-                activeFiltersCount
-                  ? `Filters (${activeFiltersCount})`
-                  : "Filters"
-              }
-              variant="secondary"
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={activeFiltersCount}
               onClick={() => {
                 setDraftStatus(selectedStatus);
                 setFiltersOpen(true);

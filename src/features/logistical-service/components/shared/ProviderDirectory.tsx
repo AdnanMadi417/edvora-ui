@@ -33,6 +33,7 @@ import FormModal from "components/ub/feedback/dialogs/FormModal";
 import SelectField from "components/ub/forms/selection/SelectField";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 export default function ProviderDirectory({
   basePath = "/admin/logistics-marketplace",
@@ -201,10 +202,8 @@ export default function ProviderDirectory({
             placeholder: "Search providers, locations, or services...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={activeFilters ? `Filters (${activeFilters})` : "Filters"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={activeFilters}
               onClick={() => {
                 setDraft(filters);
                 setOpen(true);

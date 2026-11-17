@@ -521,6 +521,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Table row actions (view, edit, delete)", "Toolbar actions", "Close buttons"],
     avoid: "Primary actions: they need a visible label.",
   },
+  FilterButton: {
+    category: "core",
+    imports: [imp("FilterButton", "core/buttons/FilterButton")],
+    useFor: "Opens a list's filter panel. Sits beside the search field: a 44px icon with a count badge on phones, \"Filters (2)\" from 640px.",
+    usedIn: ["DataTableToolbar filters", "Applications, universities and programmes filter bars", "Phone filter toggles on plain tables"],
+    avoid: "Inline filter controls (selects, chips): put those in the panel it opens.",
+  },
   PillButton: {
     category: "core",
     imports: [imp("PillButton", "core/buttons/PillButton")],

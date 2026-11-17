@@ -198,7 +198,6 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "intakes",
-      mobileSecondary: true,
       header: "Intakes",
       cell: (program) =>
         program.intake_months?.length ? (
@@ -293,6 +292,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       className="min-w-0"
     >
       <DataTable
+        className="ub-knowledge-hub-table"
         mobileLayout="stacked"
         scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
         columns={columns}

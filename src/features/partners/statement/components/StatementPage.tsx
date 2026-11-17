@@ -5,7 +5,7 @@ import TableActions, {
 } from "components/ub/data/tables/TableActions";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowUpRight, CheckCircle2, Eye, Landmark, Receipt, SlidersHorizontal, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Eye, Landmark, Receipt, Wallet } from "lucide-react";
 import StatsFilterCards, { type FilterCardItem } from "components/ub/navigation/controls/StatsFilterCards";
 import DataTable, {
   type DataTableColumn,
@@ -28,6 +28,7 @@ import { usePartnerProfile } from "features/partners/hooks/profile/usePartnerPro
 import { useAgencyMembers } from "features/agency-members/hooks/useAgencyMembers";
 import { useStatement, useStatementCounts } from "../hooks";
 import type { PartnerStatementItem, WaitingOn } from "../types";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 const PAGE_SIZE = 20;
 const STATES: Record<
   WaitingOn,
@@ -250,10 +251,8 @@ export default function StatementPage() {
               "Search this page by application, student, or university...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={filterCount ? `Filters (${filterCount})` : "Filters"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={filterCount}
               onClick={() => {
                 setDraft(filters);
                 setFiltersOpen(true);

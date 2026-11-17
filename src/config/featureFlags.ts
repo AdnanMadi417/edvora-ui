@@ -25,4 +25,10 @@ export const FEATURES = {
    *  awaits Brand sign-off. Off: everything renders light and the Light /
    *  Dark / System switch is hidden. Colors live in src/styles/tokens/semantic.css. */
   darkMode: process.env.NEXT_PUBLIC_ENABLE_DARK_MODE !== "false",
+
+  /** OFF unless NEXT_PUBLIC_ENABLE_LANGUAGE_CENTRE_ADMINS is "true". The admin
+   *  Language Centre Admins page (/admin/language-centre-admins), its link on
+   *  Staff users and the "Language Centre Admin" invite role. Hidden from
+   *  every user until the centre-admin workflow is ready. */
+  languageCentreAdmins: enabled(process.env.NEXT_PUBLIC_ENABLE_LANGUAGE_CENTRE_ADMINS),
 };

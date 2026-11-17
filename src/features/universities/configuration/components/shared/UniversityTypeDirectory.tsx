@@ -5,7 +5,7 @@ import TableActions, {
 } from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import { Eye, Pencil, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   useUniversityTypes,
   useDeleteUniversityType,
@@ -27,6 +27,7 @@ import FormModal from "components/ub/feedback/dialogs/FormModal";
 import SelectInput from "components/ub/forms/selection/SelectInput";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 export default function UniversityTypeDirectory({
   basePath = "/admin/config-universities",
@@ -200,10 +201,8 @@ export default function UniversityTypeDirectory({
             placeholder: "Search university types...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={filter === "all" ? "Filters" : "Filters (1)"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={filter === "all" ? 0 : 1}
               onClick={() => {
                 setDraft(filter);
                 setOpen(true);

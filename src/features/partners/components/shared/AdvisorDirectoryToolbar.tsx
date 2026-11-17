@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import Button from "components/ub/core/buttons/Button";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import SelectField from "components/ub/forms/selection/SelectField";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 export type AdvisorStatusFilter =
   | "active"
   | "inactive"
@@ -46,10 +46,8 @@ export default function AdvisorDirectoryToolbar({
         }}
         filters={
           onApply ? (
-            <Button
-              variant="secondary"
-              text={count ? `Filters (${count})` : "Filters"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={count}
               onClick={() => {
                 setDraft({ manager, status: status || "all" });
                 setOpen(true);

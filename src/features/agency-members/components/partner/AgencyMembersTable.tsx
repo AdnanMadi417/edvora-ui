@@ -47,6 +47,7 @@ import { parseApiError } from "utils/parseApiError";
 
 import SuspendReactivateMemberModal from "./SuspendReactivateMemberModal";
 import EditMemberCommissionModal from "./EditMemberCommissionModal";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -183,20 +184,7 @@ export default function AgencyMembersTable({
                 aria-label="Updating results"
               />
             )}
-            <button
-              type="button"
-              aria-label={activeFiltersCount > 0 ? `Filters, ${activeFiltersCount} active` : "Filters"}
-              aria-expanded={showMobileFilters}
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle"
-              onClick={() => setShowMobileFilters((v) => !v)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeFiltersCount > 0 && (
-                <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
+            <FilterButton className="sm:hidden" count={activeFiltersCount} expanded={showMobileFilters} onClick={() => setShowMobileFilters((v) => !v)} />
           </div>
 
           <div

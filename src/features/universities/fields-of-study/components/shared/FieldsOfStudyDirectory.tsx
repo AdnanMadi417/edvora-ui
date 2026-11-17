@@ -31,6 +31,7 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import CreateFieldOfStudy from "../admin/popups/CreateFieldOfStudy";
 import UpdateField from "../admin/popups/UpdateField";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 export default function FieldsOfStudyDirectory({
   allowDelete = true,
@@ -171,10 +172,8 @@ export default function FieldsOfStudyDirectory({
             placeholder: "Search by field name or code...",
           }}
           filters={
-            <Button
-              variant="secondary"
-              text={status === "all" ? "Filters" : "Filters (1)"}
-              icon={<SlidersHorizontal className="h-4 w-4" />}
+            <FilterButton
+              count={status === "all" ? 0 : 1}
               onClick={() => {
                 setDraft(status);
                 setFiltersOpen(true);

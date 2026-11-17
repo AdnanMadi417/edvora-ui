@@ -25,6 +25,7 @@ import UnsharePartnersModal from "./UnsharePartnersModal";
 import type { AccountManager } from "../types";
 import Checkbox from "components/ub/forms/choices/Checkbox";
 import { fieldGroup } from "components/ub/recipes";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -156,20 +157,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
             {isRefetching && (
               <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-ub-text-tertiary" aria-label="Updating results" />
             )}
-            <button
-              type="button"
-              aria-label={activeFiltersCount > 0 ? `Filters, ${activeFiltersCount} active` : "Filters"}
-              aria-expanded={showMobileFilters}
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle"
-              onClick={() => setShowMobileFilters((v) => !v)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeFiltersCount > 0 && (
-                <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
+            <FilterButton className="sm:hidden" count={activeFiltersCount} expanded={showMobileFilters} onClick={() => setShowMobileFilters((v) => !v)} />
           </div>
 
           <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>

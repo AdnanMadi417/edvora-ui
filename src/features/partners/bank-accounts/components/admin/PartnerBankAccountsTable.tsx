@@ -4,7 +4,7 @@ import { tableSectionPadding } from "components/ub/recipes";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { ChevronRight, RefreshCw, SlidersHorizontal, Wallet } from "lucide-react";
+import { ChevronRight, RefreshCw, Wallet } from "lucide-react";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import Button from "components/ub/core/buttons/Button";
@@ -17,6 +17,7 @@ import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import { useBanks } from "features/partners/banks/hooks";
 import { usePartnerBankAccountsList } from "../../hooks";
+import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const CURRENCY_OPTIONS = [
   { value: "RM", label: "RM" },
@@ -96,20 +97,7 @@ export default function PartnerBankAccountsTable() {
             placeholder="Search by advisor, bank, or account..."
             className="sm:w-64 sm:flex-none"
           />
-          <button
-            type="button"
-            aria-label={activeFiltersCount > 0 ? `Filters, ${activeFiltersCount} active` : "Filters"}
-            aria-expanded={showMobileFilters}
-            onClick={() => setShowMobileFilters((v) => !v)}
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle sm:hidden"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            {activeFiltersCount > 0 && (
-              <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
-                {activeFiltersCount}
-              </span>
-            )}
-          </button>
+          <FilterButton className="sm:hidden" count={activeFiltersCount} expanded={showMobileFilters} onClick={() => setShowMobileFilters((v) => !v)} />
         </div>
 
         <div

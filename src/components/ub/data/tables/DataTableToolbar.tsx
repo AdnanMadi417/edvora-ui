@@ -138,20 +138,25 @@ export default function DataTableToolbar({ search, filters, density, columns, re
   return (
     <div className={clsx("mb-3 grid gap-3", className)}>
       <div className="flex flex-wrap items-center gap-3">
-        {search && (
-          <div className="relative min-w-0 flex-1 basis-60">
-            <Search aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ub-text-tertiary" />
-            <input
-              type="search"
-              value={search.value}
-              onChange={(e) => search.onChange(e.target.value)}
-              placeholder={search.placeholder ?? "Search"}
-              aria-label={search.label ?? search.placeholder ?? "Search"}
-              className={searchField}
-            />
+        {/* Search and filters share one row at every width: the filter button never drops below the search. */}
+        {(search || filters) && (
+          <div className="flex min-w-0 flex-1 basis-full items-center gap-2 sm:basis-60 sm:gap-3">
+            {search && (
+              <div className="relative min-w-0 flex-1">
+                <Search aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ub-text-tertiary" />
+                <input
+                  type="search"
+                  value={search.value}
+                  onChange={(e) => search.onChange(e.target.value)}
+                  placeholder={search.placeholder ?? "Search"}
+                  aria-label={search.label ?? search.placeholder ?? "Search"}
+                  className={searchField}
+                />
+              </div>
+            )}
+            {filters}
           </div>
         )}
-        {filters}
         <div className="ms-auto flex flex-wrap items-center gap-2">
           {/* Rows are stacked cards below 768px, where density has no effect. */}
           {density && (
