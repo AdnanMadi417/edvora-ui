@@ -6,11 +6,18 @@ import {
   emptyConfiguration,
   type CentreConfiguration,
 } from "../configuration";
+import {
+  publishedCentreConfiguration,
+  WORKSPACE_EVENT,
+} from "features/language-centre-admin/services/centreWorkspace";
 import { getDemoCentreConfiguration } from "../fixtures/demoData";
 const key = (id: string) => `unibexs:language-centre:v1:${id}`;
 export function readCentreConfiguration(
-  id: string
+  id: string,
+  centreId?: string
 ): CentreConfiguration | null {
+  const published = publishedCentreConfiguration(centreId || id);
+  if (published) return withoutRemovedCentreFields(published);
   const raw = localStorage.getItem(key(id));
   return raw
     ? (configurationSchema.parse(
@@ -42,7 +49,7 @@ export function saveCentreConfiguration(
   }
   window.dispatchEvent(new Event("language-centre-updated"));
 }
-export function useCentreConfiguration(id?: string) {
+export function useCentreConfiguration(id?: string, centreId?: string) {
   const [value, setValue] = useState<CentreConfiguration>(emptyConfiguration);
   const [initialValue, setInitialValue] =
     useState<CentreConfiguration>(emptyConfiguration);
@@ -55,7 +62,7 @@ export function useCentreConfiguration(id?: string) {
     const load = () => {
       setLoading(true);
       try {
-        const saved = readCentreConfiguration(id);
+        const saved = readCentreConfiguration(id, centreId);
         setValue(saved || emptyConfiguration());
         setInitialValue(saved || emptyConfiguration());
         setExists(!!saved);
@@ -70,12 +77,14 @@ export function useCentreConfiguration(id?: string) {
     };
     load();
     window.addEventListener("storage", load);
+    window.addEventListener(WORKSPACE_EVENT, load);
     window.addEventListener("language-centre-updated", load);
     return () => {
       window.removeEventListener("storage", load);
+      window.removeEventListener(WORKSPACE_EVENT, load);
       window.removeEventListener("language-centre-updated", load);
     };
-  }, [id, attempt]);
+  }, [id, centreId, attempt]);
   return {
     value,
     initialValue,
@@ -109,9 +118,11 @@ export function useCentreAvailability<
     };
     load();
     window.addEventListener("storage", load);
+    window.addEventListener(WORKSPACE_EVENT, load);
     window.addEventListener("language-centre-updated", load);
     return () => {
       window.removeEventListener("storage", load);
+      window.removeEventListener(WORKSPACE_EVENT, load);
       window.removeEventListener("language-centre-updated", load);
     };
   }, [ids]);

@@ -1,6 +1,10 @@
 export interface LanguageCenter {
   id: string;
   university_id: string;
+  centre_type?: "university_linked" | "independent";
+  logo_url?: string;
+  images?: { id: string; name: string; url: string }[];
+  branches?: { id: string; name: string; location: string; address: string }[];
   name: string;
   location: string;
   email: string;

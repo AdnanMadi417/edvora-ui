@@ -366,3 +366,25 @@ it("retries failed advisor card loads and paginates cards", async () => {
     screen.getByRole("link", { name: /Language Centre 11/ })
   ).toHaveAttribute("href", "/partner/language-centers/card-10");
 });
+
+it("shows independent language centres as advisor cards without a university requirement", async () => {
+  (languageCentersApi.list as jest.Mock).mockResolvedValue({
+    data: {
+      items: [
+        {
+          ...center,
+          id: "independent",
+          university_id: "",
+          centre_type: "independent",
+          name: "Independent Academy",
+        },
+      ],
+    },
+  });
+  render(<LanguageCentersDirectory basePath="/partner" readOnly />);
+  expect(
+    await screen.findByRole("article", { name: "Independent Academy" })
+  ).toBeVisible();
+  expect(screen.getByText("Independent language centre")).toBeInTheDocument();
+  expect(screen.queryByText("University unavailable")).not.toBeInTheDocument();
+});

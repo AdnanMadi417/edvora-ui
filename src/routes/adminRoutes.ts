@@ -63,6 +63,12 @@ const AdminRoutes: IRoute[] = [
     icon: Users,
   },
   {
+    name: "Language Centre Admins",
+    layout: "/admin",
+    path: "/language-centre-admins",
+    icon: Users,
+  },
+  {
     name: "Knowledge Hub",
     parentLink: true,
     layout: "/admin",
@@ -81,7 +87,12 @@ const AdminRoutes: IRoute[] = [
         path: "/universities",
         icon: Landmark,
       },
-      { name: "Language Centers", layout: "/admin", path: "/language-centers", icon: Languages },
+      {
+        name: "Language Centers",
+        layout: "/admin",
+        path: "/language-centers",
+        icon: Languages,
+      },
     ],
   },
   {
@@ -112,11 +123,36 @@ const AdminRoutes: IRoute[] = [
     path: "/settings",
     icon: Settings,
     children: [
-      { name: "University types", layout: "/admin/config-universities", path: "", icon: SlidersHorizontal },
-      { name: "Fields of study", layout: "/admin/config-universities", path: "/fields-of-study", icon: Layers },
-      { name: "Payment methods", layout: "/admin/config-universities", path: "/payment-methods", icon: CreditCard },
-      { name: "Document templates", layout: "/admin", path: "/document-types", icon: FileText },
-      { name: "Banks", layout: "/admin/advisors", path: "/banks", icon: Banknote },
+      {
+        name: "University types",
+        layout: "/admin/config-universities",
+        path: "",
+        icon: SlidersHorizontal,
+      },
+      {
+        name: "Fields of study",
+        layout: "/admin/config-universities",
+        path: "/fields-of-study",
+        icon: Layers,
+      },
+      {
+        name: "Payment methods",
+        layout: "/admin/config-universities",
+        path: "/payment-methods",
+        icon: CreditCard,
+      },
+      {
+        name: "Document templates",
+        layout: "/admin",
+        path: "/document-types",
+        icon: FileText,
+      },
+      {
+        name: "Banks",
+        layout: "/admin/advisors",
+        path: "/banks",
+        icon: Banknote,
+      },
     ],
   },
 ];

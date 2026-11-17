@@ -11,10 +11,12 @@ export default function CentreConfigurationFields({
   value,
   onChange,
   errors = {},
+  coursesOnly = false,
 }: {
   value: CentreConfiguration;
   onChange: (value: CentreConfiguration) => void;
   errors?: Record<string, string>;
+  coursesOnly?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -67,35 +69,37 @@ export default function CentreConfigurationFields({
           below to correct them.
         </p>
       )}
-      <details open className="rounded-ub-lg border border-ub-border p-4">
-        <summary className="cursor-pointer text-ub-heading-sm text-ub-text-primary">
-          Centre overview
-        </summary>
-        <div className="mt-4 space-y-4">
-          {field(
-            "Centre name",
-            value.name,
-            (name) => update({ name }),
-            "name",
-            "text",
-            true
-          )}
-          <Textarea
-            wrapperClassName="mb-0"
-            label="Centre description"
-            value={value.description}
-            onChange={(description) => update({ description })}
-          />
-          <div className={grid}>
+      {!coursesOnly && (
+        <details open className="rounded-ub-lg border border-ub-border p-4">
+          <summary className="cursor-pointer text-ub-heading-sm text-ub-text-primary">
+            Centre overview
+          </summary>
+          <div className="mt-4 space-y-4">
             {field(
-              "Centre location",
-              value.location,
-              (location) => update({ location }),
-              "location"
+              "Centre name",
+              value.name,
+              (name) => update({ name }),
+              "name",
+              "text",
+              true
             )}
+            <Textarea
+              wrapperClassName="mb-0"
+              label="Centre description"
+              value={value.description}
+              onChange={(description) => update({ description })}
+            />
+            <div className={grid}>
+              {field(
+                "Centre location",
+                value.location,
+                (location) => update({ location }),
+                "location"
+              )}
+            </div>
           </div>
-        </div>
-      </details>
+        </details>
+      )}
       <details open className="rounded-ub-lg border border-ub-border p-4">
         <summary className="cursor-pointer text-ub-heading-sm text-ub-text-primary">
           Courses, levels and pricing

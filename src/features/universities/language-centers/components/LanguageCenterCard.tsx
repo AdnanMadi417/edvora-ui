@@ -1,5 +1,6 @@
 "use client";
 import { useId } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { focusRing } from "components/ub/recipes";
@@ -24,7 +25,23 @@ export default function LanguageCenterCard({
         href={href}
         className={`flex h-full min-w-0 flex-col gap-4 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none ${focusRing}`}
       >
-        <UniversityIdentity university={university} />
+        {center.logo_url && (
+          <Image
+            src={center.logo_url}
+            alt={`${center.name} logo`}
+            width={48}
+            height={48}
+            unoptimized
+            className="h-12 w-12 rounded-ub-md object-contain"
+          />
+        )}
+        {center.centre_type === "independent" ? (
+          <p className="text-ub-label-sm text-ub-text-secondary">
+            Independent language centre
+          </p>
+        ) : (
+          <UniversityIdentity university={university} />
+        )}
         <h3
           id={titleId}
           className="break-words text-ub-heading-sm text-ub-text-primary"

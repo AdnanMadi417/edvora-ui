@@ -1,4 +1,5 @@
 "use client";
+import { WORKSPACE_EVENT } from "features/language-centre-admin/services/centreWorkspace";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -106,6 +107,11 @@ export default function LanguageCentersDirectory({
   }, []);
   useEffect(() => {
     void load();
+    const refresh = () => {
+      void load();
+    };
+    window.addEventListener(WORKSPACE_EVENT, refresh);
+    return () => window.removeEventListener(WORKSPACE_EVENT, refresh);
   }, [load]);
   const universityName = (id: string) =>
     universities.find((university) => university.id === id)?.name ||
@@ -119,9 +125,10 @@ export default function LanguageCentersDirectory({
     (center) =>
       (!readOnly ||
         (center.is_active &&
-          visibleUniversities.some(
-            (university) => university.id === center.university_id
-          ))) &&
+          (center.centre_type === "independent" ||
+            visibleUniversities.some(
+              (university) => university.id === center.university_id
+            )))) &&
       (!(fixedUniversityId ?? universityId) ||
         center.university_id === (fixedUniversityId ?? universityId)) &&
       (status === "all" || center.is_active === (status === "active")) &&
@@ -156,6 +163,15 @@ export default function LanguageCentersDirectory({
             {center.name}
           </span>
         );
+        if (center.centre_type === "independent")
+          return (
+            <div className="space-y-1">
+              <span className="text-ub-label-sm text-ub-text-secondary">
+                Independent language centre
+              </span>
+              {name}
+            </div>
+          );
         return fixedUniversityId ? (
           name
         ) : (
@@ -211,21 +227,23 @@ export default function LanguageCentersDirectory({
               icon={<Eye className="h-4 w-4" />}
               href={detailsHref(center)}
             />
-            {!readOnly && (
+            {!readOnly && center.centre_type !== "independent" && (
               <TableAction
                 label={`Edit ${center.name}`}
                 icon={<Pencil className="h-4 w-4" />}
                 onSelect={() => setForm(center)}
               />
             )}
-            {!readOnly && allowDelete && (
-              <TableAction
-                label={`Delete ${center.name}`}
-                danger
-                icon={<Trash2 className="h-4 w-4" />}
-                onSelect={() => setDeleting(center)}
-              />
-            )}
+            {!readOnly &&
+              allowDelete &&
+              center.centre_type !== "independent" && (
+                <TableAction
+                  label={`Delete ${center.name}`}
+                  danger
+                  icon={<Trash2 className="h-4 w-4" />}
+                  onSelect={() => setDeleting(center)}
+                />
+              )}
           </TableActions>
         ),
     },

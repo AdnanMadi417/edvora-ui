@@ -7,12 +7,14 @@ import CentreConfigurationView from "./CentreConfigurationView";
 /** Use the same course and price presentation in row details and university profiles. */
 export default function CentreRecordDetails({
   universityId,
+  centreId,
   children,
 }: {
   universityId: string;
+  centreId?: string;
   children: ReactNode;
 }) {
-  const centre = useCentreConfiguration(universityId);
+  const centre = useCentreConfiguration(universityId, centreId);
   if (centre.loading)
     return <p role="status">Loading language centre details…</p>;
   if (centre.error)

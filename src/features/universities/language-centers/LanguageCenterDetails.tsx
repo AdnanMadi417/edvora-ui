@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -88,9 +89,9 @@ export default function LanguageCenterDetails({
       icon={<ArrowLeft className="h-4 w-4" />}
     />
   );
-  if (loading || universitiesLoading)
+  if (loading || (universitiesLoading && center?.centre_type !== "independent"))
     return <Loading text="Loading language centre details…" />;
-  if (error || universitiesError)
+  if (error || (universitiesError && center?.centre_type !== "independent"))
     return (
       <div className="space-y-4">
         <DetailsSection title="Unable to load language centre">
@@ -109,9 +110,8 @@ export default function LanguageCenterDetails({
     !center ||
     (readOnly &&
       (!center.is_active ||
-        !university ||
-        !university.is_active ||
-        university.is_hidden))
+        (center.centre_type !== "independent" &&
+          (!university || !university.is_active || university.is_hidden))))
   )
     return (
       <div className="space-y-4">
@@ -130,8 +130,17 @@ export default function LanguageCenterDetails({
         <div className="h-1.5 rounded-t-ub-lg bg-ub-action-primary" />
         <div className="space-y-4 p-5 sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <UniversityIdentity university={university} href={universityHref} />
-            {!readOnly && (
+            {center.centre_type === "independent" ? (
+              <p className="text-ub-label-md text-ub-text-secondary">
+                Independent language centre
+              </p>
+            ) : (
+              <UniversityIdentity
+                university={university}
+                href={universityHref}
+              />
+            )}
+            {!readOnly && center.centre_type !== "independent" && (
               <ActionsDropdown
                 items={[
                   {
@@ -168,14 +177,28 @@ export default function LanguageCenterDetails({
             ]}
           />
           <h2 className="flex items-start gap-3 text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
-            <Languages className="mt-1 h-7 w-7 shrink-0 text-ub-text-link" />
+            {center.logo_url ? (
+              <Image
+                src={center.logo_url}
+                alt={`${center.name} logo`}
+                width={48}
+                height={48}
+                unoptimized
+                className="h-12 w-12 shrink-0 rounded-ub-md object-contain"
+              />
+            ) : (
+              <Languages className="mt-1 h-7 w-7 shrink-0 text-ub-text-link" />
+            )}
             {center.name}
           </h2>
         </div>
       </header>
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0">
-          <CentreRecordDetails universityId={center.university_id}>
+        <div className="min-w-0 space-y-5">
+          <CentreRecordDetails
+            centreId={center.id}
+            universityId={center.university_id || center.id}
+          >
             <DetailsSection title="Centre overview">
               <dl className="space-y-4">
                 {[
@@ -196,21 +219,68 @@ export default function LanguageCenterDetails({
               </dl>
             </DetailsSection>
           </CentreRecordDetails>
+          {!!center.branches?.length && (
+            <DetailsSection title="Branches">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {center.branches.map((branch) => (
+                  <article
+                    key={branch.id}
+                    className="space-y-2 rounded-ub-md border border-ub-border p-4"
+                  >
+                    <h3 className="text-ub-heading-sm">{branch.name}</h3>
+                    <p className="text-ub-body-sm text-ub-text-secondary">
+                      {branch.location}
+                    </p>
+                    {branch.address && (
+                      <p className="whitespace-pre-wrap text-ub-body-sm text-ub-text-secondary">
+                        {branch.address}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </DetailsSection>
+          )}
+          {!!center.images?.length && (
+            <DetailsSection title="Centre images">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {center.images.map((image) => (
+                  <Image
+                    key={image.id}
+                    src={image.url}
+                    alt={image.name}
+                    width={640}
+                    height={400}
+                    unoptimized
+                    className="aspect-video w-full rounded-ub-md object-cover"
+                  />
+                ))}
+              </div>
+            </DetailsSection>
+          )}
         </div>
         <aside
           aria-label="Language centre summary"
           className="space-y-4 xl:sticky xl:top-24"
         >
-          <DetailsSection title="University">
+          <DetailsSection
+            title={
+              center.centre_type === "independent" ? "Centre" : "University"
+            }
+          >
             <p className="mb-4 text-ub-body-sm text-ub-text-secondary">
-              {university?.name || "University unavailable"}
+              {center.centre_type === "independent"
+                ? "Independent language centre"
+                : university?.name || "University unavailable"}
             </p>
             <div className="flex flex-col gap-3">
-              <LinkBtn
-                href={universityHref}
-                label="View university"
-                icon={<UniversityIcon className="h-4 w-4" />}
-              />
+              {center.centre_type !== "independent" && (
+                <LinkBtn
+                  href={universityHref}
+                  label="View university"
+                  icon={<UniversityIcon className="h-4 w-4" />}
+                />
+              )}
               {back}
             </div>
           </DetailsSection>

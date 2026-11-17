@@ -170,3 +170,17 @@ it.each(["hidden", "inactive university", "inactive centre"])(
     ).not.toBeInTheDocument();
   }
 );
+
+it("loads independent centre details without university actions", async () => {
+  (languageCentersApi.list as jest.Mock).mockResolvedValue({
+    data: {
+      items: [{ ...center, university_id: "", centre_type: "independent" }],
+    },
+  });
+  render(<LanguageCenterDetails id="lc-1" basePath="/partner" readOnly />);
+  await screen.findByRole("heading", { name: "English Centre" });
+  expect(
+    screen.queryByRole("link", { name: "View university" })
+  ).not.toBeInTheDocument();
+  expect(screen.queryByText("University unavailable")).not.toBeInTheDocument();
+});

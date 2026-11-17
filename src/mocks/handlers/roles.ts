@@ -11,6 +11,12 @@ export const ROLES: Role[] = [
   { id: 4, code: "finance_officer", name: "Finance Officer", is_system: false },
   { id: 5, code: "marketing_lead", name: "Marketing Lead", is_system: false },
   { id: 6, code: "support_agent", name: "Support Agent", is_system: false },
+  {
+    id: 7,
+    code: "language_centre_admin",
+    name: "Language Centre Admin",
+    is_system: true,
+  },
 ];
 
 const RESOURCES: [string, string[]][] = [
@@ -24,31 +30,67 @@ const RESOURCES: [string, string[]][] = [
   ["account_managers", ["read", "create", "update", "delete"]],
   ["knowledge_hub", ["read", "publish"]],
   ["logistics", ["read", "manage"]],
+  ["own_language_centre", ["read", "update"]],
+  ["own_centre_branches", ["read", "create", "update", "delete"]],
+  ["own_centre_courses", ["read", "create", "update", "delete"]],
 ];
 
-export const PERMISSIONS: Permission[] = RESOURCES.flatMap(([resource, actions]) =>
-  actions.map((action) => ({
-    id: `perm_${resource}_${action}`,
-    resource,
-    action,
-    description: `${action[0].toUpperCase()}${action.slice(1)} ${resource.replace(/_/g, " ")}`,
-  })),
+export const PERMISSIONS: Permission[] = RESOURCES.flatMap(
+  ([resource, actions]) =>
+    actions.map((action) => ({
+      id: `perm_${resource}_${action}`,
+      resource,
+      action,
+      description: `${action[0].toUpperCase()}${action.slice(
+        1
+      )} ${resource.replace(/_/g, " ")}`,
+    }))
 );
 
-const byResource = (...resources: string[]) => PERMISSIONS.filter((p) => resources.includes(p.resource)).map((p) => p.id);
+const byResource = (...resources: string[]) =>
+  PERMISSIONS.filter((p) => resources.includes(p.resource)).map((p) => p.id);
 const readOnly = (...resources: string[]) =>
-  PERMISSIONS.filter((p) => resources.includes(p.resource) && p.action === "read").map((p) => p.id);
+  PERMISSIONS.filter(
+    (p) => resources.includes(p.resource) && p.action === "read"
+  ).map((p) => p.id);
 
 const rolePermissions = new Map<number, string[]>([
   [1, PERMISSIONS.map((p) => p.id)],
-  [2, [...byResource("applications"), ...readOnly("partners", "universities", "programs", "knowledge_hub")]],
-  [3, [...byResource("universities", "programs"), ...readOnly("applications", "logistics"), "perm_logistics_manage"]],
+  [
+    2,
+    [
+      ...byResource("applications"),
+      ...readOnly("partners", "universities", "programs", "knowledge_hub"),
+    ],
+  ],
+  [
+    3,
+    [
+      ...byResource("universities", "programs"),
+      ...readOnly("applications", "logistics"),
+      "perm_logistics_manage",
+    ],
+  ],
   [4, [...byResource("commissions"), ...readOnly("applications", "partners")]],
-  [5, [...byResource("knowledge_hub"), ...readOnly("partners", "universities", "programs")]],
+  [
+    5,
+    [
+      ...byResource("knowledge_hub"),
+      ...readOnly("partners", "universities", "programs"),
+    ],
+  ],
   [6, readOnly("applications", "partners", "knowledge_hub", "logistics")],
+  [
+    7,
+    byResource(
+      "own_language_centre",
+      "own_centre_branches",
+      "own_centre_courses"
+    ),
+  ],
 ]);
 
-let nextRoleId = 7;
+let nextRoleId = 8;
 const findRole = (id: string) => {
   const role = ROLES.find((r) => r.id === Number(id));
   if (!role) throw httpError(404, "Role not found");
@@ -59,8 +101,14 @@ mock.get("/admin/roles", () => ROLES);
 
 mock.post("/admin/roles", ({ body }) => {
   const code = String(body?.code ?? "").trim();
-  if (ROLES.some((r) => r.code === code)) throw httpError(409, "A role with this code already exists");
-  const role: Role = { id: nextRoleId++, code, name: String(body?.name ?? code), is_system: false };
+  if (ROLES.some((r) => r.code === code))
+    throw httpError(409, "A role with this code already exists");
+  const role: Role = {
+    id: nextRoleId++,
+    code,
+    name: String(body?.name ?? code),
+    is_system: false,
+  };
   ROLES.push(role);
   rolePermissions.set(role.id, []);
   return role;
@@ -91,7 +139,9 @@ mock.get("/admin/roles/:id/permissions", ({ params }) => {
 
 mock.put("/admin/roles/:id/permissions", ({ params, body }) => {
   const role = findRole(params.id);
-  const ids: string[] = Array.isArray(body?.permission_ids) ? body.permission_ids : [];
+  const ids: string[] = Array.isArray(body?.permission_ids)
+    ? body.permission_ids
+    : [];
   rolePermissions.set(role.id, ids);
   return PERMISSIONS.filter((p) => ids.includes(p.id));
 });
