@@ -1,26 +1,117 @@
 @media (max-width: 767px) {
-  .ub-applications-table tbody > tr {
+  .ub-applications-table > div {
+    border: 1px solid var(--ub-border-default);
+    border-radius: 16px;
+    background: var(--ub-bg-surface-subtle);
+    overflow: hidden;
+  }
+
+  .ub-applications-table table[data-mobile-layout="stacked"] {
+    padding: 8px;
+  }
+
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tbody
+    > tr:has(td[data-column]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
-    padding: 12px;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--ub-border-default);
+    border-radius: 12px;
+    background: var(--ub-bg-surface);
   }
 
-
-  .ub-applications-table tbody > tr > td {
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column] {
     min-width: 0;
     padding: 0;
+    display: block;
   }
 
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="student"],
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="programme"] {
+    grid-column: 1 / -1;
+  }
 
-  .ub-applications-table td[data-column="owner"],
-  .ub-applications-table td[data-column="updated"],
-  .ub-applications-table td[data-column="actions"] {
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="owner"] {
     display: none;
   }
 
   .ub-applications-table td[data-column] > span[aria-hidden="true"] {
     display: none;
+  }
+
+  .ub-data-table.ub-applications-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="updated"] {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ub-border-default);
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .ub-applications-table td[data-column="updated"] > span[aria-hidden="true"] {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+  }
+
+  .ub-applications-table
+    table[data-mobile-layout="stacked"]
+    td[data-column="updated"]
+    > span:last-child {
+    flex: 0 1 auto;
+    width: auto;
+  }
+
+  .ub-applications-table .ub-application-student {
+    min-height: 36px;
+    gap: 10px;
+  }
+
+  .ub-applications-table
+    .ub-application-student
+    > span.min-w-0
+    > span:first-child {
+    white-space: normal;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .ub-applications-table .ub-application-programme > span:first-child {
+    font-size: 13px;
+    line-height: 19px;
+  }
+
+  .ub-applications-table .ub-application-programme > span:last-child {
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .ub-applications-table .ub-application-status {
+    gap: 6px;
   }
 
   .ub-applications-table td[data-column] > span:last-child {
@@ -29,18 +120,37 @@
     text-align: start;
   }
 
+  .ub-applications-table td[data-column="student"] a {
+    display: block;
+  }
+
   .ub-applications-table td[data-column="student"] a > span {
     max-width: 100%;
     padding: 0;
   }
 
-  .ub-applications-table td[data-column="programme"] > span:last-child > span > span,
-  .ub-applications-table td[data-column="status"] > span:last-child > span > span {
-    max-width: 100%;
+  .ub-applications-table td[data-column="programme"] .line-clamp-2 {
+    -webkit-line-clamp: 2;
   }
 
-  .ub-applications-table td[data-column="programme"] .line-clamp-2 {
-    -webkit-line-clamp: 1;
+  .ub-applications-table td[data-column="status"] .truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .ub-applications-table td[data-column="status"] [data-ub-badge] {
+    max-width: 100%;
+    height: auto;
+    min-height: 20px;
+    white-space: normal;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .ub-applications-table td[data-column="status"] [data-ub-badge-label] {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 

@@ -1,3 +1,4 @@
+import { tableSectionPadding } from "components/ub/recipes";
 import Card from "components/ub/data/cards/Card";
 import React, { useState, useMemo, useEffect } from "react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
@@ -313,7 +314,7 @@ const ModernApplicationsTable = () => {
         />
       </div>
 
-      <div className="border-t border-ub-border p-6">
+      <div className={`border-t border-ub-border ${tableSectionPadding}`}>
         <ApplicationsTable
           rows={paginatedApplications}
           loading={loading}

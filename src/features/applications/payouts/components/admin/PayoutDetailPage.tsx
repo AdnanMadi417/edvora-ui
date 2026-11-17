@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useState } from "react";
@@ -141,7 +142,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             />
           </div>
 
-          <div className="border-t border-ub-border px-6 py-6">
+          <div className={`border-t border-ub-border ${tableSectionPadding}`}>
             <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">Applications covered</h3>
             <DataTable
               caption="Applications covered by this payout"

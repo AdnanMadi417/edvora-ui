@@ -161,6 +161,8 @@ export const modalPanel = "rounded-ub-xl border border-ub-border-overlay bg-ub-m
 export const scrim = "bg-ub-scrim";
 
 /** Data table container (brief §4.6). */
+/** Space around table content: 12px on mobile, 24px from tablet up. */
+export const tableSectionPadding = "p-3 md:p-6";
 export const tableContainer = "overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface";
 export const tableScroll = "overflow-x-auto";
 export const tableHead = "bg-ub-table-head text-ub-label-sm text-ub-text-secondary";

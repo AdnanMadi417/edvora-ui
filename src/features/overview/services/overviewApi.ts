@@ -1,3 +1,4 @@
+import { createDashboardPlans } from "./dashboardPlans";
 import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
 import { isAdvisorAction } from "features/applications/stages";
@@ -392,7 +393,7 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
     for (const hidden of [false, true])
       add({
         id: hidden ? "hiddenPrograms" : "programs",
-        title: hidden ? "Hidden programmes to review" : "Visible programmes",
+        title: hidden ? "Hidden programmes" : "Visible programmes",
         subtitle: hidden
           ? "Review catalogue entries that are hidden from advisors."
           : "Programmes currently available in the catalogue.",
@@ -481,5 +482,5 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
       };
     },
   });
-  return plans;
+  return [...plans, ...createDashboardPlans(context)];
 }

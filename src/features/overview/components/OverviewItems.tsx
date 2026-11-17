@@ -72,7 +72,7 @@ export default function OverviewItems({
         <TaskListItem
           key={item.id}
           icon={
-            resourceId === "active"
+            ["active", "actionRequired"].includes(resourceId)
               ? ClipboardCheck
               : resourceId === "commission"
               ? Wallet

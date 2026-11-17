@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, type ReactNode } from "react";
-import { ClipboardList } from "lucide-react";
+import { ArrowUpRight, ClipboardList } from "lucide-react";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DataTable, {
   type DataTableColumn,
@@ -53,7 +53,7 @@ export interface ApplicationsTableProps {
 
 function StudentCell({ row }: { row: ApplicationListRow }) {
   return (
-    <span className="flex min-w-0 w-full items-center gap-3 py-2">
+    <span className="ub-application-student flex min-w-0 w-full items-center gap-3 py-2">
       <PresignedImage
         fileKey={row.student_photo_file_key ?? undefined}
         alt=""
@@ -63,7 +63,7 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
           <Avatar name={row.student_name ?? "?"} src={src} size={32} alt="" />
         )}
       />
-      <span className="min-w-0">
+      <span className="min-w-0 flex-1">
         <span className="block truncate text-ub-label-md text-ub-text-primary">
           {row.student_name}
         </span>
@@ -72,6 +72,12 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
             {row.passport_number}
           </span>
         )}
+      </span>
+      <span
+        aria-hidden="true"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-ub-full bg-ub-tone-brand-bg text-ub-tone-brand-text md:hidden"
+      >
+        <ArrowUpRight className="h-4 w-4" />
       </span>
     </span>
   );
@@ -110,7 +116,7 @@ export default function ApplicationsTable({
         mobileLabel: "Programme",
         width: ownership === "none" ? "32%" : "24%",
         cell: (r) => (
-          <span className="block min-w-0 w-full">
+          <span className="ub-application-programme block min-w-0 w-full">
             <span
               className="line-clamp-2 text-ub-body-sm text-ub-text-primary"
               title={r.program_name}
@@ -129,13 +135,18 @@ export default function ApplicationsTable({
     if (ownership !== "none") {
       cols.push({
         key: "owner",
-      mobileSecondary: true,
+        mobileSecondary: true,
         width: "18%",
         header:
           ownership === "advisor-and-manager" ? "Advisor / manager" : "Advisor",
         cell: (r) => (
           <span className="block min-w-0 w-full">
-            <span className="block truncate" title={r.partner_name ?? undefined}>{r.partner_name ?? "—"}</span>
+            <span
+              className="block truncate"
+              title={r.partner_name ?? undefined}
+            >
+              {r.partner_name ?? "—"}
+            </span>
             {ownership === "advisor-and-manager" && (
               <span className="block truncate text-ub-caption text-ub-text-tertiary">
                 {r.account_manager_name ?? "No manager"}
@@ -150,12 +161,14 @@ export default function ApplicationsTable({
     cols.push(
       {
         key: "status",
-        mobileSecondary: true,
         width: ownership === "none" ? "28%" : "24%",
         header: "Stage / status",
         cell: (r) => (
-          <span className="flex w-full min-w-0  flex-col items-start gap-1">
-            <span className="block w-full truncate text-ub-caption text-ub-text-tertiary" title={r.stage}>
+          <span className="ub-application-status flex w-full min-w-0 flex-col items-start gap-1">
+            <span
+              className="block w-full truncate text-ub-caption text-ub-text-tertiary"
+              title={r.stage}
+            >
               {r.stage}
             </span>
             <span className="flex w-full min-w-0 flex-wrap items-center gap-1.5">
@@ -177,7 +190,6 @@ export default function ApplicationsTable({
       },
       {
         key: "updated",
-      mobileSecondary: true,
         width: ownership === "none" ? "14%" : "12%",
         header: "Updated",
         cell: (r) => (
@@ -198,9 +210,9 @@ export default function ApplicationsTable({
     <>
       <DataTable<ApplicationListRow>
         className="ub-applications-table"
-        // Phones show compact summaries; other fields remain on the detail page.
+        // Phones use separate cards with student identity, programme, status and recency.
         mobileLayout="stacked"
-        scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
+        scrollClassName="max-h-none overflow-y-visible md:max-h-[65dvh] md:overflow-y-auto md:overscroll-contain"
         caption="Applications"
         columns={columns}
         rows={rows}

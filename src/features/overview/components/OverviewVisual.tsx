@@ -4,7 +4,7 @@ import { RefreshCw } from "lucide-react";
 import GaugeCard from "components/ub/dashboard/cards/GaugeCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
-import PipelineFlow from "components/ub/dashboard/pipeline/PipelineFlow";
+import CategoryColumnChart from "components/ub/dashboard/charts/CategoryColumnChart";
 import type {
   OverviewResource,
   OverviewRole,
@@ -32,6 +32,7 @@ export default function OverviewVisual({
         : resource?.state ?? "loading";
     return (
       <DashboardCard
+        className="h-full"
         title={pipeline.title}
         subtitle={pipeline.subtitle}
         as="h2"
@@ -41,27 +42,81 @@ export default function OverviewVisual({
         errorMessage={resource?.error}
         onRetry={onRetry}
         actions={
-          <CardLinkButton href={pipeline.href} label="Open application tracker" />
+          <CardLinkButton
+            href={pipeline.href}
+            label="Open application tracker"
+          />
         }
       >
-        <p className="mb-1 text-ub-caption text-ub-text-tertiary sm:hidden">
-          Scroll horizontally to see all stages.
-        </p>
-        <PipelineFlow
-          stages={distribution.map((stage) => ({
-            id: stage.key,
+        <CategoryColumnChart
+          data={distribution.map((stage) => ({
+            key: stage.key,
             label: stage.label,
-            count: stage.value,
-            stageId: stage.stageId,
+            value: stage.value,
           }))}
+          label="Applications by stage"
+          unit="applications"
+          heightClass="h-52"
         />
       </DashboardCard>
     );
   }
-  // Data entry's visible/hidden split is already in the cards above; no chart.
-  if (role === "data_entry") return null;
+  if (role === "data_entry") {
+    const inputs = [
+      resources.programs,
+      resources.hiddenPrograms,
+      resources.catalogueQuality,
+    ];
+    const error = inputs.find((resource) => resource?.state === "error");
+    const loading = inputs.some(
+      (resource) => !resource || resource.state === "loading"
+    );
+    const total =
+      (resources.programs?.data?.total || 0) +
+      (resources.hiddenPrograms?.data?.total || 0);
+    const issues = resources.catalogueQuality?.data?.total || 0;
+    const invalid = issues > total;
+    const state: WidgetState =
+      error || invalid
+        ? "error"
+        : loading
+        ? "loading"
+        : !total
+        ? "empty"
+        : "ready";
+    const complete = Math.max(0, total - issues);
+    const percent = total ? Math.round((complete / total) * 100) : 0;
+    return (
+      <GaugeCard
+        title="Catalogue completeness"
+        subtitle="Required program fields and delivery mode."
+        as="h2"
+        className="h-full"
+        state={state}
+        emptyMessage="Add programs to see catalogue completeness."
+        errorMessage={
+          error?.error ||
+          (invalid ? "Catalogue counts changed. Try again." : undefined)
+        }
+        onRetry={onRetry}
+        stats={[
+          { label: "Complete", value: complete.toLocaleString() },
+          { label: "Needs attention", value: issues.toLocaleString() },
+        ]}
+        segments={[
+          { label: "Complete", value: percent, color: "cat-1" },
+          { label: "Needs attention", value: 100 - percent, color: "cat-2" },
+        ]}
+        label="Required program information"
+        centerLabel={`${percent}%`}
+        centerCaption="complete"
+      />
+    );
+  }
   const values = [resources.verified, resources.reviews];
-  const [verified, awaiting] = values.map((resource) => resource?.data?.total ?? 0);
+  const [verified, awaiting] = values.map(
+    (resource) => resource?.data?.total ?? 0
+  );
   const total = verified + awaiting;
   const error = values.find((resource) => resource?.state === "error");
   const state: WidgetState = error
@@ -87,12 +142,23 @@ export default function OverviewVisual({
       ]}
       menu={{
         label: "Chart options",
-        extraItems: [{ label: "Refresh data", icon: RefreshCw, onClick: onRetry }],
+        extraItems: [
+          { label: "Refresh data", icon: RefreshCw, onClick: onRetry },
+        ],
       }}
-      actions={<CardLinkButton href="/reviewer/advisors" label="Open advisor directory" />}
+      actions={
+        <CardLinkButton
+          href="/reviewer/advisors"
+          label="Open advisor directory"
+        />
+      }
       segments={[
         { label: "Verified", value: percent, color: "cat-1" as const },
-        { label: "Awaiting review", value: 100 - percent, color: "cat-2" as const },
+        {
+          label: "Awaiting review",
+          value: 100 - percent,
+          color: "cat-2" as const,
+        },
       ]}
       label="Advisor verification status"
       centerLabel={`${percent}%`}

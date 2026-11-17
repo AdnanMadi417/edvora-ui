@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import { WORKSPACE_EVENT } from "features/language-centre-admin/services/centreWorkspace";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -359,7 +360,7 @@ export default function LanguageCentersDirectory({
           className="!mb-0"
         />
       </div>
-      <div className={readOnly ? "p-3 md:p-5" : "p-3 md:p-6"}>
+      <div className={tableSectionPadding}>
         {readOnly ? (
           loading || universitiesLoading ? (
             <Loading text="Loading language centres…" />

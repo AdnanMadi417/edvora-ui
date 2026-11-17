@@ -25,6 +25,8 @@ export interface OverviewItem {
   statusLabel?: string;
 }
 export interface OverviewData {
+  universityCommission?: import("./dashboardData").UniversityCommission[];
+  universities?: { id: string; name: string; logo_file_key?: string }[];
   total: number;
   items: OverviewItem[];
   distribution?: {

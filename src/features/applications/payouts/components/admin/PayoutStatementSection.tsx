@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useMemo, useState } from "react";
 import { Receipt, Eye, Download, Ban } from "lucide-react";
@@ -161,7 +162,7 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
   ];
 
   return (
-    <div className="p-6">
+    <div className={tableSectionPadding}>
       <DataTableToolbar search={{ value: searchTerm, onChange: setSearchTerm, placeholder: "Search by bank reference or student..." }} />
 
       <DataTable<PayoutStatementItem>

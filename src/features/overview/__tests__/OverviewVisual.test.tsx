@@ -51,16 +51,26 @@ test("failed chart source exposes retry instead of a misleading percentage", () 
   expect(screen.getByRole("alert")).toHaveTextContent("Could not load reviews");
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
 });
-test("data entry has no chart, since the cards already show visible and hidden", () => {
-  const { container } = render(
+test("data entry charts required-field completeness, independently of hidden state", () => {
+  render(
     <OverviewVisual
       role="data_entry"
-      resources={{ programs: ready(26), hiddenPrograms: ready(2) }}
+      resources={{
+        programs: ready(26),
+        hiddenPrograms: ready(2),
+        catalogueQuality: ready(7),
+      }}
       plans={[]}
       onRetry={retry}
     />
   );
-  expect(container).toBeEmptyDOMElement();
+  expect(
+    screen.getByRole("img", {
+      name: "Required program information: Complete 75%, Needs attention 25%",
+    })
+  ).toBeInTheDocument();
+  expect(screen.getByText("21")).toBeInTheDocument();
+  expect(screen.getByText("7")).toBeInTheDocument();
 });
 test("pipeline displays API counts and stage names", () => {
   const plan = {

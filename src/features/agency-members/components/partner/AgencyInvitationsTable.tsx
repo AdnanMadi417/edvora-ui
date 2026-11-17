@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -260,7 +261,7 @@ export default function AgencyInvitationsTable() {
       </div>
 
       {/* Table */}
-      <div className="p-6">
+      <div className={tableSectionPadding}>
         <TableWrapper
           scrollLabel="Scroll to see all columns and rows"
           footer={

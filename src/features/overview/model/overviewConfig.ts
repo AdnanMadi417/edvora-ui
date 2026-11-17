@@ -38,8 +38,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
-        metrics: ["active", "hold", "reviews", "commission"],
-        panels: ["active", "reviews", "commission"],
+        metrics: ["actionRequired", "active", "reviews", "commission"],
+        panels: ["actionRequired", "reviews", "commission"],
         actions: [
           action(
             "Review applications",
@@ -64,8 +64,8 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your work overview",
         subtitle:
           "Follow up on applications and support your assigned advisors.",
-        metrics: ["active", "hold", "advisors", "unread"],
-        panels: ["active", "advisors"],
+        metrics: ["actionRequired", "active", "hold", "advisors"],
+        panels: ["actionRequired", "hold", "advisors"],
         actions: [
           action(
             "Application tracker",
@@ -88,7 +88,7 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Review overview",
         subtitle: "Review advisor profiles and monitor registration progress.",
-        metrics: ["reviews", "registrations", "advisors", "managers"],
+        metrics: ["reviews", "registrations", "verified", "managers"],
         panels: ["reviews", "registrations"],
         actions: [
           action(
@@ -112,8 +112,13 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Catalogue overview",
         subtitle: "Maintain accurate programmes and institution information.",
-        metrics: ["programs", "hiddenPrograms", "institutions", "unread"],
-        panels: ["hiddenPrograms", "programs"],
+        metrics: [
+          "catalogueQuality",
+          "programs",
+          "institutions",
+          "languageCenters",
+        ],
+        panels: ["catalogueQuality", "hiddenPrograms", "languageCenters"],
         actions: [
           action(
             "Create programme",
@@ -124,6 +129,11 @@ export function overviewConfig(context: OverviewContext) {
             "Add institution",
             "/universities/create",
             "Register a university"
+          ),
+          action(
+            "Language centers",
+            "/language-centers",
+            "Maintain center information"
           ),
           action(
             "Manage programmes",
@@ -142,15 +152,12 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your advisor overview",
         subtitle: "Stay on top of your students, applications and next steps.",
         metrics: [
+          "actionRequired",
           "active",
-          "hold",
-          "unread",
+          "offers",
           ...(context.canViewCommission ? ["commission"] : []),
         ],
-        panels: [
-          "active",
-          ...(context.canViewCommission ? ["commission"] : []),
-        ],
+        panels: ["actionRequired", "hold"],
         actions: [
           ...(context.canCreateApplication
             ? [
@@ -171,6 +178,11 @@ export function overviewConfig(context: OverviewContext) {
             "/knowledge-hub",
             "Find the right course"
           ),
+          action(
+            "Explore language centers",
+            "/language-centers",
+            "Find university language pathways"
+          ),
           ...(context.agencyAdmin
             ? [
                 action(
@@ -185,6 +197,11 @@ export function overviewConfig(context: OverviewContext) {
   }
 }
 export const metricIcons = {
+  offers: ClipboardList,
+  actionRequired: ClipboardList,
+  catalogueQuality: BookOpen,
+  languageCenters: Building2,
+  verified: Handshake,
   active: ClipboardList,
   hold: Clock3,
   reviews: Handshake,
@@ -198,6 +215,11 @@ export const metricIcons = {
   unread: Bell,
 };
 export const metricLabels: Record<string, string> = {
+  offers: "In offer stage",
+  actionRequired: "Action required",
+  catalogueQuality: "Records to complete",
+  languageCenters: "Language centers",
+  verified: "Verified advisors",
   active: "Active applications",
   hold: "Applications on hold",
   reviews: "Advisors awaiting review",
@@ -212,6 +234,11 @@ export const metricLabels: Record<string, string> = {
 };
 
 export const metricCaptions: Record<string, string> = {
+  offers: "Active applications in the offer-letter stage",
+  actionRequired: "Applications waiting for the next step",
+  catalogueQuality: "Programs missing required information",
+  languageCenters: "Centers in the institution catalogue",
+  verified: "Profiles that have completed verification",
   active: "Applications currently in progress",
   hold: "Paused applications to follow up",
   reviews: "Unverified advisor profiles",

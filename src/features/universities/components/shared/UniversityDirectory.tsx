@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import { useMemo, useState } from "react";
 import { GraduationCap, AlertTriangle } from "lucide-react";
@@ -172,7 +173,7 @@ export default function UniversityDirectory({
           showVisibility={canManage}
         />
       </div>
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         {canManage ? (
           <UniversitiesDataTable
             universities={sorted.slice(

@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -204,7 +205,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
         </div>
       </div>
 
-      <div className="p-6">
+      <div className={tableSectionPadding}>
         <TableWrapper
           scrollLabel="Scroll to see all columns and rows"
           footer={

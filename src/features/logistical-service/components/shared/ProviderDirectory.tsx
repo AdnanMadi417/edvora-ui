@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -214,7 +215,7 @@ export default function ProviderDirectory({
           resultLabel={`${matching.length} providers`}
         />
       </div>
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         <DataTable
           columns={columns}
           rows={rows}

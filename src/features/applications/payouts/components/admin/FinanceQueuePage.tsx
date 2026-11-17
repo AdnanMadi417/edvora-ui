@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -540,7 +541,7 @@ export default function FinanceQueuePage() {
         </div>
       </Drawer>
       {/* Table */}
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         <DataTable<CommissionQueueItem>
           caption="Finance queue"
           columns={columns}

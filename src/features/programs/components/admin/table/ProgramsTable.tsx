@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useState, useMemo } from "react";
 import {
@@ -353,7 +354,7 @@ const ProgramsTable = () => {
 
       <div>
 
-        <div className="min-w-0 p-3 sm:p-6">
+        <div className={`min-w-0 ${tableSectionPadding}`}>
 
           <KnowledgeHubTable
             basePath="/admin"

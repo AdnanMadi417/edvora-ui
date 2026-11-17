@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal, ClipboardList } from "lucide-react";
@@ -137,7 +138,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
         </div>
       </div>
 
-      <div className="p-6">
+      <div className={tableSectionPadding}>
         <TableWrapper
           scrollLabel="Scroll to see all columns and rows"
           footer={

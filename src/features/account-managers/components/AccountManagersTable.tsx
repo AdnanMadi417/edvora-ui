@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -356,7 +357,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
           />
         </label>
       </Drawer>
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         <DataTable
           caption="Account managers"
           columns={readOnly ? columns.filter((column) => column.key !== "actions") : columns}

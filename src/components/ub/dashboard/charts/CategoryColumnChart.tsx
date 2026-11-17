@@ -47,7 +47,7 @@ export default function CategoryColumnChart({ data, highlightKey, formatValue = 
               <span aria-hidden="true" className={clsx("ub-tabular mb-1.5 whitespace-nowrap rounded-ub-full border px-2 py-0.5 text-ub-label-sm", active ? "border-transparent bg-ub-tooltip text-ub-text-on-action" : "border-ub-border bg-ub-surface text-ub-text-primary")}>
                 {text}
               </span>
-              <span aria-hidden="true" className={clsx("w-full max-w-10 rounded-t-ub-md transition-[height,background-color] duration-ub-slow ease-ub-standard motion-reduce:transition-none", active ? "bg-ub-chart-cat-1" : "bg-ub-chart-muted")} style={{ height: `${Math.max(4, (d.value / max) * 100)}%` }} />
+              <span aria-hidden="true" className={clsx("w-full max-w-10 rounded-t-ub-md transition-[height,background-color] duration-ub-slow ease-ub-standard motion-reduce:transition-none", active ? "bg-ub-chart-cat-1" : "bg-ub-chart-muted")} style={{ height: `${d.value === 0 ? 0 : Math.max(4, (d.value / max) * 100)}%` }} />
             </li>
           );
         })}

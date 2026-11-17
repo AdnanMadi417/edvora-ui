@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import DataTable, {
   type DataTableColumn,
 } from "components/ub/data/tables/DataTable";
@@ -436,7 +437,7 @@ export default function PendingRegistrationOtpsTable() {
           />
         </div>
       </Drawer>
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         <DataTable
           columns={columns}
           rows={items}

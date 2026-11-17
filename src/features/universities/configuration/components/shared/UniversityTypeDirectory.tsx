@@ -1,4 +1,5 @@
 "use client";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -221,7 +222,7 @@ export default function UniversityTypeDirectory({
           }
         />
       </div>
-      <div className="min-w-0 p-3 sm:p-6">
+      <div className={`min-w-0 ${tableSectionPadding}`}>
         <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
           Swipe across for more columns. Scroll within the table for more types.
         </p>
