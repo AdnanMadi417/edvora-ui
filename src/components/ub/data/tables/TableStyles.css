@@ -63,65 +63,179 @@ table [data-ub-badge-label] {
 }
 
 @media (max-width: 767px) {
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] tbody > tr:has(td[data-column]),
+  .ub-table-container:has(
+      table[data-mobile-layout="stacked"],
+      table.ub-legacy-table
+    ) {
+    border: 1px solid var(--ub-border-default);
+    border-radius: 16px;
+    background: var(--ub-bg-surface-subtle);
+  }
+
+  .ub-table-container:has(
+      table[data-mobile-layout="stacked"],
+      table.ub-legacy-table
+    )
+    > .ub-table-content
+    > .ub-table-scroll {
+    padding: 8px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .ub-data-table table[data-mobile-layout="stacked"],
+  .ub-legacy-table {
+    padding: 0;
+    background: transparent;
+  }
+
+  .ub-data-table table[data-mobile-layout="stacked"] tbody,
+  .ub-legacy-table tbody {
+    display: grid;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .ub-data-table table[data-mobile-layout="stacked"] thead {
+    border-radius: 8px;
+    background: transparent;
+  }
+
+  .ub-data-table
+    table[data-mobile-layout="stacked"]
+    thead:has(input[type="checkbox"]) {
+    margin-bottom: 8px;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tbody
+    > tr:has(td[data-column]),
   .ub-legacy-table tbody > tr:has(td[data-label]) {
     display: grid;
     position: relative;
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
-    padding: 12px;
+    gap: 12px;
+    height: auto;
+    padding: 14px;
+    border: 1px solid var(--ub-border-default);
+    border-radius: 12px;
+    background: var(--ub-bg-surface);
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"][data-selectable] tbody > tr:has(td[data-column]) {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"][data-selectable]
+    tbody
+    > tr:has(td[data-column]) {
     grid-template-columns: 24px minmax(0, 1fr);
     column-gap: 8px;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-column] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column] {
     min-width: 0;
     padding: 0;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"][data-selectable] td[data-column] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"][data-selectable]
+    td[data-column] {
     grid-column: 2;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"][data-selectable] tbody > tr > td:first-child {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"][data-selectable]
+    tbody
+    > tr
+    > td:first-child {
     grid-column: 1;
     grid-row: 1;
     align-self: center;
     padding: 0;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-primary] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-primary] {
     grid-row: 1;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-primary] > span[aria-hidden] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-primary]
+    > span[aria-hidden] {
     display: none;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-column] > span:last-child {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]
+    > span:last-child {
     flex: 1;
     text-align: start;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-mobile-secondary] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]
+    > span:first-child[aria-hidden] {
+    font-size: 11px;
+    line-height: 17px;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-primary] {
+    font-weight: 500;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]
+    [data-ub-badge],
+  .ub-legacy-table td[data-label] [data-ub-badge] {
+    height: auto;
+    min-height: 20px;
+    white-space: normal;
+    padding-block: 2px;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    [data-ub-badge-label],
+  .ub-legacy-table [data-ub-badge-label] {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-mobile-secondary] {
     display: none;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] tr:has(td[data-column]:has([data-row-action])) td[data-primary] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tr:has([data-row-action])
+    td[data-primary] {
     padding-inline-end: 48px;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-column]:has([data-row-action]) {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]:has([data-row-action]) {
     position: absolute;
     inset-inline-end: 12px;
     top: 12px;
     width: 40px;
   }
 
-  .ub-data-table table[data-layout="table"][data-mobile-layout="stacked"] td[data-column]:has([data-row-action]) > span[aria-hidden] {
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]:has([data-row-action])
+    > span[aria-hidden] {
     display: none;
   }
 
@@ -181,5 +295,92 @@ table [data-ub-badge-label] {
     grid-column: 2;
     min-width: 0;
     max-width: 100%;
+  }
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tr:has(td[data-column="actions"]:not([data-mobile-secondary]))
+    td[data-primary],
+  .ub-legacy-table tr:has([data-row-action]) td[data-primary] {
+    padding-inline-end: 48px;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="actions"]:not([data-mobile-secondary]),
+  .ub-legacy-table td:has([data-row-action]) {
+    display: block;
+    position: absolute;
+    inset-inline-end: 10px;
+    top: 12px;
+    width: 40px;
+    padding: 0;
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="actions"]
+    > span:first-child[aria-hidden],
+  .ub-legacy-table td:has([data-row-action])::before {
+    display: none;
+  }
+
+  .ub-legacy-table td[data-primary] > * {
+    width: 100%;
+  }
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    tbody
+    > tr[data-selected] {
+    border-color: var(--ub-border-focus);
+    background: var(--ub-bg-selected);
+  }
+
+  .ub-data-table
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column="actions"]:not(:has(button, a)),
+  .ub-legacy-table td[data-label="Actions"]:not(:has(button, a)) {
+    display: none;
+  }
+
+  .ub-table-container .ub-legacy-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+}
+
+/* Phone cards: one label column for every table, so values line up from row
+   to row and from table to table. Applications keeps its own card layout. */
+@media (max-width: 767px) {
+  .ub-data-table:not(.ub-applications-table)
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]:not([data-primary]):not([data-column="actions"]):not([data-mobile-secondary]) {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 8px;
+  }
+
+  .ub-data-table:not(.ub-applications-table)
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]:not([data-primary])
+    > span:first-child[aria-hidden],
+  .ub-legacy-table td[data-label]::before {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--ub-text-tertiary);
+  }
+
+  .ub-legacy-table td[data-label] {
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  /* Chips and short values keep their own width instead of stretching. */
+  .ub-legacy-table td[data-label] > *,
+  .ub-data-table:not(.ub-applications-table)
+    table[data-layout="table"][data-mobile-layout="stacked"]
+    td[data-column]
+    > span:last-child {
+    justify-self: start;
   }
 }

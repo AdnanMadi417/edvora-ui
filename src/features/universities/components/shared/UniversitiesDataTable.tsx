@@ -85,7 +85,6 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "university_type_name",
-      mobileSecondary: true,
       header: "University type",
       sortable: true,
       cell: (university) => (
@@ -123,7 +122,6 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "is_active",
-      mobileSecondary: true,
       header: "Status",
       sortable: true,
       cell: (university) => (

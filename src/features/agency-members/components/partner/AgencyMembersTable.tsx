@@ -388,7 +388,7 @@ export default function AgencyMembersTable({
                         )}
                       </td>
 
-                      <td data-label="Status" data-mobile-secondary className="px-6 py-4">
+                      <td data-label="Status" className="px-6 py-4">
                         {member.is_active ? (
                           <StatusBadge
                             variant="success"

@@ -209,7 +209,6 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "advisors",
-      mobileSecondary: true,
       header: "Assigned advisors",
       cell: (m) => (
         <div className="flex flex-wrap gap-2">
@@ -231,7 +230,6 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     },
     {
       key: "status",
-      mobileSecondary: true,
       header: "Status",
       cell: (m) => (
         <StatusBadge variant={m.is_active ? "success" : "neutral"}>

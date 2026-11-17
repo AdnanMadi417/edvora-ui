@@ -126,7 +126,6 @@ export default function ProviderDirectory({
     },
     {
       key: "is_active",
-      mobileSecondary: true,
       header: "Status",
       cell: (provider) => (
         <Tag hue={provider.is_active ? "teal" : "grey"}>

@@ -71,7 +71,6 @@ export default function PaymentMethodsDirectory({
     },
     {
       key: "description",
-      mobileSecondary: true,
       header: "Description",
       sortable: true,
       sortValue: (method) => descriptionText(method.description),

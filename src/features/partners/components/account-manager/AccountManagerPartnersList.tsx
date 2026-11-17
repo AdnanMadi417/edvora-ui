@@ -118,7 +118,6 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "2",
-      mobileSecondary: true,
       header: "Applications",
       cell: (partner) => (
         <>
@@ -130,7 +129,6 @@ export default function AccountManagerPartnersList() {
     },
     {
       key: "3",
-      mobileSecondary: true,
       header: "Status",
       cell: (partner) => (
         <>

@@ -167,7 +167,6 @@ export default function StaffUsersTable() {
     },
     {
       key: "status",
-      mobileSecondary: true,
       header: "Status",
       cell: (user) => (
         <StatusBadge variant={user.is_active ? "success" : "neutral"}>

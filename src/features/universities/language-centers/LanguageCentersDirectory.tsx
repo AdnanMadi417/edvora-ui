@@ -199,7 +199,6 @@ export default function LanguageCentersDirectory({
       key: "is_active",
       header: "Status",
       width: "100px",
-      mobileSecondary: true,
       cell: (center) => (
         <Tag hue={center.is_active ? "teal" : "grey"}>
           {center.is_active ? "Active" : "Inactive"}

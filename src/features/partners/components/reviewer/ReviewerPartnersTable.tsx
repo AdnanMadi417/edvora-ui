@@ -283,7 +283,6 @@ export default function ReviewerPartnersTable() {
     },
     {
       key: "2",
-      mobileSecondary: true,
       header: "Assigned manager",
       cell: (partner) => (
         <>
@@ -297,7 +296,6 @@ export default function ReviewerPartnersTable() {
     },
     {
       key: "3",
-      mobileSecondary: true,
       header: "Status",
       cell: (partner) => (
         <>

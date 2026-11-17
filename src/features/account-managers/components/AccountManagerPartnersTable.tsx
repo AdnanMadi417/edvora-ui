@@ -296,7 +296,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                     <div className="truncate text-xs text-ub-text-secondary">{partner.email || "—"}</div>
                   </td>
 
-                  <td data-label="Status" data-mobile-secondary className="px-6 py-4">
+                  <td data-label="Status" className="px-6 py-4">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {partner.is_active ? (
                         <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>

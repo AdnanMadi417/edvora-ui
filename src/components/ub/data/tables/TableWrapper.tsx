@@ -19,7 +19,12 @@ interface TableWrapperProps {
  * side has more columns. Scroll edges are tracked in logical terms so the
  * hints sit on the correct side in RTL.
  */
-export default function TableWrapper({ children, footer, scrollClassName, scrollLabel }: TableWrapperProps) {
+export default function TableWrapper({
+  children,
+  footer,
+  scrollClassName,
+  scrollLabel,
+}: TableWrapperProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollStart, setCanScrollStart] = useState(false);
   const [canScrollEnd, setCanScrollEnd] = useState(false);
@@ -27,7 +32,15 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
     const el = scrollRef.current;
     if (!el) return;
     const rtl = getComputedStyle(el).direction === "rtl";
-    el.scrollBy({ left: (forward ? 1 : -1) * (rtl ? -1 : 1) * Math.max(160, el.clientWidth * 0.75), behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    el.scrollBy({
+      left:
+        (forward ? 1 : -1) *
+        (rtl ? -1 : 1) *
+        Math.max(160, el.clientWidth * 0.75),
+      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
   };
 
   useEffect(() => {
@@ -43,7 +56,10 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
 
     updateScrollState();
     el.addEventListener("scroll", updateScrollState);
-    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateScrollState);
+    const resizeObserver =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(updateScrollState);
     resizeObserver?.observe(el);
     window.addEventListener("resize", updateScrollState);
 
@@ -55,9 +71,23 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
   }, [children]);
 
   return (
-    <div className={`min-w-0 max-w-full ${tableContainer}`}>
-      <div className="relative">
-        <div ref={scrollRef} style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y pinch-zoom", overscrollBehaviorY: "auto" }} className={`${tableScroll} ${scrollClassName ?? "max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
+    <div className={`ub-table-container min-w-0 max-w-full ${tableContainer}`}>
+      <div className="ub-table-content relative">
+        <div
+          ref={scrollRef}
+          style={{
+            WebkitOverflowScrolling: "touch",
+            touchAction: "pan-x pan-y pinch-zoom",
+            overscrollBehaviorY: "auto",
+          }}
+          className={`ub-table-scroll ${tableScroll} ${
+            scrollClassName ??
+            "max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
+          }`}
+          role={scrollLabel ? "region" : undefined}
+          aria-label={scrollLabel}
+          tabIndex={scrollLabel ? 0 : undefined}
+        >
           {children}
         </div>
         {canScrollStart && (
@@ -75,10 +105,29 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
       </div>
       {(canScrollStart || canScrollEnd) && (
         <div className="flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-3 py-2">
-          <span className="text-ub-caption text-ub-text-tertiary">More columns <span className="hidden sm:inline">— scroll horizontally</span></span>
+          <span className="text-ub-caption text-ub-text-tertiary">
+            More columns{" "}
+            <span className="hidden sm:inline">— scroll horizontally</span>
+          </span>
           <div className="flex gap-1">
-            <button type="button" aria-label="Scroll to previous columns" disabled={!canScrollStart} onClick={() => move(false)} className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
-            <button type="button" aria-label="Scroll to next columns" disabled={!canScrollEnd} onClick={() => move(true)} className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
+            <button
+              type="button"
+              aria-label="Scroll to previous columns"
+              disabled={!canScrollStart}
+              onClick={() => move(false)}
+              className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}
+            >
+              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+            </button>
+            <button
+              type="button"
+              aria-label="Scroll to next columns"
+              disabled={!canScrollEnd}
+              onClick={() => move(true)}
+              className={`grid h-10 w-10 place-items-center rounded-ub-md border border-ub-border bg-ub-surface text-ub-text-primary hover:bg-ub-action-secondary-hover disabled:opacity-40 ${focusRing}`}
+            >
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+            </button>
           </div>
         </div>
       )}

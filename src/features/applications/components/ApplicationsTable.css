@@ -1,35 +1,4 @@
 @media (max-width: 767px) {
-  .ub-applications-table > div {
-    border: 1px solid var(--ub-border-default);
-    border-radius: 16px;
-    background: var(--ub-bg-surface-subtle);
-    overflow: hidden;
-  }
-
-  .ub-applications-table table[data-mobile-layout="stacked"] {
-    padding: 8px;
-  }
-
-  .ub-data-table.ub-applications-table
-    table[data-layout="table"][data-mobile-layout="stacked"]
-    tbody {
-    display: grid;
-    gap: 12px;
-  }
-
-  .ub-data-table.ub-applications-table
-    table[data-layout="table"][data-mobile-layout="stacked"]
-    tbody
-    > tr:has(td[data-column]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-    padding: 14px;
-    border: 1px solid var(--ub-border-default);
-    border-radius: 12px;
-    background: var(--ub-bg-surface);
-  }
-
   .ub-data-table.ub-applications-table
     table[data-layout="table"][data-mobile-layout="stacked"]
     td[data-column] {

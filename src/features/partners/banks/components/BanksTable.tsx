@@ -123,7 +123,6 @@ export default function BanksTable({
     },
     {
       key: "is_active",
-      mobileSecondary: true,
       header: "Status",
       cell: (bank) => (
         <Tag hue={bank.is_active ? "teal" : "grey"}>

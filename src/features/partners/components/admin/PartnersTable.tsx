@@ -391,7 +391,6 @@ export default function PartnersTable() {
     },
     {
       key: "2",
-      mobileSecondary: true,
       header: "Assigned manager",
       cell: (partner) => (
         <>
@@ -405,7 +404,6 @@ export default function PartnersTable() {
     },
     {
       key: "3",
-      mobileSecondary: true,
       header: "Status",
       cell: (partner) => (
         <>

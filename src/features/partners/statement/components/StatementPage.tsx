@@ -172,7 +172,6 @@ export default function StatementPage() {
     },
     {
       key: "status",
-      mobileSecondary: true,
       header: "Status",
       cell: (item) => (
         <span className="flex max-w-[220px] flex-col items-start gap-1">

@@ -80,7 +80,6 @@ export default function FieldsOfStudyDirectory({
     },
     {
       key: "code",
-      mobileSecondary: true,
       header: "Code",
       sortable: true,
       cell: (field) => (
@@ -89,7 +88,6 @@ export default function FieldsOfStudyDirectory({
     },
     {
       key: "is_active",
-      mobileSecondary: true,
       header: "Status",
       cell: (field) => (
         <Tag hue={field.is_active ? "teal" : "grey"}>

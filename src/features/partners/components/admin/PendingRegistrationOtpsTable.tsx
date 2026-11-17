@@ -242,7 +242,6 @@ export default function PendingRegistrationOtpsTable() {
     },
     {
       key: "Status",
-      mobileSecondary: true,
       header: "Status",
       cell: (row) => {
         const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
@@ -278,7 +277,6 @@ export default function PendingRegistrationOtpsTable() {
     },
     {
       key: "Expires",
-      mobileSecondary: true,
       header: "Expires",
       cell: (row) => {
         const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;

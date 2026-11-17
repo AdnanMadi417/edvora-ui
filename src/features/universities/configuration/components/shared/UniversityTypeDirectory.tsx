@@ -73,7 +73,6 @@ export default function UniversityTypeDirectory({
     },
     {
       key: "required",
-      mobileSecondary: true,
       header: "Required fields",
       sortable: true,
       sortValue: requiredCount,
