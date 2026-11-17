@@ -56,7 +56,7 @@ export default function UniversityTypeDirectory({
       width: "320px",
       sortable: true,
       cell: (type) => (
-        <div className="min-w-[220px] max-w-[340px] space-y-2 py-3">
+        <div className="min-w-0 max-w-[340px] space-y-2 md:min-w-[220px] md:py-3">
           <p
             className="line-clamp-2 break-words text-ub-label-md text-ub-text-primary"
             title={type.name}

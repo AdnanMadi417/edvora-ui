@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { focusRing } from "components/ub/recipes";
+import { focusRing, buttonBase, buttonVariants } from "components/ub/recipes";
 import { getPageRange } from "components/ub/navigation/controls/Pagination";
 
 interface TablePaginationProps {
@@ -13,7 +13,9 @@ interface TablePaginationProps {
   loading?: boolean;
 }
 
-const pageButton = `inline-flex h-10 min-w-10 shrink-0 items-center justify-center rounded-ub-md px-2 text-ub-label-sm transition-colors hover:bg-ub-action-secondary-hover disabled:pointer-events-none disabled:opacity-40 ${focusRing}`;
+const pageButton = `inline-flex h-10 min-w-10 shrink-0 items-center justify-center rounded-ub-full px-2 text-ub-label-sm transition-colors hover:bg-ub-action-secondary-hover disabled:pointer-events-none disabled:opacity-40 ${focusRing}`;
+// Previous / next: the brand's secondary pill as a circle (blue outline), 44px on phones.
+const navButton = `${buttonBase} ${buttonVariants.secondary} h-11 w-11 shrink-0 p-0 md:h-10 md:w-10 disabled:pointer-events-none disabled:opacity-40`;
 
 export default function TablePagination({
   currentPage,
@@ -26,7 +28,7 @@ export default function TablePagination({
   const totalPages = Math.max(Math.ceil(totalCount / itemsPerPage), 1);
 
   return (
-    <div className="flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-4 py-3 text-ub-body-sm text-ub-text-secondary md:px-6">
+    <div className="ub-table-pagination flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-4 py-3 text-ub-body-sm text-ub-text-secondary max-md:border-t-0 max-md:bg-transparent max-md:px-1 md:px-6">
       <span className="ub-tabular hidden shrink-0 md:inline" role="status">
         {loading ? "Updating results…" : (
           <>
@@ -38,7 +40,7 @@ export default function TablePagination({
       <nav aria-label="Pagination" aria-busy={loading || undefined} className="ub-tabular flex w-full items-center justify-between gap-2 md:w-auto md:justify-end">
         <button
           type="button"
-          className={`${pageButton} border border-ub-border bg-ub-surface text-ub-text-primary`}
+          className={navButton}
           onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
           disabled={loading || currentPage <= 1}
           aria-label="Previous page"
@@ -70,7 +72,7 @@ export default function TablePagination({
         </span>
         <button
           type="button"
-          className={`${pageButton} border border-ub-border bg-ub-surface text-ub-text-primary`}
+          className={navButton}
           onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
           disabled={loading || currentPage >= totalPages}
           aria-label="Next page"

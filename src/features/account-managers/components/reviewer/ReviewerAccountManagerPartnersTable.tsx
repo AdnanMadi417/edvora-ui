@@ -20,6 +20,7 @@ import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -232,7 +233,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                           fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                           alt={partner.name}
                           className="h-full w-full object-cover"
-                          fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                          fallback={partner.name ? getInitials(partner.name) : "NA"}
                         />
                         <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"}`} />
                       </div>

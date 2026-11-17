@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
+import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -48,6 +48,7 @@ import { parseApiError } from "utils/parseApiError";
 import SuspendReactivateMemberModal from "./SuspendReactivateMemberModal";
 import EditMemberCommissionModal from "./EditMemberCommissionModal";
 import FilterButton from "components/ub/core/buttons/FilterButton";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -339,8 +340,8 @@ export default function AgencyMembersTable({
                     >
                       <td data-label="Name" data-primary className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
-                            {member.name?.slice(0, 2).toUpperCase() ?? "?"}
+                          <div aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
+                            {getInitials(member.name ?? "") || "?"}
                           </div>
                           <div className="min-w-0">
                             <div className="truncate text-sm font-medium text-ub-text-primary">

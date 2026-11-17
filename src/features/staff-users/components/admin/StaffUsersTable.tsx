@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
+import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -39,6 +39,7 @@ import InviteStaffUserModal from "./InviteStaffUserModal";
 import ResendStaffInvitationOtpModal from "./ResendStaffInvitationOtpModal";
 import FilterButton from "components/ub/core/buttons/FilterButton";
 import { FEATURES } from "config/featureFlags";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -138,8 +139,8 @@ export default function StaffUsersTable() {
       header: "Staff user",
       cell: (user) => (
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg text-ub-tone-brand-text">
-            {user.name?.slice(0, 2).toUpperCase() || "?"}
+          <span aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
+            {getInitials(user.name ?? "") || "?"}
           </span>
           <span
             className="line-clamp-2 break-words font-medium"

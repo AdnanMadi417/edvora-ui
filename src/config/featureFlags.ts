@@ -28,7 +28,8 @@ export const FEATURES = {
 
   /** OFF unless NEXT_PUBLIC_ENABLE_LANGUAGE_CENTRE_ADMINS is "true". The admin
    *  Language Centre Admins page (/admin/language-centre-admins), its link on
-   *  Staff users and the "Language Centre Admin" invite role. Hidden from
-   *  every user until the centre-admin workflow is ready. */
+   *  Staff users, the "Language Centre Admin" invite role, and the whole
+   *  centre-admin portal (/language-centre-admin/*, a 404 while off). Hidden
+   *  from every user until the centre-admin workflow is ready. */
   languageCentreAdmins: enabled(process.env.NEXT_PUBLIC_ENABLE_LANGUAGE_CENTRE_ADMINS),
 };

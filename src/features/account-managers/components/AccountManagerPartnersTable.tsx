@@ -26,6 +26,7 @@ import type { AccountManager } from "../types";
 import Checkbox from "components/ub/forms/choices/Checkbox";
 import { fieldGroup } from "components/ub/recipes";
 import FilterButton from "components/ub/core/buttons/FilterButton";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -268,7 +269,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                           fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                           alt={partner.name}
                           className="h-full w-full object-cover"
-                          fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                          fallback={partner.name ? getInitials(partner.name) : "NA"}
                         />
                         <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"}`} />
                       </div>

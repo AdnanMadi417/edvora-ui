@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
+import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -40,6 +40,7 @@ import Drawer from "components/ub/feedback/dialogs/Drawer";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import { useRouter } from "next/navigation";
 import FilterButton from "components/ub/core/buttons/FilterButton";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -189,8 +190,8 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
       header: "Account manager",
       cell: (m) => (
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg text-ub-tone-brand-text">
-            {m.name?.slice(0, 2).toUpperCase() || "?"}
+          <span aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
+            {getInitials(m.name ?? "") || "?"}
           </span>
           <span className="line-clamp-2 break-words font-medium" title={m.name}>
             {m.name}

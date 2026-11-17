@@ -28,6 +28,7 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import AppDate from "components/ub/data/formatting/AppDate";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import Button from "components/ub/core/buttons/Button";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -82,7 +83,7 @@ export default function AccountManagerPartnersList() {
         <>
           <div className="flex items-center gap-2">
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
-              {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+              {partner.name ? getInitials(partner.name) : "NA"}
               <span
                 className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${
                   partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"

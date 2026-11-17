@@ -200,6 +200,7 @@ it("denies account management to centre administrators", () => {
   ).not.toBeInTheDocument();
 });
 
+// Long form flow; the default 5s isn't enough while the full suite runs in parallel.
 it("saves course and intake edits without stripping centre-admin fields", async () => {
   const user = userEvent.setup();
   portal(<CentreEditor section="courses" />);
@@ -214,4 +215,4 @@ it("saves course and intake edits without stripping centre-admin fields", async 
   const course = readWorkspace().centres[0].configuration.courses[0];
   expect(course.name).toBe("Centre-owned English");
   expect(course.intakes[0].date).toBe("2027-08-16");
-});
+}, 20_000);

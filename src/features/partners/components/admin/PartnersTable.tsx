@@ -60,6 +60,7 @@ import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -345,7 +346,7 @@ export default function PartnersTable() {
                 alt={partner.name}
                 className="h-full w-full object-cover"
                 fallback={
-                  partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"
+                  partner.name ? getInitials(partner.name) : "NA"
                 }
               />
               <span
