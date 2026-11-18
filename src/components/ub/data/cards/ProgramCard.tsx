@@ -1,12 +1,12 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import type { LinkProps } from "next/link";
-import { Award, CalendarDays, Eye, GraduationCap, Send } from "lucide-react";
+import { Award, CalendarDays, GraduationCap } from "lucide-react";
 import Tag from "components/ub/data/badges/Tag";
 import EntityCell from "components/ub/data/display/EntityCell";
-import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
-import { focusRing } from "components/ub/recipes";
+import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
 import UniversityLogo from "features/universities/components/shared/UniversityLogo";
 import { programStatus } from "features/programs/components/shared/table/KnowledgeHubTable";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
@@ -39,17 +39,6 @@ export interface ProgramCardProps {
   applyHref?: LinkProps["href"];
 }
 
-/** TableAction takes a string href; build one from a Next href object. */
-const hrefString = (target: LinkProps["href"]) => {
-  if (typeof target === "string") return target;
-  const query = new URLSearchParams(
-    Object.entries(target.query ?? {}).flatMap(([key, value]) =>
-      value == null ? [] : [[key, String(value)]]
-    )
-  ).toString();
-  return `${target.pathname ?? ""}${query ? `?${query}` : ""}`;
-};
-
 const money = (amount: number, currency: string) =>
   `${currency.toUpperCase()} ${amount.toLocaleString("en-MY")}`;
 
@@ -59,6 +48,7 @@ export default function ProgramCard({
   href,
   applyHref,
 }: ProgramCardProps) {
+  const cardLink = useRef<HTMLAnchorElement>(null);
   return (
     <article
       aria-label={program.name}
@@ -68,13 +58,19 @@ export default function ProgramCard({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`View ${program.name} (opens in a new tab)`}
-        title={program.name}
-        className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`}
+        // Pointer shortcut only: keyboard and screen readers use "View details".
+        aria-hidden="true"
+        tabIndex={-1}
+        ref={cardLink}
+        className="absolute inset-0 z-10 rounded-ub-lg"
       />
       <div className="flex items-start justify-between gap-2 px-4 pt-4">
-        <h3 className="min-w-0 flex-1">
+        <h3
+          className="relative z-20 min-w-0 flex-1 cursor-pointer"
+          onClick={() => cardLink.current?.click()}
+        >
           <EntityCell
+            tooltip
             name={program.name}
             avatar={
               <UniversityLogo
@@ -86,25 +82,6 @@ export default function ProgramCard({
             subtitle={program.university.name}
           />
         </h3>
-        <div className="relative z-20 -me-2 -mt-1 shrink-0">
-          <TableActions label={program.name}>
-            {applyHref && (
-              <TableAction
-                label={`Apply for ${program.name}`}
-                icon={<Send className="h-4 w-4" />}
-                href={hrefString(applyHref)}
-                primary
-              />
-            )}
-            <TableAction
-              label={`View ${program.name}`}
-              icon={<Eye className="h-4 w-4" />}
-              href={href}
-              target="_blank"
-              primary={!applyHref}
-            />
-          </TableActions>
-        </div>
       </div>
 
       <div className="flex flex-1 flex-col px-4 pb-4 pt-3">
@@ -187,6 +164,26 @@ export default function ProgramCard({
               </span>
             </div>
           )}
+          <div className="flex gap-2">
+            <Link
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View details of ${program.name} (opens in a new tab)`}
+              className={`relative z-20 flex-1 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.secondary}`}
+            >
+              View details
+            </Link>
+            {applyHref && (
+              <Link
+                href={applyHref}
+                aria-label={`Apply now for ${program.name}`}
+                className={`relative z-20 flex-1 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.primary}`}
+              >
+                Apply now
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </article>
