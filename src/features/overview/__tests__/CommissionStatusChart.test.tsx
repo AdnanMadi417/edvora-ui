@@ -68,12 +68,12 @@ it("shows missing amounts as unavailable rather than charting partial totals", (
       }}
     />
   );
-  // The stage and the total both say so; nothing is summed or drawn from a partial figure.
-  expect(screen.getAllByText("Not available").length).toBeGreaterThanOrEqual(2);
+  // The stage and the total both say so; no rings are drawn from a partial figure.
+  expect(screen.getByText("Total not available")).toBeInTheDocument();
   expect(screen.getByRole("listitem", { name: /^Ready for payout: Not available/ })).toBeInTheDocument();
-  expect(document.querySelector("[data-stage]")).toBeNull();
+  expect(screen.queryByRole("img", { name: /Commission by payout stage/ })).toBeNull();
 });
-it("draws only stages that have an amount, and names each row's count", () => {
+it("draws a ring per stage and names each row's count", () => {
   render(
     <CommissionStatusChart
       onRetry={jest.fn()}
@@ -89,6 +89,6 @@ it("draws only stages that have an amount, and names each row's count", () => {
   );
   expect(screen.getByRole("listitem", { name: "Expected: MYR 0, 0 commissions" })).toBeInTheDocument();
   expect(screen.getByRole("listitem", { name: "Ready for payout: MYR 100, 1 commission" })).toBeInTheDocument();
-  // Only the Ready segment has a width; empty stages draw nothing.
-  expect([...document.querySelectorAll("[data-stage]")].map((el) => el.getAttribute("data-stage"))).toEqual(["ready"]);
+  // One ring per stage, each its share of the total.
+  expect(screen.getByRole("img", { name: "Commission by payout stage in MYR: Expected 0 of 100, Ready for payout 100 of 100, Paid 0 of 100" })).toBeInTheDocument();
 });

@@ -11,7 +11,7 @@ import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
 import AdvisorEntityCell, { advisorName } from "../shared/AdvisorEntityCell";
 
 import { useId as useTabId } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   RefreshCw,
@@ -21,11 +21,15 @@ import {
   CalendarDays,
   Pencil,
   ShieldCheck,
+  CheckCircle,
+  XCircle,
   Ban,
   Power,
   Clock,
   Handshake,
   SlidersHorizontal,
+  Building2,
+  User,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import AppDate from "components/ub/data/formatting/AppDate";
@@ -37,7 +41,9 @@ import SuspendActivatePartner from "../admin/SuspendActivatePartner";
 import PendingRegistrationOtpsTable from "../admin/PendingRegistrationOtpsTable";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
-import AdvisorStatsRings from "features/partners/components/shared/AdvisorStatsRings";
+import StatsFilterCards, {
+  type FilterCardItem,
+} from "components/ub/navigation/controls/StatsFilterCards";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
@@ -155,6 +161,39 @@ export default function ReviewerPartnersTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
+  const statsCards = useMemo<FilterCardItem[]>(
+    () => [
+      {
+        id: "active",
+        label: "Active",
+        count: stats?.active ?? 0,
+        icon: CheckCircle,
+        colorScheme: "emerald",
+      },
+      {
+        id: "inactive",
+        label: "Suspended",
+        count: stats?.inactive ?? 0,
+        icon: XCircle,
+        colorScheme: "rose",
+      },
+      {
+        id: "individual",
+        label: "Individual",
+        count: stats?.individual ?? 0,
+        icon: User,
+        colorScheme: "violet",
+      },
+      {
+        id: "agency",
+        label: "Company",
+        count: stats?.agency ?? 0,
+        icon: Building2,
+        colorScheme: "cyan",
+      },
+    ],
+    [stats]
+  );
 
   const displayTotal =
     partners.length < ITEMS_PER_PAGE
@@ -270,7 +309,12 @@ export default function ReviewerPartnersTable() {
           <>
             {/* Stats Cards */}
             <div className="border-b border-ub-border p-4 sm:p-6">
-              <AdvisorStatsRings stats={stats} loading={loading} selectedId={selectedStatus} onSelect={handleCardSelect} />
+              <StatsFilterCards
+                className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&_button]:gap-2 [&_button]:p-3"
+                cards={statsCards}
+                selectedId={selectedStatus}
+                onSelect={handleCardSelect}
+              />
             </div>
 
             <div className="border-b border-ub-border p-4 sm:p-6">
