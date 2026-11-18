@@ -1,6 +1,6 @@
 import { mock, httpError, reply } from "../router";
 import { table, newId, daysAgo, daysFromNow, dateOnly, nowIso, pick, placeholderImage, search, SAMPLE_PDF_URL } from "../db";
-import { PARTNERS, CURRENT_PARTNER, ACCOUNT_MANAGERS, APPLICATIONS } from "../seed";
+import { PARTNERS, CURRENT_PARTNER, ACCOUNT_MANAGERS, APPLICATIONS, CURRENT_ACCOUNT_MANAGER } from "../seed";
 import type {
   PartnerDetails,
   IndividualDetails,
@@ -426,13 +426,28 @@ mock.post("/admin/partners/:id/resend-approval-email", ({ params }) => {
 
 const appsCount = (id: string) => APPLICATIONS.filter((a) => a.partner.id === id).length;
 
+/**
+ * What the signed-in account manager can see, as the backend scopes it:
+ * advisors assigned to them, plus advisors another manager shared with them.
+ */
+export function accountManagerScope() {
+  const me = CURRENT_ACCOUNT_MANAGER.id;
+  const assigned = new Set<string>();
+  const shared = new Set<string>();
+  for (const p of allPartners()) {
+    if (p.assigned_manager_id === me) assigned.add(p.id);
+    else if (p.additional_managers?.some((m) => m.id === me)) shared.add(p.id);
+  }
+  return { assigned, shared, all: new Set([...assigned, ...shared]) };
+}
+
 mock.get("/account-managers/partners", ({ query }) => {
-  // The mock AM sees every verified Advisor; a few arrive via a share.
+  const scope = accountManagerScope();
   const rows = search(
-    allPartners().filter((p) => p.is_verified),
+    allPartners().filter((p) => p.is_verified && scope.all.has(p.id)),
     query.search,
     ["name", "email", "country"],
-  ).map((p, i) => ({
+  ).map((p) => ({
     id: p.id,
     name: p.name,
     email: p.email,
@@ -445,7 +460,7 @@ mock.get("/account-managers/partners", ({ query }) => {
     last_login: p.last_login,
     created_at: p.created_at,
     updated_at: p.updated_at,
-    is_shared: i % 4 === 3,
+    is_shared: scope.shared.has(p.id),
     agency_role: p.agency_role as "admin" | "member" | null,
     agency_membership: p.agency_membership,
   }));

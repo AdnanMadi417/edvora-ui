@@ -99,6 +99,8 @@ export const PARTNERS = PARTNER_SEED.map(([name, type, country], i) => ({
 
 /** The partner the mock partner session signs in as (config/mockSession.ts). */
 export const CURRENT_PARTNER = PARTNERS[0];
+/** The account manager the demo signs in as: sees only the advisors assigned or shared to them. */
+export const CURRENT_ACCOUNT_MANAGER = ACCOUNT_MANAGERS[0];
 
 const FIRST = ["Amina", "Chinedu", "Tanvir", "Sara", "Mohamed", "Putri", "Kevin", "Zainab", "Ibrahim", "Nadia", "Yusuf", "Mei Ling", "Omar", "Halima", "Arif", "Grace", "Tariq", "Laila", "Samuel", "Nur", "Bilal", "Esther", "Faisal", "Ruqayyah"];
 const LAST = ["Okafor", "Hossain", "Mahmoud", "Siregar", "Ochieng", "Bello", "Khan", "Abdallah", "Zhang", "Adeyemi", "Rahman", "Hassan"];

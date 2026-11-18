@@ -4,6 +4,7 @@ import { table, daysAgo } from "../db";
 import { APPLICATIONS, CURRENT_PARTNER, PARTNERS } from "../seed";
 import { messages } from "./chat";
 import { documentTypeByCode } from "./documentTypes";
+import { accountManagerScope } from "./partners";
 import type { Notification } from "features/notifications/types";
 import { WORKFLOW } from "config/workflow.generated";
 
@@ -88,7 +89,8 @@ function stageChanged(area: string, app: App, key: StatusKey, from: StatusKey, a
     id: nextId(area),
     type: "application_stage_changed",
     title: `moved ${app.student.name}'s application to ${to.name}`,
-    body: NEXT_STEP[key],
+    // Account managers follow disputes; Unibexs finance resolves them.
+    body: area === "am" && key === "commissionDisputed" ? "Unibexs finance is reviewing the dispute. Follow its progress in the application." : NEXT_STEP[key],
     application_id: app.id,
     data: {
       ...studentContext(app),
@@ -244,7 +246,7 @@ function partnerFeed(): Notification[] {
   ];
 }
 
-function adminFeed(area: string, includeSignups: boolean): Notification[] {
+function adminFeed(area: string, includeSignups: boolean, app: (n: number) => App = (n) => APPLICATIONS[n % APPLICATIONS.length]): Notification[] {
   const list = [
     newApplication(area, app(23), 0.05, false),
     messageReceived(area, app(1), true, 0.2, false),
@@ -271,6 +273,13 @@ function adminFeed(area: string, includeSignups: boolean): Notification[] {
   return list;
 }
 
+/** The account manager's feed: only their assigned and shared advisors' applications. */
+function amFeed(): Notification[] {
+  const scope = accountManagerScope().all;
+  const scoped = APPLICATIONS.filter((a) => scope.has(a.partner.id));
+  return scoped.length ? adminFeed("am", false, (n) => scoped[n % scoped.length]) : [];
+}
+
 function reviewerFeed(): Notification[] {
   const a = "reviewer";
   return [
@@ -283,14 +292,9 @@ function reviewerFeed(): Notification[] {
   ];
 }
 
+/** Data entry maintains the catalogue; application events aren't their work, so their feed stays empty. */
 function dataEntryFeed(): Notification[] {
-  const a = "data_entry";
-  return [
-    stageChanged(a, app(2), "correction", "underReview", 0.5, false),
-    stageChanged(a, app(7), "sentToInstitution", "underReview", 1.3, false),
-    fileReuploaded(a, app(12), 2.2, true),
-    stageChanged(a, app(15), "offerLetter", "sentToInstitution", 5, true),
-  ];
+  return [];
 }
 
 const FEEDS: Record<string, ReturnType<typeof table<Notification>>> = {};
@@ -300,7 +304,7 @@ function feed() {
   if (!FEEDS[area]) {
     const rows =
       area === "partner" ? partnerFeed()
-      : area === "account-manager" ? adminFeed("am", false)
+      : area === "account-manager" ? amFeed()
       : area === "reviewer" ? reviewerFeed()
       : area === "data-entry" ? dataEntryFeed()
       : adminFeed("admin", true);

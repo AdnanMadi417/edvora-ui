@@ -4,6 +4,7 @@ import { daysAgo, newId, nowIso, paginate, search, SAMPLE_PDF_URL } from "../db"
 import { CURRENT_PARTNER, PARTNERS, PROGRAMS } from "../seed";
 import { getApplicationFinance, recordFinanceForStatus } from "./finance";
 import { applicationRequiredFields } from "./universities";
+import { accountManagerScope } from "./partners";
 import {
   APP_DOCUMENT_TYPES,
   STAGES,
@@ -208,7 +209,11 @@ mock.get("/partners/:partnerId/universities/:universityId/required-fields", ({ p
 // --- lists -------------------------------------------------------------------
 
 mock.get("/admin/applications", ({ query }) => listApplications(applications.all(), query));
-mock.get("/account-managers/applications", ({ query }) => listApplications(applications.all(), query));
+// Scoped like the backend: only the applications of the manager's assigned and shared advisors.
+mock.get("/account-managers/applications", ({ query }) => {
+  const scope = accountManagerScope().all;
+  return listApplications(applications.all().filter((a) => scope.has(a.partnerId)), query);
+});
 
 const partnerRows = (partnerId: string) => {
   const known = PARTNERS.some((p) => p.id === partnerId);
