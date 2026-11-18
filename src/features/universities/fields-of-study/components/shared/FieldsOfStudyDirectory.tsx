@@ -84,7 +84,7 @@ export default function FieldsOfStudyDirectory({
             onChange: (value) => {
               setSearch(value);
             },
-            placeholder: "Search by field name or code...",
+            placeholder: "Search fields of study...",
           }}
           filters={
             <FilterButton
@@ -104,7 +104,6 @@ export default function FieldsOfStudyDirectory({
         getId={(field) => field.id}
         getName={(field) => field.name}
         getStatus={(field) => ({ status: field.is_active })}
-        getTag={(field) => field.code}
         onOpen={(field) => setViewing(field)}
         loading={fieldsLoading}
         error={fieldsError}

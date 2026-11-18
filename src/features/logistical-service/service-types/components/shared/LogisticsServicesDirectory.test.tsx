@@ -114,3 +114,11 @@ it("keeps create/edit available to data-entry without deletion", () => {
     queryRowAction("Delete Airport transfer")
   ).not.toBeInTheDocument();
 });
+it("is a plain list of service names, without a table", () => {
+  const { container } = render(<LogisticsServicesDirectory />);
+  expect(container.querySelector("table")).toBeNull();
+  expect(
+    screen.getByRole("list", { name: "Logistics service types" })
+  ).toBeInTheDocument();
+  expect(screen.getByText("Airport transfer")).toBeInTheDocument();
+});

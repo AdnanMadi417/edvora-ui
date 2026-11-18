@@ -1,5 +1,4 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -7,15 +6,9 @@ import { useState } from "react";
 import { Pencil, Plus, Trash2, Truck } from "lucide-react";
 import { useLogisticServices, useDeleteLogisticService } from "../../hooks";
 import type { LogisticService } from "../../types";
-import DataTable, {
-  sortRows,
-  type DataTableColumn,
-  type DataTableSort,
-} from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
-import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import EntityCell from "components/ub/data/display/EntityCell";
+import ItemList from "components/ub/data/display/ItemList";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import CreateServiceType from "../admin/popups/CreateServiceType";
@@ -35,58 +28,14 @@ export default function LogisticsServicesDirectory({
   const { deleteLogisticService, isDeleting } = useDeleteLogisticService();
   const { showToast } = useToast();
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<DataTableSort | null>(null);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<LogisticService | null>(null);
   const [target, setTarget] = useState<LogisticService | null>(null);
-  const matching = logisticServices.filter((service) =>
-    service.name.toLowerCase().includes(search.trim().toLowerCase())
-  );
-  const currentPage = Math.min(
-    page,
-    Math.max(1, Math.ceil(matching.length / 10))
-  );
-  const columns: DataTableColumn<LogisticService>[] = [
-    {
-      key: "name",
-      header: "Service name",
-      sortable: true,
-      cell: (service) => (
-        <EntityCell name={service.name} noAvatar />
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      width: "144px",
-      cell: (service) => (
-        <TableActions>
-          <TableAction
-            label={`Edit ${service.name}`}
-            icon={<Pencil className="h-4 w-4" />}
-            onSelect={() => {
-              setEditing(service);
-            }}
-            primary
-          />
-          {allowDelete && (
-            <TableAction
-              label={`Delete ${service.name}`}
-              icon={<Trash2 className="h-4 w-4" />}
-              onSelect={() => setTarget(service)}
-              danger
-            />
-          )}
-        </TableActions>
-      ),
-    },
-  ];
-  const rows = sortRows(matching, columns, sort).slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
-  );
+  const matching = logisticServices
+    .filter((service) =>
+      service.name.toLowerCase().includes(search.trim().toLowerCase())
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
   async function remove() {
     if (!target) return;
     try {
@@ -121,47 +70,44 @@ export default function LogisticsServicesDirectory({
             value: search,
             onChange: (value) => {
               setSearch(value);
-              setPage(1);
             },
             placeholder: "Search logistics services...",
           }}
           resultLabel={`${matching.length} services`}
         />
       </div>
-      <div className={`min-w-0 ${tableSectionPadding}`}>
-        <DataTable
-          columns={columns}
-          rows={rows}
-          getRowId={(service) => service.id}
-          caption="Logistics service types"
-          getRowClassName={() => "md:[&>td]:py-4"}
-          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
-          loading={loadingLogisticServices}
-          error={errorLogisticServices}
-          onRetry={refetchLogisticServices}
-          sort={sort}
-          onSortChange={(value) => {
-            setSort(value);
-            setPage(1);
-          }}
-          manualSort
-          empty={{
-            title: "No services found",
-            description: "Try another search or create a service.",
-          }}
-          footer={
-            <TablePagination
-              currentPage={currentPage}
-              onPageChange={setPage}
-              itemsPerPage={10}
-              itemCount={rows.length}
-              totalCount={matching.length}
-              itemLabel="services"
-              loading={loadingLogisticServices}
+      <ItemList
+        label="Logistics service types"
+        items={matching}
+        getId={(service) => service.id}
+        getName={(service) => service.name}
+        loading={loadingLogisticServices}
+        error={errorLogisticServices}
+        onRetry={refetchLogisticServices}
+        empty={{
+          title: "No services found",
+          description: "Try another search or create a service.",
+          icon: Truck,
+        }}
+        renderActions={(service) => (
+          <TableActions label={service.name}>
+            <TableAction
+              label={`Edit ${service.name}`}
+              icon={<Pencil className="h-4 w-4" />}
+              onSelect={() => setEditing(service)}
+              primary
             />
-          }
-        />
-      </div>
+            {allowDelete && (
+              <TableAction
+                label={`Delete ${service.name}`}
+                icon={<Trash2 className="h-4 w-4" />}
+                onSelect={() => setTarget(service)}
+                danger
+              />
+            )}
+          </TableActions>
+        )}
+      />
       <CreateServiceType
         isOpen={creating}
         onClose={() => setCreating(false)}

@@ -215,14 +215,14 @@ export function Badges() {
         <ItemList
           label="Fields of study (demo)"
           items={[
-            { id: "cs", name: "Computer Science and IT", code: "CS", active: true },
-            { id: "bus", name: "Business and Management", code: "BUS", active: true },
-            { id: "art", name: "Arts and Design", code: "ART", active: false },
+            { id: "cs", name: "Computer Science and IT", level: "Degree", active: true },
+            { id: "bus", name: "Business and Management", level: "Diploma", active: true },
+            { id: "art", name: "Arts and Design", level: "Degree", active: false },
           ]}
           getId={(f) => f.id}
           getName={(f) => f.name}
           getStatus={(f) => ({ status: f.active })}
-          getTag={(f) => f.code}
+          getTag={(f) => f.level}
           onOpen={() => undefined}
           renderActions={(f) => (
             <TableActions label={f.name}>
