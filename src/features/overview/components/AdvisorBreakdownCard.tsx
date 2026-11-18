@@ -48,8 +48,8 @@ export default function AdvisorBreakdownCard({ resource, href, onRetry }: { reso
             {
               label: "Type",
               parts: [
-                { id: "company", label: "Company", value: stats.agency, tone: "cat-1", href: to("company") },
-                { id: "individual", label: "Individual", value: stats.individual, tone: "cat-2", href: to("individual") },
+                { id: "company", label: "Company", value: stats.agency, tone: "cat-1", href: `${href}?type=company` },
+                { id: "individual", label: "Individual", value: stats.individual, tone: "cat-2", href: `${href}?type=individual` },
               ],
             },
           ]}

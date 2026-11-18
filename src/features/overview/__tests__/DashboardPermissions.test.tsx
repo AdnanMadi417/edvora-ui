@@ -44,7 +44,7 @@ it("hides university commission and team shortcuts from restricted advisor membe
     screen.queryByRole("link", { name: /manage your team/i })
   ).not.toBeInTheDocument();
   // In the header on desktop and in the sticky bar on phones (CSS shows one at a time).
-  expect(screen.getAllByRole("link", { name: "Start application" }).length).toBeGreaterThan(0);
+  expect(screen.getAllByRole("link", { name: "New application" }).length).toBeGreaterThan(0);
 });
 
 it("gives agency owners a Manage your team quick action alongside their financial overview", () => {

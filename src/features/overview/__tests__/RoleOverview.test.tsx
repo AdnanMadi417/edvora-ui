@@ -34,7 +34,9 @@ test("keeps the On hold KPI at zero but hides its empty list, and has no refresh
       <RoleOverview role="account_manager" />
     </SessionContext.Provider>
   );
-  await waitFor(() => expect(screen.getAllByText("12").length).toBeGreaterThan(0));
+  // On hold comes back as 0 and still shows as a KPI.
+  await waitFor(() => expect(screen.getByRole("heading", { name: "Waiting on you" })).toBeInTheDocument());
+  await waitFor(() => expect(screen.getAllByText("0").length).toBeGreaterThan(0));
   // KPIs are always there (0 is an answer); an empty list isn't.
   expect(screen.getByRole("heading", { name: "On hold" })).toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Applications on hold" })).not.toBeInTheDocument();

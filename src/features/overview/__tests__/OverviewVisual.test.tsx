@@ -39,8 +39,8 @@ test("data entry charts required-field completeness, independently of hidden sta
   // The counts live in the Records to complete tile, not repeated here.
   expect(screen.queryByText("7")).not.toBeInTheDocument();
 });
-test("a complete catalogue shows no completeness card", () => {
-  const { container } = render(
+test("a complete catalogue says so in one line instead of a 100% gauge", () => {
+  render(
     <OverviewVisual
       role="data_entry"
       resources={{ programs: ready(26), hiddenPrograms: ready(2), catalogueQuality: ready(0) }}
@@ -48,7 +48,8 @@ test("a complete catalogue shows no completeness card", () => {
       onRetry={retry}
     />
   );
-  expect(container).toBeEmptyDOMElement();
+  expect(screen.getByText("All 28 programs are complete.")).toBeInTheDocument();
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
 });
 test("pipeline displays API counts and stage names", () => {
   const plan = {

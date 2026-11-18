@@ -6,7 +6,7 @@ import { unibexsVoice } from "lib/unibexsVoice";
 import { relabelText, stageLabel, statusLabel, nextActionLabel } from "config/statusLabels";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
-import { byOldest, daysSince } from "../model/dashboardData";
+import { byOldest, completeCollection, daysSince } from "../model/dashboardData";
 import { getSenderName } from "features/notifications/utils/notificationIcons";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
 import { programApi } from "features/programs/services/programApi";
@@ -60,8 +60,8 @@ const auth = () => {
 
 /** "OTP pending" / "otp expired" → "Verification code pending" / "Verification code expired"; anything else sentence case. */
 function sentenceCase(text: string): string {
-  const t = text.trim().replace(/\botp\b/gi, "verification code");
-  return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : t;
+  const t = text.trim().toLowerCase();
+  return (t ? t.charAt(0).toUpperCase() + t.slice(1) : t).replace(/\botp\b/gi, "OTP");
 }
 
 export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
@@ -233,10 +233,11 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
       href: `${base}/advisors`,
       emptyMessage: "No advisor profiles are awaiting review.",
       load: async () => {
+        // Every profile awaiting review (oldest first), so "Oldest waiting" is exact.
         const response = await partnersApi.list({
           is_verified: false,
           page: 1,
-          page_size: 6,
+          page_size: 100,
         });
         const data = collection(response.data);
         // The same response carries counts over every advisor: the home's advisor rings.
@@ -307,19 +308,25 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
         const data = collection(response.data);
         return {
           total: data.total,
-          items: data.items.map((item) => ({
-            id: item.email,
-            title: item.full_name || item.company_name || item.email,
-            // Sentence case, and "OTP" spelled out: "otp_pending" → "Verification code pending".
-            description: sentenceCase(
-              String(item.progress || "Registration in progress").replace(/_/g, " ")
-            ),
-            href: `${base}/advisors?tab=pending-otps`,
-            at: item.created_at,
-            avatar: { name: item.full_name || item.company_name || item.email },
-            waitingDays: daysSince(item.created_at),
-            actionLabel: "Follow up",
-          })),
+          items: data.items
+            .map((item) => {
+              const progress = sentenceCase(String(item.progress || "Registration in progress").replace(/_/g, " "));
+              return {
+                id: item.email,
+                title: item.full_name || item.company_name || item.email,
+                description: item.company_name && item.full_name ? item.company_name : item.email,
+                // "otp_expired" → "OTP expired": a tag, coloured by config/statusTone.ts.
+                status: progress,
+                statusLabel: progress,
+                href: `${base}/advisors?tab=pending-otps`,
+                at: item.created_at,
+                avatar: { name: item.full_name || item.company_name || item.email },
+                waitingDays: daysSince(item.created_at),
+                actionLabel: "Follow up",
+              };
+            })
+            // Expired codes first (they need a resend), then oldest first.
+            .sort((a, b) => Number(/expired|exhausted/i.test(b.status)) - Number(/expired|exhausted/i.test(a.status)) || byOldest(a, b)),
         };
       },
     });
@@ -355,32 +362,26 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
   }
   if (role === "account_manager") {
     add({
-      id: "advisors",
-      title: "Your advisors",
-      subtitle: "Advisors assigned or shared with you.",
+      id: "advisorsAttention",
+      title: "Advisors needing attention",
+      subtitle: "Suspended, or no applications yet, among your assigned and shared advisors.",
       href: `${base}/advisors`,
-      emptyMessage: "No advisors are assigned to you yet.",
+      emptyMessage: "Every advisor you look after is active and applying.",
       load: async () => {
-        const response = await partnersApi.listForAccountManager({
-          limit: 6,
-          offset: 0,
-        });
-        const data = collection(response.data);
+        const rows = await completeCollection((page) =>
+          partnersApi.listForAccountManager({ limit: 100, offset: (page - 1) * 100 })
+        );
+        const flagged = rows.filter((item) => item.is_active === false || !item.applications_count);
         return {
-          total: data.total,
-          items: data.items.map((item) => ({
+          total: flagged.length,
+          items: flagged.map((item) => ({
             id: item.id,
             title: item.name,
-            description: [
-              item.country,
-              item.is_shared ? "Shared advisor" : "Assigned advisor",
-            ]
-              .filter(Boolean)
-              .join(" · "),
+            description: [item.country, item.is_shared ? "Shared" : "Assigned"].filter(Boolean).join(" · "),
             href: idPath(`${base}/advisors`, item.id),
             avatar: { name: item.name },
-            status: item.is_active === false ? "suspended" : "active",
-            statusLabel: item.is_active === false ? "Suspended" : "Active",
+            status: item.is_active === false ? "Suspended" : "No applications",
+            statusLabel: item.is_active === false ? "Suspended" : "No applications",
             actionLabel: "Open advisor",
           })),
         };

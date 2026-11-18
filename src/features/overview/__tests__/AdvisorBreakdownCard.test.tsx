@@ -9,7 +9,7 @@ it("splits all advisors one dimension per row, each adding up to the whole", () 
   expect(screen.getByRole("region", { name: "Verification" })).toHaveTextContent("Verified16");
   expect(screen.getByRole("link", { name: "Verification, Awaiting review: 5 advisors, 24%" })).toHaveAttribute("href", "/admin/advisors?status=unverified");
   expect(screen.getByRole("link", { name: "Account, Suspended: 6 advisors, 29%" })).toHaveAttribute("href", "/admin/advisors?status=suspended");
-  expect(screen.getByRole("link", { name: "Type, Company: 6 advisors, 29%" })).toHaveAttribute("href", "/admin/advisors?status=company");
+  expect(screen.getByRole("link", { name: "Type, Company: 6 advisors, 29%" })).toHaveAttribute("href", "/admin/advisors?type=company");
 });
 
 it("says the counts aren't available when the response has none", () => {

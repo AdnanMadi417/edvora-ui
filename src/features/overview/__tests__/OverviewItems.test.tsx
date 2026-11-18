@@ -32,7 +32,7 @@ test("advisors are rows (never a carousel) with one verb + object action", () =>
   expect(screen.queryByText("Awaiting review")).toBeNull();
   expect(screen.getByText(item.description)).toBeInTheDocument();
 });
-test("activity uses a dated timeline and retains notification links", () => {
+test("activity rows are dated and keep their notification links", () => {
   render(
     <OverviewItems
       resourceId="updates"
@@ -45,7 +45,7 @@ test("activity uses a dated timeline and retains notification links", () => {
   expect(
     screen.getByRole("list", { name: "Recent activity" })
   ).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: item.title })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: new RegExp(item.title) })).toHaveAttribute(
     "href",
     "/admin/notifications"
   );

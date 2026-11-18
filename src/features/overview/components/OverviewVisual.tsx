@@ -1,6 +1,6 @@
 "use client";
 import type { WidgetState } from "components/ub/dashboard/types";
-import { RefreshCw } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import GaugeCard from "components/ub/dashboard/cards/GaugeCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
@@ -86,8 +86,16 @@ export default function OverviewVisual({
         : "ready";
     const complete = Math.max(0, total - issues);
     const percent = total ? Math.round((complete / total) * 100) : 0;
-    // A complete catalogue needs no card: the Records to complete tile already says 0.
-    if (state === "ready" && issues === 0) return null;
+    // A complete catalogue says so in one line, not a 100% gauge.
+    if (state === "ready" && issues === 0)
+      return (
+        <DashboardCard title="Catalogue completeness" as="h2">
+          <p className="flex items-center gap-2 text-ub-body-sm text-ub-text-secondary">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0 text-ub-tone-success-text" />
+            All {total.toLocaleString()} programs are complete.
+          </p>
+        </DashboardCard>
+      );
     return (
       <GaugeCard
         title="Catalogue completeness"

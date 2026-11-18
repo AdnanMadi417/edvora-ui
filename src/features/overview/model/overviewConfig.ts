@@ -39,8 +39,8 @@ export function overviewConfig(context: OverviewContext) {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
         // Active and payouts live in the pipeline and commission cards; KPIs carry only numbers shown nowhere else.
-        metrics: ["actionRequired", "reviews", "hold", "commission"],
-        panels: ["actionRequired", "reviews", "commission"],
+        metrics: ["actionRequired", "stuck", "reviews", "disputes"],
+        panels: ["actionRequired", "stuck", "reviews", "disputes", "commission", "amWorkload"],
         actions: [
           action(
             "Review applications",
@@ -65,13 +65,18 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your work overview",
         subtitle:
           "Follow up on applications and support your assigned advisors.",
-        metrics: ["actionRequired", "hold", "advisors"],
-        panels: ["actionRequired", "hold", "advisors"],
+        metrics: ["actionRequired", "waitingOnAdvisors", "hold", "advisorsAttention"],
+        panels: ["actionRequired", "waitingOnAdvisors", "hold", "advisorsAttention"],
         actions: [
           action(
-            "Review follow-ups",
+            "Review next application",
             "/applications",
-            "Move your applications forward"
+            "Opens the oldest application waiting on you"
+          ),
+          action(
+            "Application tracker",
+            "/applications",
+            "All your applications"
           ),
           action(
             "View your advisors",
@@ -90,11 +95,11 @@ export function overviewConfig(context: OverviewContext) {
         title: "Review overview",
         subtitle: "Review advisor profiles and monitor registration progress.",
         // The reviewer's work: profiles to verify and registrations to follow.
-        metrics: ["reviews", "registrations", "suspended"],
+        metrics: ["reviews", "oldestWaiting", "registrations"],
         panels: ["reviews", "registrations"],
         actions: [
           action(
-            "Review advisors",
+            "Review next advisor",
             "/advisors",
             "Check profiles and verification"
           ),
@@ -115,8 +120,8 @@ export function overviewConfig(context: OverviewContext) {
         title: "Catalogue overview",
         subtitle: "Maintain accurate program and university information.",
         // What needs doing in the catalogue, not inventory counts.
-        metrics: ["catalogueQuality", "hiddenPrograms"],
-        panels: ["catalogueQuality", "hiddenPrograms", "languageCenters"],
+        metrics: ["catalogueQuality", "hiddenPrograms", "providerIssues", "intakesNotSet"],
+        panels: ["catalogueQuality", "providerIssues", "intakesNotSet", "hiddenPrograms"],
         actions: [
           action(
             "Create program",
@@ -150,13 +155,13 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your advisor overview",
         subtitle: "Stay on top of your students, applications and next steps.",
         // Active, offer and payout figures are in the pipeline and commission cards.
-        metrics: ["actionRequired", "hold", ...(context.canViewCommission ? ["commission"] : [])],
+        metrics: ["actionRequired", "active", ...(context.canViewCommission ? ["expected"] : [])],
         panels: ["actionRequired", "hold"],
         actions: [
           ...(context.canCreateApplication
             ? [
                 action(
-                  "Start application",
+                  "New application",
                   "/applications/apply-now",
                   "Apply for a student"
                 ),
@@ -206,6 +211,14 @@ export const metricIcons = {
   programs: BookOpen,
   hiddenPrograms: BookOpen,
   suspended: Users,
+  stuck: Clock3,
+  disputes: Wallet,
+  waitingOnAdvisors: Handshake,
+  advisorsAttention: Users,
+  oldestWaiting: Clock3,
+  providerIssues: Building2,
+  intakesNotSet: BookOpen,
+  expected: Wallet,
   institutions: Building2,
   unread: Bell,
 };
@@ -220,6 +233,14 @@ export const metricLabels: Record<string, string> = {
   reviews: "Advisors awaiting review",
   commission: "Payouts to record",
   suspended: "Suspended advisors",
+  stuck: "Stuck applications",
+  disputes: "Open disputes",
+  waitingOnAdvisors: "Waiting on Advisors",
+  advisorsAttention: "Advisors needing attention",
+  oldestWaiting: "Oldest waiting",
+  providerIssues: "Provider issues",
+  intakesNotSet: "Intakes not set",
+  expected: "Expected commission",
   advisors: "Active advisors",
   registrations: "Pending registrations",
   managers: "Account managers",
@@ -241,6 +262,14 @@ export const metricCaptions: Record<string, string> = {
   reviews: "Profiles to verify",
   commission: "Ready for payout",
   suspended: "Accounts to follow up",
+  stuck: "Past the stage's time limit",
+  disputes: "Finance resolves them",
+  waitingOnAdvisors: "Advisor has the next step",
+  advisorsAttention: "Suspended or no applications",
+  oldestWaiting: "Profile awaiting review",
+  providerIssues: "Missing details",
+  intakesNotSet: "No intake months",
+  expected: "Before the commission stage",
   advisors: "In your directory",
   registrations: "Still in progress",
   managers: "In the directory",
