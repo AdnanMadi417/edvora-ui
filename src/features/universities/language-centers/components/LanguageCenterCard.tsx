@@ -2,7 +2,6 @@
 import { useId } from "react";
 import Link from "next/link";
 import { Eye, MapPin } from "lucide-react";
-import { focusRing } from "components/ub/recipes";
 import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import type { University } from "features/universities/types";
 import type { LanguageCenter } from "../types";
@@ -24,10 +23,12 @@ export default function LanguageCenterCard({
       aria-labelledby={titleId}
       className="relative flex h-full min-w-0 flex-col gap-3 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none"
     >
+      {/* Pointer shortcut only: keyboard and screen-reader users get the View action. */}
       <Link
         href={href}
-        aria-label={`View ${center.name}`}
-        className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`}
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute inset-0 z-10 rounded-ub-lg"
       />
       <div className="flex items-start justify-between gap-2">
         <h3 id={titleId} className="min-w-0 flex-1">

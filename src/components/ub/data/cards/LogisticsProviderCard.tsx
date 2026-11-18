@@ -72,10 +72,12 @@ export default function LogisticsProviderCard({
       }`}
     >
       {!locked && (
+        // Pointer shortcut only: keyboard and screen-reader users get the View action.
         <Link
           href={href}
-          aria-label={`View ${provider.name}`}
-          className={`absolute inset-0 z-10 rounded-ub-xl ${focusRing}`}
+          aria-hidden="true"
+          tabIndex={-1}
+          className="absolute inset-0 z-10 rounded-ub-xl"
         />
       )}
       <div className="flex items-start justify-between gap-2 p-4 pb-0 sm:p-5 sm:pb-0">
