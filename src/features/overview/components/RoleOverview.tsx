@@ -4,7 +4,7 @@ import Link from "next/link";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
-import StatCard from "components/ub/dashboard/cards/StatCard";
+import StatTile from "components/ub/dashboard/cards/StatTile";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import { focusRing } from "components/ub/recipes";
@@ -12,7 +12,7 @@ import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
 import CommissionStatusChart from "./CommissionStatusChart";
 import { useRoleOverview } from "../hooks/useRoleOverview";
-import { metricLabels, overviewConfig } from "../model/overviewConfig";
+import { metricCaptions, metricIcons, metricLabels, overviewConfig } from "../model/overviewConfig";
 import type { OverviewResource, OverviewRole } from "../model/types";
 const HIDE_WHEN_ZERO = new Set(["hold", "hiddenPrograms", "unread"]);
 const GRID_COLS = [
@@ -151,26 +151,35 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
     const resource = resources[id];
     if (!plan) return null;
     return (
-      <StatCard
+      <StatTile
         key={id}
-        className="relative !gap-2 !pe-14 md:!pe-16 [&_.text-ub-data-lg]:text-2xl md:[&_.text-ub-data-lg]:text-3xl"
         label={
           id === "advisors" && role === "account_manager"
             ? "Your advisors"
             : metricLabels[id]
         }
         value={resource?.data?.total.toLocaleString()}
-        variant="default"
-        state={resource?.state || "loading"}
+        icon={metricIcons[id as keyof typeof metricIcons]}
+        iconTone={
+          id === "actionRequired"
+            ? "warning"
+            : id === "commission"
+            ? "success"
+            : "brand"
+        }
+        // No history from the API yet, so no change pill: the caption says what the number counts.
+        footer={metricCaptions[id] ? { text: metricCaptions[id] } : undefined}
+        href={plan.href}
+        linkLabel={`Open ${plan.title}`}
+        state={
+          resource?.state === "error"
+            ? "error"
+            : resource?.state === "ready"
+            ? "ready"
+            : "loading"
+        }
         errorMessage={resource?.error}
         onRetry={refresh}
-        action={
-          <CardLinkButton
-            href={plan.href}
-            label={`Open ${plan.title}`}
-            className="absolute end-3 top-1/2 -translate-y-1/2 !rounded-ub-md !border-0 !bg-ub-tone-brand-bg !text-ub-tone-brand-text md:end-4"
-          />
-        }
       />
     );
   });

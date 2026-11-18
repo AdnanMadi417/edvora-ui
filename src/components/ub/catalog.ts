@@ -346,6 +346,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "A trend inside a card; applications by stage.",
     usedIn: ["StatCard trends", "Tracker summary"],
   },
+  StatTile: {
+    category: "data",
+    imports: ['import { StatTile } from "components/ub/dashboard";'],
+    useFor: "KPI on a home or dashboard: label, big value, optional change pill, icon, and a footer line linking to the list behind the number.",
+    usedIn: ["Role home KPI row (RoleOverview) for every role"],
+    avoid: "Inventing a change pill without real history; a chart or list of numbers (use DashboardCard).",
+  },
   "PipelineFlow": {
     category: "data",
     imports: ['import { PipelineFlow } from "components/ub/dashboard";'],

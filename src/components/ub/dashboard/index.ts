@@ -6,6 +6,7 @@ export { default as CardLinkButton } from "./cards/CardLinkButton";
 export { default as DashboardCard } from "./cards/DashboardCard";
 export { default as CardFooterStats } from "./cards/CardFooterStats";
 export { default as StatCard } from "./cards/StatCard";
+export { default as StatTile, type StatTileProps } from "./cards/StatTile";
 export { default as DeltaPill, formatDelta, deltaTone } from "./shared/DeltaPill";
 export { default as IconTile } from "./shared/IconTile";
 export { default as PillBarChart, defaultHighlight } from "./charts/PillBarChart";

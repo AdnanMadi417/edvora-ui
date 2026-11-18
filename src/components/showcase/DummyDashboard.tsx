@@ -52,6 +52,7 @@ import {
   ReminderCard,
   Sparkline,
   StatCard,
+  StatTile,
   StatusTag,
   TaskList,
   TaskListItem,
@@ -72,7 +73,7 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
   { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions"] },
@@ -251,6 +252,15 @@ export default function DummyDashboard() {
             <StatCard variant="icon" icon={ClipboardCheck} label="Active applications" value="10" delta={{ value: 12, comparedTo: "vs last month" }} />
             <StatCard variant="bars" label="Arriving in 30 days" value="3" bars={[1, 2, 1, 3, 2, 4, 3]} caption="7 weeks" />
             <StatCard variant="icon" icon={Wallet} iconTone="success" label="Expected commission" value={<Amount value={7950} />} delta={{ value: 8, comparedTo: "vs last intake" }} />
+          </div>
+        </Block>
+
+        <Block show={labels} names={["StatTile", "DeltaPill", "IconTile"]}>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatTile label="Action required" value="7" icon={ClipboardCheck} iconTone="warning" footer={{ text: "Applications waiting for you" }} href="#c-overview" />
+            <StatTile label="Active applications" value="10" icon={GraduationCap} delta={{ value: 10.7, comparedTo: "vs last 7 days" }} footer={{ value: "+1", text: "vs last 7 days" }} href="#c-overview" />
+            <StatTile label="Arriving in 30 days" value="3" icon={Plane} delta={{ value: -5.1, comparedTo: "vs last month" }} footer={{ value: "−1", text: "vs last month" }} href="#c-overview" />
+            <StatTile label="Expected commission" value={<Amount value={7950} />} icon={Wallet} iconTone="success" footer={{ text: "In the commission stage, not yet paid" }} href="#c-overview" />
           </div>
         </Block>
 

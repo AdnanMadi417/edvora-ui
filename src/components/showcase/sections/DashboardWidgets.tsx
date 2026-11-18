@@ -32,6 +32,7 @@ import {
   ReminderCard,
   Sparkline,
   StatCard,
+  StatTile,
   StatusTag,
   TaskList,
   TaskListItem,
@@ -189,6 +190,29 @@ export default function DashboardWidgets() {
           <IconTile icon={FileCheck2} tone="brand" size="sm" />
           <IconTile icon={Wallet} tone="success" />
           <IconTile icon={Bell} tone="warning" size="lg" />
+        </div>
+      </Demo>
+
+      <Demo
+        name="StatTile"
+        path="components/ub/dashboard/cards/StatTile.tsx"
+        description="KPI tile used on every role home: a tray holding the stat card (label, big tabular value, optional change pill, icon on the end) and a footer line that links to the list behind the number, with an arrow on the end (mirrored in RTL). Show a change pill only when there is a real comparison. Loading shows a skeleton; error says so with Try again."
+        code={`<StatTile label="Active applications" value="10" icon={ClipboardCheck} delta={{ value: 12, comparedTo: "vs last 7 days" }} footer={{ value: "+3", text: "vs last 7 days" }} href="/partner/applications" />`}
+        props={[
+          { name: "label / value", type: "string / ReactNode", description: "Value uses Amount or a formatted number." },
+          { name: "delta", type: "{ value, unit?, goodWhen?, comparedTo? }", description: "DeltaPill beside the value; omit without real history." },
+          { name: "icon / iconTone", type: "IconComponent / brand | success | warning | danger | neutral", description: "IconTile on the end side." },
+          { name: "footer", type: "{ value?: ReactNode; text: ReactNode }", description: "Bold figure then words, or words alone." },
+          { name: "href / linkLabel", type: "string / string", description: "Footer becomes a link with an arrow; linkLabel names it." },
+          { name: "state / errorMessage / onRetry", type: '"ready" | "loading" | "error"', description: "Skeleton or error with Try again." },
+        ]}
+      >
+        <StateSwitch<"ready" | "loading" | "error"> value={statState} options={["ready", "loading", "error"] as const} onChange={setStatState} label="Tile state" />
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatTile state={statState} onRetry={() => setStatState("ready")} label="Action required" value="7" icon={ClipboardCheck} iconTone="warning" footer={{ text: "Applications waiting for you" }} href="#c-stattile" />
+          <StatTile state={statState} onRetry={() => setStatState("ready")} label="Active applications" value="126" icon={GraduationCap} delta={{ value: 10.7, comparedTo: "vs last 7 days (sample)" }} footer={{ value: "+12", text: "vs last 7 days (sample)" }} href="#c-stattile" />
+          <StatTile state={statState} onRetry={() => setStatState("ready")} label="Arriving in 30 days" value="3" icon={Plane} delta={{ value: -5.1, comparedTo: "vs last month (sample)" }} footer={{ value: "−1", text: "vs last month (sample)" }} href="#c-stattile" />
+          <StatTile state={statState} onRetry={() => setStatState("ready")} label="Expected commission" value={<Amount value={7950} />} icon={Wallet} iconTone="success" footer={{ text: "In the commission stage, not yet paid" }} href="#c-stattile" />
         </div>
       </Demo>
 
