@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import type { ReactNode } from "react";
+import { CHART_OTHER, CHART_PALETTE } from "config/chartPalette";
 
 export interface DonutSegment {
   key: string;
@@ -11,19 +12,9 @@ export interface DonutSegment {
   color: string;
 }
 
-/**
- * Categorical slots in fixed order (never cycled), then "Other". Checked for
- * contrast and colour-blind separation in light and dark; every slice also
- * has a text label and value in the legend, so colour is never the only cue.
- */
-export const DONUT_COLORS = [
-  "var(--ub-chart-cat-1)",
-  "var(--ub-chart-cat-2)",
-  "var(--ub-chart-cat-3)",
-  "var(--ub-chart-6)",
-  "var(--ub-chart-5)",
-] as const;
-export const DONUT_OTHER_COLOR = "var(--ub-neutral-600)";
+/** The chart palette (config/chartPalette.ts), kept under its old names for existing callers. */
+export const DONUT_COLORS = CHART_PALETTE;
+export const DONUT_OTHER_COLOR = CHART_OTHER;
 
 export interface DonutChartProps {
   segments: DonutSegment[];

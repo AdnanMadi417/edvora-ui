@@ -130,7 +130,7 @@ export default function DonutStatsCard({
               const share = viewTotal > 0 ? Math.round((s.value / viewTotal) * 100) : 0;
               const row = (
                 <>
-                  <span aria-hidden="true" className="h-7 w-7 shrink-0 rounded-ub-md" style={{ background: s.color }} />
+                  <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: s.color }} />
                   <span className="min-w-0 flex-1 truncate text-ub-body-sm" title={s.label}>
                     <span className="text-ub-label-md text-ub-text-primary">{s.label}</span>
                     <span className="text-ub-text-tertiary"> · {share}%</span>
