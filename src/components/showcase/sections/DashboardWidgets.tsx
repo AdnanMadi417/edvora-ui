@@ -91,7 +91,7 @@ export default function DashboardWidgets() {
   const pick = (s: WidgetState) => (s === "ready" ? undefined : s);
 
   return (
-    <ShowcaseSection id="dashboard-widgets" title="Dashboard widgets" description="components/ub/dashboard: presentational widgets for dashboards.">
+    <ShowcaseSection id="dashboard-widgets" title="Dashboard widgets" description="components/ub/dashboard: presentational widgets for dashboards. All of them composed on one page: /ui-unibexs-template-2026/dashboard.">
       <Demo
         name="DashboardHeader and PeriodSelect"
         path="components/ub/dashboard/shared/DashboardHeader.tsx"

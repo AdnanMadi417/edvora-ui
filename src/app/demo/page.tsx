@@ -23,6 +23,7 @@ const showcases = [
   { name: "Advisor profile", href: "/design-system/patterns/advisor-profile", description: "Explore the profile editor and public profile pattern." },
   { name: "Application details", href: "/design-system/patterns/application-details", description: "See how the shared components form an application workspace." },
   { name: "Component gallery", href: "/ui-unibexs-template-2026", description: "Browse the portal’s reusable interface components." },
+  { name: "Dummy dashboard", href: "/ui-unibexs-template-2026/dashboard", description: "Every dashboard and overview component on one page, with sample data." },
 ];
 
 export default function DemoPage() {
