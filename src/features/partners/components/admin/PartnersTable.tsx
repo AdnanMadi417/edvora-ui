@@ -265,6 +265,13 @@ export default function PartnersTable() {
     setCurrentPage(1);
   };
 
+  // ?status= from a link (the home advisor rings) opens the list on that group.
+  useEffect(() => {
+    const status = new URLSearchParams(window.location.search).get("status");
+    if (status && ["active", "inactive", "individual", "agency"].includes(status))
+      setSelectedStatus(status as StatusFilter);
+  }, []);
+
   const handleResendEmail = async () => {
     if (!resendTarget) return;
     try {

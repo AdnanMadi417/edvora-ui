@@ -9,6 +9,7 @@ import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
 import CommissionStatusChart from "./CommissionStatusChart";
+import AdvisorRingsCard from "./AdvisorRingsCard";
 import { useRoleOverview } from "../hooks/useRoleOverview";
 import {
   metricCaptions,
@@ -215,7 +216,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
         >
           <div
             className={`order-2 grid min-w-0 items-stretch gap-4 md:order-1 ${
-              canSeeUniversityCommission ? "lg:grid-cols-2" : ""
+              Number(canSeeUniversityCommission) + Number(role === "admin" || role === "reviewer") > 0 ? "lg:grid-cols-2" : ""
             }`}
           >
             <OverviewVisual
@@ -227,6 +228,13 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
             {canSeeUniversityCommission && (
               <CommissionStatusChart
                 resource={resources.universityCommission}
+                onRetry={refresh}
+              />
+            )}
+            {(role === "admin" || role === "reviewer") && (
+              <AdvisorRingsCard
+                resource={resources.reviews}
+                href={`/${role}/advisors`}
                 onRetry={refresh}
               />
             )}

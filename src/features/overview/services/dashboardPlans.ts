@@ -9,7 +9,6 @@ import { commissionsApi } from "features/applications/payouts/services/commissio
 import { statementApi } from "features/partners/statement/services/statementApi";
 import {
   completeCollection,
-  groupPaidByMonth,
   groupUniversityCommission,
 } from "../model/dashboardData";
 import type {
@@ -151,7 +150,6 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
           total: rows.length,
           items: [],
           universityCommission: groupUniversityCommission(rows, admin),
-          paidByMonth: groupPaidByMonth(rows, admin),
           universities: universities.map((item) => ({
             id: item.id,
             name: item.name,

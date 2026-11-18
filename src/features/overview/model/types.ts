@@ -26,8 +26,8 @@ export interface OverviewItem {
 }
 export interface OverviewData {
   universityCommission?: import("./dashboardData").UniversityCommission[];
-  /** Paid commission per month and currency (settled records). */
-  paidByMonth?: import("./dashboardData").PaidMonth[];
+  /** Advisor counts (all advisors the viewer can see): active / suspended, company / individual. */
+  advisorStats?: { active: number; inactive: number; agency: number; individual: number };
   universities?: { id: string; name: string; logo_file_key?: string }[];
   total: number;
   items: OverviewItem[];

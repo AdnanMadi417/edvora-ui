@@ -223,8 +223,13 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
           page_size: 6,
         });
         const data = collection(response.data);
+        // The same response carries counts over every advisor: the home's advisor rings.
+        const stats = (response.data as { stats?: Record<string, number> })?.stats;
         return {
           total: data.total,
+          advisorStats: stats
+            ? { active: stats.active ?? 0, inactive: stats.inactive ?? 0, agency: stats.agency ?? 0, individual: stats.individual ?? 0 }
+            : undefined,
           items: data.items.map((item) => ({
             id: item.id,
             title: item.name,
