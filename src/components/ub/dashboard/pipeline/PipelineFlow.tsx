@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import type { CSSProperties } from "react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { getStage } from "config/applicationStages";
 import { focusRing, type TagTone } from "components/ub/recipes";
 import Tag from "components/ub/data/badges/Tag";
@@ -13,19 +14,28 @@ export interface PipelineFlowStage {
   count: number;
   /** Stage tag id in config/applicationStages.ts; sets the colour. Unknown ids show neutral. */
   stageId?: string;
-  /** Short call-out above the station, e.g. { label: "Your move", tone: "attention" }. */
+  /** Short call-out on the stage, e.g. { label: "Action needed", tone: "attention" }. */
   badge?: { label: string; tone: TagTone };
-  /** Pulses the station: something here is waiting on the viewer. */
+  /** Something in this stage is waiting on the viewer: adds an "Action needed" badge when no badge is given. */
   attention?: boolean;
 }
 
 export interface PipelineFlowProps {
   stages: PipelineFlowStage[];
-  /** Makes each station a toggle button, e.g. to filter a table by stage. */
+  /** Makes each stage a toggle button, e.g. to filter a table by stage. Pressing the selected stage clears it. */
   onSelect?: (id: string | null) => void;
   selectedId?: string | null;
-  /** Accessible name for the group. */
+  /** Makes each stage a link instead (e.g. the home page opening the filtered list). */
+  getHref?: (stage: PipelineFlowStage) => string;
+  /**
+   * "auto": a list on phones, one column per stage from 1024px up.
+   * "list": always the list, for narrow cards (e.g. half-width on a dashboard).
+   */
+  layout?: "auto" | "list";
+  /** Accessible name for the list. */
   label?: string;
+  /** Noun for the count in screen-reader text. */
+  unit?: string;
   className?: string;
 }
 
@@ -35,98 +45,129 @@ const stageColor = (stageId?: string) => {
   return hue === "success" ? "var(--ub-success-500)" : `var(--ub-tag-${hue}-solid)`;
 };
 
-// Station diameter grows with the stage's share: 44px (tap target) to 64px.
-const MIN = 44;
-const MAX = 64;
+// One column per stage from 1024px up (tablets get the list); the workflow has five.
+const COLS: Record<number, string> = {
+  1: "lg:grid-cols-1",
+  2: "lg:grid-cols-2",
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+  5: "lg:grid-cols-5",
+  6: "lg:grid-cols-3 xl:grid-cols-6",
+};
 
 /**
- * Applications by stage as a journey line toward payout. Each stage is a
- * station whose size follows its volume; the track between stations takes the
- * stage colour from config/applicationStages.ts and drifts toward the end.
- * With onSelect, pressing a station filters and pressing it again clears.
+ * Applications by stage, in workflow order. Columns: one per stage with a
+ * coloured track, the stage name, the count and its share. List (phones and
+ * narrow cards): name and share bar, count on the end; never a squeezed strip.
+ * Colours come from config/applicationStages.ts; stages waiting on the viewer
+ * carry an "Action needed" badge. With onSelect each stage toggles a filter;
+ * with getHref it opens a link.
  */
-export default function PipelineFlow({ stages, onSelect, selectedId = null, label = "Applications by stage", className }: PipelineFlowProps) {
+export default function PipelineFlow({
+  stages,
+  onSelect,
+  selectedId = null,
+  getHref,
+  layout = "auto",
+  label = "Applications by stage",
+  unit = "applications",
+  className,
+}: PipelineFlowProps) {
   const total = stages.reduce((sum, s) => sum + s.count, 0);
-  const peak = Math.max(1, ...stages.map((s) => s.count));
+  const cols = layout === "auto";
 
   return (
-    <div role="region" aria-label={label} tabIndex={0} className={clsx("-mx-1 overflow-x-auto rounded-ub-sm px-1 pb-1", focusRing, className)}>
-      <ol aria-label={label} className="grid min-w-[44rem]" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
-        {stages.map((s, i) => {
-          const color = stageColor(s.stageId);
-          const prev = i > 0 ? stageColor(stages[i - 1].stageId) : null;
-          const share = total > 0 ? Math.round((s.count / total) * 100) : 0;
-          const size = Math.round(MIN + (MAX - MIN) * (s.count / peak));
-          const selected = selectedId === s.id;
-          const empty = s.count === 0;
+    <ol aria-label={label} data-layout={layout} className={clsx("grid gap-2", cols && ["lg:gap-3", COLS[stages.length] ?? "lg:grid-cols-4"], className)}>
+      {stages.map((s, i) => {
+        const color = stageColor(s.stageId);
+        const share = total > 0 ? Math.round((s.count / total) * 100) : 0;
+        const selected = selectedId === s.id;
+        const empty = s.count === 0;
+        const badge = s.badge ?? (s.attention ? { label: "Action needed", tone: "attention" as TagTone } : undefined);
+        const interactive = Boolean(onSelect || getHref);
+        const name = `${s.label}: ${s.count.toLocaleString()} ${unit}, ${share}%${badge ? `, ${badge.label}` : ""}`;
 
-          const nodeStyle: CSSProperties = {
-            width: size,
-            height: size,
-            borderColor: color,
-            boxShadow: selected ? `0 0 0 4px var(--ub-bg-surface), 0 0 0 7px ${color}` : undefined,
-          };
-          const node = (
-            <>
-              {s.attention && (
-                <span aria-hidden="true" className="absolute -end-0.5 -top-0.5 flex h-3 w-3">
-                  <span className="absolute inset-0 rounded-ub-full motion-safe:animate-ping" style={{ background: color, opacity: 0.6 }} />
-                  <span className="relative h-3 w-3 rounded-ub-full border-2 border-ub-surface" style={{ background: color }} />
+        const body: ReactNode = (
+          <>
+            {/* Marker: the step number in a ring of the stage colour; in columns a track runs from it. */}
+            <span aria-hidden="true" className={clsx("flex shrink-0 items-center", cols && "lg:w-full")}>
+              <span
+                className={clsx(
+                  "ub-tabular grid h-7 w-7 shrink-0 place-items-center rounded-ub-full border-[3px] bg-ub-surface text-ub-label-sm",
+                  empty ? "border-dashed text-ub-text-tertiary" : "text-ub-text-primary"
+                )}
+                style={{ borderColor: color }}
+              >
+                {i + 1}
+              </span>
+              {cols && <span className="ms-2 hidden h-1 flex-1 rounded-ub-full lg:block" style={{ background: color, opacity: empty ? 0.35 : 1 }} />}
+            </span>
+
+            <span className={clsx("min-w-0 flex-1", cols && "lg:flex-none")}>
+              <span
+                title={s.label}
+                className={clsx("block truncate text-ub-label-md text-ub-text-primary", cols && "lg:line-clamp-2 lg:whitespace-normal lg:break-words")}
+              >
+                {s.label}
+              </span>
+              {/* List: the share as a bar under the name, with the badge beside it so the name keeps the full width. */}
+              <span className={clsx("mt-1.5 flex items-center gap-2", cols && "lg:hidden")}>
+                <span aria-hidden="true" className="block h-1.5 min-w-0 flex-1 overflow-hidden rounded-ub-full bg-ub-border">
+                  <span className="block h-full rounded-ub-full" style={{ width: `${share}%`, background: color }} />
                 </span>
-              )}
-              <span className={clsx("ub-tabular text-ub-label-lg font-semibold", empty ? "text-ub-text-tertiary" : "text-ub-text-primary")}>{s.count}</span>
-            </>
-          );
-          const nodeClass = clsx(
-            "relative z-10 flex items-center justify-center rounded-ub-full border-[3px] bg-ub-surface transition-[box-shadow,transform] duration-ub-base motion-reduce:transition-none",
-            empty && "border-dashed",
-          );
-
-          return (
-            <li key={s.id} className="flex min-w-0 flex-col items-center text-center">
-              <span className="flex h-7 items-end pb-1.5">
-                {s.badge && (
-                  <Tag tone={s.badge.tone} size="sm">
-                    {s.badge.label}
+                {badge && (
+                  <Tag tone={badge.tone} size="sm">
+                    {badge.label}
                   </Tag>
                 )}
               </span>
+            </span>
 
-              <span className="relative flex w-full items-center justify-center" style={{ height: MAX + 8 }}>
-                {prev && (
-                  <span aria-hidden="true" className="absolute start-0 top-1/2 h-1.5 w-1/2 -translate-y-1/2 overflow-hidden" style={{ background: prev }}>
-                    <span className="ub-pipeline-flow absolute inset-0" />
-                  </span>
-                )}
-                {i < stages.length - 1 && (
-                  <span aria-hidden="true" className="absolute end-0 top-1/2 h-1.5 w-1/2 -translate-y-1/2 overflow-hidden" style={{ background: color }}>
-                    <span className="ub-pipeline-flow absolute inset-0" />
-                  </span>
-                )}
-                {onSelect ? (
-                  <button
-                    type="button"
-                    aria-pressed={selected}
-                    aria-label={`${s.label}: ${s.count} (${share}%)${s.badge ? `, ${s.badge.label}` : ""}`}
-                    onClick={() => onSelect(selected ? null : s.id)}
-                    className={clsx(nodeClass, "hover:scale-105 motion-reduce:hover:scale-100", focusRing)}
-                    style={nodeStyle}
-                  >
-                    {node}
-                  </button>
-                ) : (
-                  <span className={nodeClass} style={nodeStyle}>
-                    {node}
-                  </span>
-                )}
+            {/* Count, share and badge: on the end side in the list, under the name in columns. */}
+            <span className={clsx("flex shrink-0 flex-col items-end gap-1", cols && "lg:mt-auto lg:items-stretch lg:gap-2")}>
+              <span className={clsx("ub-tabular text-ub-heading-sm", cols && "lg:text-ub-heading-lg", empty ? "text-ub-text-tertiary" : "text-ub-text-primary")}>
+                {s.count.toLocaleString()}
               </span>
+              <span className={clsx("flex min-w-0 flex-wrap items-center gap-2", cols && "lg:justify-between")}>
+                {/* Columns only: the badge in the bottom row (the list shows it under the name). */}
+                {badge && cols && (
+                  <Tag tone={badge.tone} size="sm" className="hidden lg:order-2 lg:inline-flex">
+                    {badge.label}
+                  </Tag>
+                )}
+                <span className={clsx("ub-tabular text-ub-caption text-ub-text-tertiary", cols && "lg:order-1")}>{share}%</span>
+              </span>
+            </span>
+          </>
+        );
 
-              <span className={clsx("mt-2 line-clamp-2 px-1 text-ub-label-sm", selected ? "text-ub-text-primary" : "text-ub-text-secondary")}>{s.label}</span>
-              <span className="ub-tabular mt-0.5 text-ub-caption text-ub-text-tertiary">{share}%</span>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
+        const cell = clsx(
+          "flex h-full min-h-14 w-full min-w-0 items-center gap-3 rounded-ub-lg border px-3 py-2.5 text-start",
+          cols && "lg:flex-col lg:items-stretch lg:gap-3 lg:p-4",
+          "transition-colors duration-ub-base motion-reduce:transition-none",
+          selected ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface",
+          interactive && !selected && "hover:border-ub-border-hover hover:bg-ub-surface-subtle",
+          interactive && focusRing
+        );
+
+        return (
+          <li key={s.id} className="min-w-0">
+            {getHref ? (
+              <Link href={getHref(s)} aria-label={name} className={cell}>
+                {body}
+              </Link>
+            ) : onSelect ? (
+              <button type="button" aria-pressed={selected} aria-label={name} onClick={() => onSelect(selected ? null : s.id)} className={cell}>
+                {body}
+              </button>
+            ) : (
+              <div role="group" aria-label={name} className={cell}>
+                {body}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }

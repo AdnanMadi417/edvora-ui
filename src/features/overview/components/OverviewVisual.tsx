@@ -4,7 +4,7 @@ import { RefreshCw } from "lucide-react";
 import GaugeCard from "components/ub/dashboard/cards/GaugeCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
-import CategoryColumnChart from "components/ub/dashboard/charts/CategoryColumnChart";
+import PipelineFlow from "components/ub/dashboard/pipeline/PipelineFlow";
 import type {
   OverviewResource,
   OverviewRole,
@@ -36,7 +36,7 @@ export default function OverviewVisual({
         title={pipeline.title}
         subtitle={pipeline.subtitle}
         as="h2"
-        skeleton="chart"
+        skeleton="list"
         state={state}
         emptyMessage={pipeline.emptyMessage}
         errorMessage={resource?.error}
@@ -48,15 +48,17 @@ export default function OverviewVisual({
           />
         }
       >
-        <CategoryColumnChart
-          data={distribution.map((stage) => ({
-            key: stage.key,
-            label: stage.label,
-            value: stage.value,
-          }))}
+        <PipelineFlow
+          layout="list"
           label="Applications by stage"
-          unit="applications"
-          heightClass="h-52"
+          stages={distribution.map((stage) => ({
+            id: stage.key,
+            label: stage.label,
+            count: stage.value,
+            stageId: stage.stageId,
+          }))}
+          // Each stage opens the Application Tracker filtered to it.
+          getHref={(stage) => `${pipeline.href}?stage=${encodeURIComponent(stage.id)}`}
         />
       </DashboardCard>
     );

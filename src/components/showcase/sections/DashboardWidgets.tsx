@@ -69,9 +69,9 @@ const PLACEMENT = [
   { label: "Withdrawn", value: 11, color: "cat-3" as const },
 ];
 const FLOW_STAGES = [
-  { id: "s1", label: "Application Submission", count: 6, stageId: "documents-pending", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "s1", label: "Application Submission", count: 6, stageId: "documents-pending", attention: true },
   { id: "s2", label: "Institution Review", count: 4, stageId: "institution-review" },
-  { id: "s3", label: "Offer & Visa Payment", count: 3, stageId: "offer-received", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "s3", label: "Offer & Visa Payment", count: 3, stageId: "offer-received", attention: true },
   { id: "s4", label: "Visa Processing", count: 5, stageId: "visa-in-progress" },
   { id: "s5", label: "Arrival & Enrollment", count: 2, stageId: "arrival-logistics" },
   { id: "s6", label: "Commission Invoicing", count: 3, stageId: "enrolled", badge: { label: "Payout", tone: "success" as const } },
@@ -288,15 +288,16 @@ export default function DashboardWidgets() {
       <Demo
         name="PipelineFlow"
         path="components/ub/dashboard/pipeline/PipelineFlow.tsx"
-        description="Applications by stage as a journey line toward payout. Each station grows with its volume (44–64px), the track takes the stage colour from config/applicationStages.ts and drifts toward the end (still under reduced motion), and attention stations pulse. Press a station to filter; press it again to clear. Scrolls sideways on narrow screens; flows the other way in RTL."
+        description="The one pipeline: applications by stage in workflow order, used on every Applications page and the role home. From 1024px: one column per stage with a track in the stage colour (config/applicationStages.ts), the name, the count and its share. Tablets, phones and narrow cards (layout=&quot;list&quot;): a vertical list with a share bar, count on the end; never a squeezed strip. Stages waiting on the viewer carry an Action needed badge. onSelect toggles a filter (press again to clear); getHref makes each stage a link."
         code={`<PipelineFlow
   stages={[{ id: "s1", label: "Application Submission", count: 6, stageId: "documents-pending", badge: { label: "Your move", tone: "attention" }, attention: true }]}
   selectedId={stage}
   onSelect={setStage}
 />`}
         props={[
-          { name: "stages", type: "{ id, label, count, stageId?, badge?, attention? }[]", description: "stageId picks the colour; unknown ids show neutral. attention pulses the station." },
-          { name: "selectedId / onSelect", type: "string | null / (id | null) => void", description: "Without onSelect the stations are static." },
+          { name: "stages", type: "{ id, label, count, stageId?, badge?, attention? }[]", description: "stageId picks the colour; unknown ids show neutral. attention adds an Action needed badge." },
+          { name: "selectedId / onSelect / getHref", type: "string | null / (id | null) => void / (stage) => string", description: "Toggle filter, or a link per stage; without either the stages are static." },
+          { name: "layout", type: '"auto" | "list"', default: '"auto"', description: "auto: columns from 1024px, list below. list: always the list (half-width cards)." },
           { name: "label", type: "string", default: '"Applications by stage"', description: "Accessible name for the group." },
         ]}
       >

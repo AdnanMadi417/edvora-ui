@@ -3,6 +3,7 @@ import { tableSectionPadding } from "components/ub/recipes";
 
 import Card from "components/ub/data/cards/Card";
 import React, { useState, useMemo, useEffect } from "react";
+import { useStageParam } from "features/applications/hooks/useStageParam";
 import { FilePlus } from "lucide-react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
@@ -45,6 +46,11 @@ const PartnerApplications = () => {
 
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedStages, setSelectedStages] = useState<string | null>(null);
+  // ?stage= from a link (the home pipeline) opens the list on that stage.
+  useStageParam(stages, (id) => {
+    setSelectedStages(id);
+    setCurrentPage(1);
+  });
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});

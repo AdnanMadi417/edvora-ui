@@ -1,6 +1,7 @@
 import { tableSectionPadding } from "components/ub/recipes";
 import Card from "components/ub/data/cards/Card";
 import React, { useState, useMemo, useEffect } from "react";
+import { useStageParam } from "features/applications/hooks/useStageParam";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
@@ -46,6 +47,11 @@ const ModernApplicationsTable = () => {
 
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedStages, setSelectedStages] = useState<string | null>(null);
+  // ?stage= from a link (the home pipeline) opens the list on that stage.
+  useStageParam(stages, (id) => {
+    setSelectedStages(id);
+    setCurrentPage(1);
+  });
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
