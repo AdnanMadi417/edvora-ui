@@ -223,14 +223,6 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
       align: "end",
       cell: (m) => (
         <TableActions label={m.name}>
-          {readOnly && (
-            <TableAction
-              label={`View ${m.name}`}
-              icon={<Eye className="h-4 w-4" />}
-              href={`${basePath}/profile/${m.id}`}
-              primary
-            />
-          )}
           {!readOnly && (
             <>
               <TableAction
