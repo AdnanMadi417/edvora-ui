@@ -1,3 +1,4 @@
+import { rowAction } from "testUtils/rowActions";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LogisticsMarketplace from "./LogisticsMarketplace";
@@ -27,19 +28,16 @@ jest.mock("components/ub/data/media/PresignedImage", () => ({
   __esModule: true,
   default: ({ fallback }: any) => fallback,
 }));
-it("offers a card link and separate details/contact actions", () => {
-  render(<LogisticsMarketplace />);
+it("offers the card's view and WhatsApp actions top-right, with the status on the logo", () => {
+  const { container } = render(<LogisticsMarketplace />);
   expect(
     screen.getByRole("link", { name: "View Airport Assist" })
   ).toHaveAttribute("href", "/partner/logistics-marketplace/provider");
-  expect(screen.getByRole("link", { name: "Details" })).toHaveAttribute(
-    "href",
-    "/partner/logistics-marketplace/provider"
-  );
-  expect(screen.getByRole("link", { name: "WhatsApp" })).toHaveAttribute(
-    "href",
-    "https://wa.me/60123456789"
-  );
+  expect(rowAction("WhatsApp Airport Assist")).toBeInTheDocument();
+  const status = container.querySelector("[data-entity-status]");
+  expect(status).toHaveAttribute("data-entity-status", "active");
+  expect(status).toHaveAttribute("title", "Active");
+  expect(screen.queryByText("Active", { selector: ":not(.sr-only)" })).toBeNull();
   expect(screen.getByText("RM 0")).toBeInTheDocument();
 });
 it("hides provider details, prices and contact links while locked", () => {
@@ -54,6 +52,7 @@ it("hides provider details, prices and contact links while locked", () => {
     screen.queryByRole("link", { name: "WhatsApp" })
   ).not.toBeInTheDocument();
   expect(screen.getByText("Contact locked")).toBeInTheDocument();
+  expect(document.querySelector("[data-entity-status]")).toBeNull();
 });
 it("searches by service and location", async () => {
   const user = userEvent.setup();

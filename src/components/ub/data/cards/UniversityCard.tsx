@@ -1,6 +1,5 @@
 "use client";
 
-import { useId } from "react";
 import Link from "next/link";
 import { focusRing } from "components/ub/recipes";
 import { BookOpen, Eye, Languages } from "lucide-react";
@@ -23,15 +22,14 @@ export default function UniversityCard({
   href,
   programsHref,
 }: UniversityCardProps) {
-  const titleId = useId();
   return (
     <article
-      aria-labelledby={titleId}
+      aria-label={university.name}
       className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs transition-[border-color,box-shadow] duration-200 hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none"
     >
       <Link href={href} aria-label={`View ${university.name}`} title={university.name} className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`} />
       <div className="flex items-start justify-between gap-2 p-5 pb-0">
-        <h3 id={titleId} className="min-w-0 flex-1">
+        <h3 className="min-w-0 flex-1">
           <EntityCell
             name={university.name}
             avatar={<UniversityLogo name={university.name} fileKey={university.logo_file_key} />}

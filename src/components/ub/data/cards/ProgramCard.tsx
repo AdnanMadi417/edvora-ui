@@ -1,6 +1,5 @@
 "use client";
 
-import { useId } from "react";
 import Link from "next/link";
 import type { LinkProps } from "next/link";
 import { Award, CalendarDays, Eye, GraduationCap, Send } from "lucide-react";
@@ -60,10 +59,9 @@ export default function ProgramCard({
   href,
   applyHref,
 }: ProgramCardProps) {
-  const titleId = useId();
   return (
     <article
-      aria-labelledby={titleId}
+      aria-label={program.name}
       className="relative flex h-full min-w-0 flex-col break-words overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none"
     >
       <Link
@@ -75,7 +73,7 @@ export default function ProgramCard({
         className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`}
       />
       <div className="flex items-start justify-between gap-2 px-4 pt-4">
-        <h3 id={titleId} className="min-w-0 flex-1">
+        <h3 className="min-w-0 flex-1">
           <EntityCell
             name={program.name}
             avatar={

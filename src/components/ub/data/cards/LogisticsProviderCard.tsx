@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   Eye,
@@ -60,11 +60,10 @@ export default function LogisticsProviderCard({
   href: string;
   locked?: boolean;
 }) {
-  const titleId = useId();
   const whatsapp = provider.whatsapp?.replace(/\D/g, "");
   return (
     <article
-      aria-labelledby={titleId}
+      aria-label={locked ? "Logistics provider" : provider.name}
       className={`relative flex h-full min-w-0 flex-col rounded-ub-xl border border-ub-border bg-ub-surface transition-[border-color,box-shadow] duration-200 motion-reduce:transition-none ${
         locked
           ? ""
@@ -81,7 +80,7 @@ export default function LogisticsProviderCard({
         />
       )}
       <div className="flex items-start justify-between gap-2 p-4 pb-0 sm:p-5 sm:pb-0">
-        <h3 id={titleId} className="min-w-0 flex-1">
+        <h3 className="min-w-0 flex-1">
           {locked ? (
             <EntityCell
               name="Logistics provider"

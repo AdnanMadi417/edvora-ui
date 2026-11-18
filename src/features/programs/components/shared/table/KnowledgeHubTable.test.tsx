@@ -51,13 +51,16 @@ it("preserves off-page selection and keeps business amounts and management actio
   expect(select).toHaveBeenCalledWith(sampleProgram.id);
 });
 
-it.each(["/admin", "/data-entry"] as const)(
-  "provides role-correct university and language-center quick links for %s",
-  (basePath) => {
+it.each([
+  ["/admin", false, "active", "Visible"],
+  ["/data-entry", true, "inactive", "Hidden"],
+] as const)(
+  "shows the card's fields only, with visibility on the logo, for %s",
+  (basePath, isHidden, tone, label) => {
     render(
       <KnowledgeHubTable
         basePath={basePath}
-        programs={[sampleProgram]}
+        programs={[{ ...sampleProgram, is_hidden: isHidden }]}
         loading={false}
         isFetching={false}
         error={null}
@@ -75,27 +78,20 @@ it.each(["/admin", "/data-entry"] as const)(
         editHref={(id) => `${basePath}/knowledge-hub/${id}/edit`}
       />
     );
-    const university = screen.getByRole("link", {
-      name: `University: ${sampleProgram.university.name}`,
+    expect(
+      screen.getAllByRole("columnheader").map((th) => th.textContent?.trim())
+    ).toEqual(expect.arrayContaining(["Program", "Commission", "Intakes", "Actions"]));
+    expect(screen.queryByRole("columnheader", { name: /Requirements|Quick links|Status/ })).toBeNull();
+    const row = screen.getByRole("link", {
+      name: new RegExp(
+        `^${label} ${sampleProgram.name.replace(/[()]/g, "\\$&")}`
+      ),
     });
-    const centers = screen.getByRole("link", {
-      name: `Language centers for ${sampleProgram.university.name}`,
-    });
-    expect(university).toHaveAttribute(
-      "href",
-      `${basePath}/universities/${encodeURIComponent(
-        sampleProgram.university.id
-      )}`
-    );
-    expect(centers).toHaveAttribute(
-      "href",
-      `${basePath}/language-centers?university_id=${encodeURIComponent(
-        sampleProgram.university.id
-      )}`
-    );
-    expect(university.closest("[data-column]")).toBe(
-      centers.closest("[data-column]")
-    );
-    expect(university.parentElement?.closest("a")).toBeNull();
+    expect(row).toHaveAttribute("href", `${basePath}/knowledge-hub/${sampleProgram.id}`);
+    expect(row).toHaveTextContent(sampleProgram.university.name);
+    const status = row.querySelector("[data-entity-status]");
+    expect(status).toHaveAttribute("data-entity-status", tone);
+    expect(status).toHaveAttribute("title", label);
+    expect(screen.getByRole("columnheader", { name: "Actions" })).toHaveClass("text-end");
   }
 );

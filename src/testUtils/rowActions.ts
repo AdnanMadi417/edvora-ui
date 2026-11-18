@@ -12,8 +12,9 @@ function inline(name: string): HTMLElement | null {
   // "View X" is now the row's name link (or name button).
   const view = /^View (.+)$/.exec(name);
   if (view) {
-    // The row link's name is the whole cell, which starts with the row's name.
-    const starts = new RegExp(`^${view[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+    // The row link's name is the whole cell: the status circle's word (when
+    // the record has one), then the row's name.
+    const starts = new RegExp(`^(?:\\S+ )?${view[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
     return screen.queryAllByRole("link", { name: starts })[0] ?? screen.queryAllByRole("button", { name: starts })[0] ?? null;
   }
   return null;

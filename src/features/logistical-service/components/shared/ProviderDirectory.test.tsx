@@ -124,3 +124,13 @@ it("offers data-entry details and edit links without deletion", () => {
     queryRowAction("Delete Airport Assist")
   ).not.toBeInTheDocument();
 });
+it("shows each provider's logo or initials with its status on it, and no Status column", () => {
+  render(<ProviderDirectory />);
+  expect(screen.queryByRole("columnheader", { name: "Status" })).toBeNull();
+  expect(screen.getByRole("columnheader", { name: "Actions" })).toHaveClass("text-end");
+  const active = screen.getByRole("link", { name: /^Active Airport Assist/ });
+  expect(within(active).getByText("AA")).toBeInTheDocument();
+  expect(active.querySelector("[data-entity-status]")).toHaveAttribute("title", "Active");
+  const inactive = screen.getByRole("link", { name: /^Inactive City Support/ });
+  expect(inactive.querySelector("[data-entity-status]")).toHaveAttribute("data-entity-status", "inactive");
+});
