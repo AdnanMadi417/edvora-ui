@@ -115,7 +115,7 @@ export default function CreateFieldOfStudy({
       size="md"
       icon={Tag}
       title="Create field of study"
-      description="Add a study area to help advisors find the right programmes."
+      description="Add a study area to help advisors find the right programs."
       onSubmit={async () => {
         await handleCreate();
       }}

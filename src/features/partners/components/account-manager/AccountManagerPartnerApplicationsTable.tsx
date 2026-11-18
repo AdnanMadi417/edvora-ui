@@ -227,7 +227,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                       </div>
                     </td>
 
-                    <td data-label="Programme" className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
+                    <td data-label="Program" className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
                       <div className="truncate text-sm text-ub-text-primary">{app.program_name}</div>
                       <div className="truncate text-xs text-ub-text-secondary">{app.university_name}</div>
                     </td>

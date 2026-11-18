@@ -81,7 +81,7 @@ export default function CreateBranch({
       size="md"
       icon={GitBranch}
       title="Create branch"
-      description="Add a campus and its location to this institution."
+      description="Add a campus and its location to this university."
       onSubmit={async () => {
         await handleCreate();
       }}

@@ -226,7 +226,7 @@ export default function UniversityPublicProfile({ university }: Props) {
               tabs={PROFILE_TABS}
               active={activeTab}
               onChange={(key: ProfileTab) => setActiveTab(key)}
-              variant="underline" idPrefix={tabId} aria-label="Institution sections"
+              variant="underline" idPrefix={tabId} aria-label="University sections"
             />
           )}
 

@@ -44,7 +44,7 @@ it("hides university commission and team shortcuts from restricted advisor membe
     screen.queryByRole("link", { name: /manage your team/i })
   ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Start application" })
+    screen.getByRole("link", { name: "New application" })
   ).toBeInTheDocument();
 });
 

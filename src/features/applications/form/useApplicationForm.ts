@@ -24,6 +24,8 @@ import { getCurrentDate } from "features/applications/partner/components/form/ut
 import { updateFormData as updateNestedFormData } from "features/applications/partner/components/form/utility-functions/updateFormData";
 import { validateFormData } from "features/applications/partner/components/form/utility-functions/validateFormData";
 import type { DocumentItem, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
+import { draftKey, type ApplicationDraft } from "./draftStore";
+import { useApplicationDraft } from "./useApplicationDraft";
 import { APPLICATION_FORM_STEPS, buildPayload, missingRequiredDocuments, visibleSteps, type ApplicationFormStepId } from "./applicationFormModel";
 
 export interface ApplicationFormPreset {
@@ -177,6 +179,32 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
 
   const { removeDocument } = useRemoveDocument(formData, setFormData, showToast);
 
+  // Device-local draft, one per user and per form (New application, or the
+  // programme the Advisor came from). See draftStore.
+  const restoreDraft = (draft: ApplicationDraft) => {
+    // Finished uploads come back as they were; ones cut off mid-upload are sent again.
+    const done = draft.formData.documents.filter((d) => d.file_key).map((d) => ({ ...d, uploading: false, progress: 100 }));
+    const retry = draft.formData.documents.filter((d) => !d.file_key && d.raw);
+    setFormData({ ...draft.formData, documents: done });
+    setStep(draft.step);
+    setCompleted(draft.completed);
+    setErrors({});
+    setDirty(true);
+    retry.forEach((d) => void upload(d.raw as File, d.document_type_id));
+  };
+  const draft = useApplicationDraft({
+    key: draftKey(user?.id, { programId: preset?.program_id }),
+    formData,
+    step,
+    completed,
+    dirty,
+    onRestore: restoreDraft,
+  });
+  const saveDraft = async () => {
+    if (await draft.saveNow()) showToast("Draft saved on this device.", "success");
+    else showToast("Couldn't save a draft in this browser. Private browsing can block it, so submit before you leave.", "error");
+  };
+
   const submit = async () => {
     for (const s of steps) {
       if (!validate(s.id)) {
@@ -201,6 +229,7 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
     try {
       await createPartnerApplication(buildPayload(formData));
       setDirty(false);
+      await draft.clear();
       showToast("Application submitted.", "success");
       router.push("/partner/applications");
     } catch (err: unknown) {
@@ -211,11 +240,17 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
   const goTo = (id: ApplicationFormStepId) => setStep(id);
   const { dialog: leaveDialog } = useLeaveGuard(dirty, {
     title: "Leave this application?",
-    description: "What you've entered will be lost. Applications can't be saved as drafts yet.",
+    description: draft.saved
+      ? "Your progress is saved as a draft on this device, so you can resume it here later."
+      : "What you've entered will be lost.",
   });
 
   return {
     leaveDialog,
+    draftOffer: draft.offer,
+    resumeDraft: draft.resume,
+    discardDraft: draft.discard,
+    saveDraft,
     formData,
     errors,
     update,

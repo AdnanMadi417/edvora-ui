@@ -587,7 +587,7 @@ export function seedTimeline(app: AppRecord): TimelineEntry[] {
       to_stage: STAGES[st.stageIndex].name,
       to_status: st.name,
       reason_text: CORRECTION_REASONS[code] ?? null,
-      notes: code === "UNIVERSITY_APPROVED" ? "Offer letter received from the Institution." : null,
+      notes: code === "UNIVERSITY_APPROVED" ? "Offer letter received from the university." : null,
       required_document_types: code === app.statusCode && app.requested_doc_type_ids.length ? app.requested_doc_type_ids.map(docTypeRef) : null,
     });
     if (code === "PAYMENT_SUBMITTED") {

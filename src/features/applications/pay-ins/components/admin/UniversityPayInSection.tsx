@@ -28,7 +28,7 @@ export default function UniversityPayInSection({ payIn, onRefetch }: UniversityP
   return (
     <>
       <SectionCard
-        title="Institution pay-in"
+        title="University pay-in"
         action={<StatusTag status={isVoided ? "Voided" : "Received"} tone={isVoided ? "danger" : "success"} size="md" />}
         footer={!isVoided ? <Button variant="secondary" size="sm" onClick={() => setShowVoidModal(true)} icon={<Ban className="h-4 w-4" aria-hidden="true" />} text="Void and correct" /> : undefined}
       >

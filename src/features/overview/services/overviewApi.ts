@@ -3,6 +3,7 @@ import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
 import { isAdvisorAction } from "features/applications/stages";
 import { unibexsVoice } from "lib/unibexsVoice";
+import { relabelText, stageLabel, statusLabel } from "config/statusLabels";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
@@ -58,7 +59,7 @@ const auth = () => {
 export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
   const { role, partnerId, agencyAdmin, canViewCommission } = context;
   // Advisors hear one voice: backend copy that names a staff role reads as Unibexs.
-  const say = (text: string) => (role === "partner" ? unibexsVoice(text) : text);
+  const say = (text: string) => (role === "partner" ? unibexsVoice(relabelText(text)) : relabelText(text));
   if (
     !["admin", "account_manager", "reviewer", "data_entry", "partner"].includes(
       role
@@ -135,7 +136,7 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
                   .join(" · "),
                 href: idPath(`${base}/applications`, item.id),
                 status: item.status,
-                statusLabel: item.status ? say(item.status.replace(/_/g, " ")) : undefined,
+                statusLabel: item.status ? say(statusLabel(item.status)) : undefined,
               })
             );
           return { total: data.total, items };
@@ -192,7 +193,7 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
               });
               return {
                 key: stage.id,
-                label: stage.name,
+                label: stageLabel(stage.name),
                 value: collection(result.data).total,
                 stageId: getApiStageTagId(stage),
               };
@@ -393,14 +394,14 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
     for (const hidden of [false, true])
       add({
         id: hidden ? "hiddenPrograms" : "programs",
-        title: hidden ? "Hidden programmes" : "Visible programmes",
+        title: hidden ? "Hidden programs" : "Visible programs",
         subtitle: hidden
           ? "Review catalogue entries that are hidden from advisors."
-          : "Programmes currently available in the catalogue.",
+          : "Programs currently available in the catalogue.",
         href: `${base}/knowledge-hub`,
         emptyMessage: hidden
-          ? "No programmes are hidden from advisors."
-          : "No visible programmes yet.",
+          ? "No programs are hidden from advisors."
+          : "No visible programs yet.",
         load: async () => {
           const response = await programApi.programs.list({
             page: 1,
@@ -424,10 +425,10 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
       });
     add({
       id: "institutions",
-      title: "Institutions",
-      subtitle: "Institutions in the catalogue",
+      title: "Universities",
+      subtitle: "Universities in the catalogue",
       href: `${base}/universities`,
-      emptyMessage: "No institutions yet.",
+      emptyMessage: "No universities yet.",
       load: async () => {
         const response = await universityApi.universities.list({
           page: 1,

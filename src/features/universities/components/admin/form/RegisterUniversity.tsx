@@ -275,7 +275,7 @@ export default function RegisterUniversity({
   return (
     <SteppedFormPage
       title="Create university"
-      description="Build the institution profile, set its availability, then add its campuses."
+      description="Build the university profile, set its availability, then add its campuses."
       className="mx-auto max-w-5xl"
       icon={GraduationCap}
       currentStep={currentStep}
@@ -288,7 +288,7 @@ export default function RegisterUniversity({
       steps={[
         {
           id: "profile",
-          label: "Institution",
+          label: "University",
           description: "Name, category and profile",
           validate: () => validateStep(false),
           content: (
@@ -517,7 +517,7 @@ export default function RegisterUniversity({
       review={
         <div className="space-y-6">
           <Alert tone="info" title="Ready to create">
-            Check the institution and branch details. Use Back or a completed
+            Check the university and branch details. Use Back or a completed
             step to make changes.
           </Alert>
           <DescriptionList
@@ -537,7 +537,7 @@ export default function RegisterUniversity({
                 fullWidth: true,
               },
               {
-                label: "Institution type",
+                label: "University type",
                 value: formData.is_public ? "Public" : "Private",
               },
               {

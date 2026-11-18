@@ -53,7 +53,7 @@ export function overviewConfig(context: OverviewContext) {
             "Review outstanding payouts"
           ),
           action(
-            "Manage institutions",
+            "Manage universities",
             "/universities",
             "Maintain university records"
           ),
@@ -78,7 +78,7 @@ export function overviewConfig(context: OverviewContext) {
             "Support assigned and shared advisors"
           ),
           action(
-            "Explore programmes",
+            "Explore programs",
             "/knowledge-hub",
             "Find suitable study options"
           ),
@@ -111,7 +111,7 @@ export function overviewConfig(context: OverviewContext) {
     case "data_entry":
       return {
         title: "Catalogue overview",
-        subtitle: "Maintain accurate programmes and institution information.",
+        subtitle: "Maintain accurate program and university information.",
         metrics: [
           "catalogueQuality",
           "programs",
@@ -121,12 +121,12 @@ export function overviewConfig(context: OverviewContext) {
         panels: ["catalogueQuality", "hiddenPrograms", "languageCenters"],
         actions: [
           action(
-            "Create programme",
+            "Create program",
             "/knowledge-hub/create",
             "Add a new study option"
           ),
           action(
-            "Add institution",
+            "Add university",
             "/universities/create",
             "Register a university"
           ),
@@ -136,7 +136,7 @@ export function overviewConfig(context: OverviewContext) {
             "Maintain center information"
           ),
           action(
-            "Manage programmes",
+            "Manage programs",
             "/knowledge-hub",
             "Review and update catalogue entries"
           ),
@@ -162,7 +162,7 @@ export function overviewConfig(context: OverviewContext) {
           ...(context.canCreateApplication
             ? [
                 action(
-                  "Start application",
+                  "New application",
                   "/applications/apply-now",
                   "Apply for a student"
                 ),
@@ -174,7 +174,7 @@ export function overviewConfig(context: OverviewContext) {
             "Review progress and next steps"
           ),
           action(
-            "Explore programmes",
+            "Explore programs",
             "/knowledge-hub",
             "Find the right course"
           ),
@@ -216,7 +216,7 @@ export const metricIcons = {
 };
 export const metricLabels: Record<string, string> = {
   offers: "In offer stage",
-  actionRequired: "Action required",
+  actionRequired: "Action needed",
   catalogueQuality: "Records to complete",
   languageCenters: "Language centers",
   verified: "Verified advisors",
@@ -227,9 +227,9 @@ export const metricLabels: Record<string, string> = {
   advisors: "Active advisors",
   registrations: "Pending registrations",
   managers: "Account managers",
-  programs: "Visible programmes",
-  hiddenPrograms: "Hidden programmes",
-  institutions: "Institutions",
+  programs: "Visible programs",
+  hiddenPrograms: "Hidden programs",
+  institutions: "Universities",
   unread: "Unread updates",
 };
 
@@ -237,7 +237,7 @@ export const metricCaptions: Record<string, string> = {
   offers: "Active applications in the offer-letter stage",
   actionRequired: "Applications waiting for the next step",
   catalogueQuality: "Programs missing required information",
-  languageCenters: "Centers in the institution catalogue",
+  languageCenters: "Centers in the university catalogue",
   verified: "Profiles that have completed verification",
   active: "Applications currently in progress",
   hold: "Paused applications to follow up",
@@ -248,6 +248,6 @@ export const metricCaptions: Record<string, string> = {
   managers: "Account manager directory",
   programs: "Available in the catalogue",
   hiddenPrograms: "Not visible to advisors",
-  institutions: "Institutions in the catalogue",
+  institutions: "Universities in the catalogue",
   unread: "Notifications for your account",
 };

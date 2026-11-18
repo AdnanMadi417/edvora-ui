@@ -363,7 +363,7 @@ export default function RegisterProgram({
     <>
       <SteppedFormPage
         title="Create program"
-        description="Define the programme, set its fees and requirements, then review before publishing."
+        description="Define the program, set its fees and requirements, then review before publishing."
         icon={BookOpen}
         currentStep={currentStep}
         onStepChange={setCurrentStep}
@@ -374,8 +374,8 @@ export default function RegisterProgram({
         steps={[
           {
             id: "programme",
-            label: "Programme",
-            description: "Details and institution",
+            label: "Program",
+            description: "Details and university",
             validate: () => validateStep(0),
             content: (
               <div className="space-y-6">
@@ -471,10 +471,10 @@ export default function RegisterProgram({
                 </div>
                 <section
                   className="border-t border-ub-border pt-6"
-                  aria-label="Institution and campus"
+                  aria-label="University and campus"
                 >
                   <h3 className="mb-4 text-ub-heading-sm text-ub-text-primary">
-                    Institution and campus
+                    University and campus
                   </h3>
 
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -777,7 +777,7 @@ export default function RegisterProgram({
               Check the programme details, fees, and scholarships. Use Back or a
               completed step to make changes.
             </Alert>
-            <SectionCard title="Programme">
+            <SectionCard title="Program">
               <DescriptionList
                 columns={2}
                 fallback="Not provided"
@@ -803,7 +803,7 @@ export default function RegisterProgram({
                     label: "Delivery",
                     value: formData.is_on_campus ? "On campus" : "Online",
                   },
-                  { label: "Institution", value: selectedUniversity?.name },
+                  { label: "University", value: selectedUniversity?.name },
                   { label: "Branch", value: selectedBranch?.name },
                   ...(isMasterOrPhd(selectedQualification?.name)
                     ? [

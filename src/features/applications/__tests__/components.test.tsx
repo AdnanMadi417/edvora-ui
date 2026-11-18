@@ -29,7 +29,7 @@ describe("Application Details components", () => {
     render(<ApplicationHeader studentName="Nur Aisyah Binti Kamal" reference="UBX-2026-0412" stageId="offer-received" daysInStage={9} institution="Sunway University" primaryAction={{ label: "Accept offer", onClick }} overflowActions={[{ label: "Withdraw application", icon: XCircle, onClick: jest.fn(), destructive: true }]} />);
     expect(screen.getByRole("heading", { level: 1, name: "Nur Aisyah Binti Kamal" })).toBeInTheDocument();
     expect(screen.getByText("UBX-2026-0412")).toBeInTheDocument();
-    expect(screen.getByText("Offer received")).toBeInTheDocument();
+    expect(screen.getByText("University and offer")).toBeInTheDocument();
     expect(screen.getByText("9 days in stage")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Accept offer" }));
     expect(onClick).toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("Application Details components", () => {
   it("ApplicationTrackerCard: aria-current step and next step", () => {
     render(<ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_LETTER", statusCode: "WAITING_FOR_PAYMENT" })} nextStep="Pay the visa fee" />);
     const current = screen.getAllByRole("listitem").find((li) => li.getAttribute("aria-current") === "step");
-    expect(current).toHaveTextContent("Offer");
+    expect(current).toHaveTextContent("University and offer");
     expect(screen.getByText("Pay the visa fee")).toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe("Application Details components", () => {
     expect(screen.getByText("Offer received")).toBeInTheDocument();
     expect(screen.getByText("Due in 12 days")).toBeInTheDocument();
     rerender(<OfferCard status="awaiting" />);
-    expect(screen.getByText(/appears here once the Institution decides/)).toBeInTheDocument();
+    expect(screen.getByText(/appears here once the university decides/)).toBeInTheDocument();
   });
 
   it("VisaStatusCard: steps", () => {
@@ -175,7 +175,7 @@ describe("Application Details components", () => {
   it("WithdrawApplicationDialog: names the consequence, Cancel focused first", async () => {
     render(<WithdrawApplicationDialog open onClose={jest.fn()} onConfirm={jest.fn()} />);
     const dialog = await screen.findByRole("alertdialog");
-    expect(within(dialog).getByText("The Institution will be notified, and this can't be undone.")).toBeInTheDocument();
+    expect(within(dialog).getByText("The university will be notified, and this can't be undone.")).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: "Withdraw application" })).toBeInTheDocument();
   });
 });

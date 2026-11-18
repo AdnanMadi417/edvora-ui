@@ -102,7 +102,7 @@ export default function ApplicationDetails({ application, onRefetch }: Applicati
     "reupload-form": { label: `Re-upload ${rejectedForm?.label ?? "form"}`, icon: FileUp, run: () => setPopup("reupload") },
     "required-docs": { label: "Upload required documents", icon: Upload, run: () => setPopup("required") },
     "arrival-form": { label: "Upload arrival form", icon: Upload, run: () => setPopup("required") },
-    "program-decision": { label: "Submit programme decision", icon: ClipboardCheck, run: () => setPopup("program") },
+    "program-decision": { label: "Submit program decision", icon: ClipboardCheck, run: () => setPopup("program") },
     "visa-payment": { label: "Pay visa fee", icon: CreditCard, run: () => setPopup("visa-payment") },
     "accept-offer": { label: "Accept offer", icon: CheckCircle2, run: acceptOffer },
     "confirm-arrival": { label: "Confirm arrival", icon: Plane, run: () => setPopup("arrival") },

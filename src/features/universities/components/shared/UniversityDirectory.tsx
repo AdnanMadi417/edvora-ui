@@ -135,8 +135,8 @@ export default function UniversityDirectory({
       <div className="flex flex-col gap-4 border-b border-ub-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <p className="text-ub-body-sm text-ub-text-secondary">
           {canManage
-            ? "Manage institutions, intakes and university availability."
-            : "Explore institutions, study locations and language support."}
+            ? "Manage universities, intakes and availability."
+            : "Explore universities, study locations and language support."}
         </p>
         {canManage && (
           <LinkBtn

@@ -192,7 +192,7 @@ export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
         open={showFilters}
         onClose={onToggleFilters}
         title="Filter applications"
-        description="Narrow applications by institution, stage and status."
+        description="Narrow applications by university, stage and status."
         footer={
           <div className="grid w-full grid-cols-2 gap-3">
             <Button

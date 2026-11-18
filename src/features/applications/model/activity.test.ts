@@ -30,7 +30,7 @@ it("keeps bulk document names in readable details instead of a long headline", (
 
 it("keeps the actor separate and preserves correction reasons and notes", () => {
   const [event] = toTimelineEvents([item({ to_status: "Correction requested", reason_text: "The passport scan is blurred.\nPlease upload a clear copy.", notes: "Keep every page visible." })]);
-  expect(event.title).toBe("Status changed to Correction requested");
+  expect(event.title).toBe("Status changed to Corrections requested by Unibexs");
   expect(event.actor).toBe("Priya Nair");
   expect(event.details).toContainEqual({ label: "Reason", text: "The passport scan is blurred.\nPlease upload a clear copy." });
   expect(event.details).toContainEqual({ label: "Notes", text: "Keep every page visible." });

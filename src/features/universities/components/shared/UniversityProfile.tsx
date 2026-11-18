@@ -31,7 +31,7 @@ export default function UniversityProfile({
     return (
       <EmptyData
         title="University unavailable"
-        subtitle="This institution could not be found or is unavailable."
+        subtitle="This university could not be found or is unavailable."
         action={
           <LinkBtn
             href={basePath}

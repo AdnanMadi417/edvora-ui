@@ -20,42 +20,21 @@ export interface StageMapping {
   stepId: string | "done";
 }
 
-/** Backend stage code → stage tag + tracker step (codes from config/workflow.generated.ts). */
+/** Backend stage code → stage tag + tracker step (codes from config/workflow.generated.ts).
+ *  One tag and one tracker step per stage, both with the stage's own name. */
 export const API_STAGE_MAP: Record<string, StageMapping> = {
-  APPLICATION_REVIEW: { stageId: "documents-pending", stepId: "documents" },
-  OFFER_LETTER: { stageId: "submitted", stepId: "submitted" },
+  APPLICATION_REVIEW: { stageId: "documents-pending", stepId: "review" },
+  OFFER_LETTER: { stageId: "offer-received", stepId: "offer" },
   VISA_PROCESSING: { stageId: "visa-in-progress", stepId: "visa" },
   STUDENT_ARRIVAL_ENROLLMENT: { stageId: "arrival-logistics", stepId: "arrival" },
-  PARTNER_COMMISSION_INVOICING: { stageId: "enrolled", stepId: "commission" },
+  PARTNER_COMMISSION_INVOICING: { stageId: "commission-paid", stepId: "commission" },
 };
 
-// The backend's Offer Letter stage covers both the Institution's review and the
-// offer itself, so the tracker step comes from the status inside it.
-const OFFER: Partial<StageMapping> = { stageId: "offer-received", stepId: "offer" };
-const AT_INSTITUTION: Partial<StageMapping> = { stageId: "institution-review", stepId: "submitted" };
-
-/** Status codes that refine the stage tag or tracker step inside a backend stage. */
+/** Status codes that change the tracker position inside a backend stage. Statuses no
+ *  longer change the stage tag: the status label says what is happening. */
 export const API_STATUS_STAGE_OVERRIDES: Record<string, Partial<StageMapping>> = {
-  APPROVED: { stageId: "submitted", stepId: "submitted" },
-  SENT_TO_UNIVERSITY: AT_INSTITUTION,
-  UNI_REQ_CORRECTIONS: AT_INSTITUTION,
-  PROGRAM_CHANGE_SUGGESTED: AT_INSTITUTION,
-  REJECTED_BY_UNIVERSITY: AT_INSTITUTION,
-  UNIVERSITY_APPROVED: OFFER,
-  WAITING_FOR_PAYMENT: OFFER,
-  PAYMENT_SUBMITTED: OFFER,
-  PAYMENT_REJECTED: OFFER,
-  PAYMENT_APPROVED: OFFER,
-  OFFER_LETTER_FORMS_APPROVED: OFFER,
-  APPLICATION_FORM_REJECTED: OFFER,
-  APPLICATION_FORM_2_REJECTED: OFFER,
-  HEALTH_DECLARATION_REJECTED: OFFER,
-  SIGNED_OFFER_LETTER_REJECTED: OFFER,
-  ENGLISH_FORM_REJECTED: OFFER,
-  ENROLLMENT_VERIFIED: { stageId: "enrolled" },
-  // Paid, but the Advisor still confirms receipt, so Commission stays the current step.
-  COMMISSION_PAID: { stageId: "commission-paid" },
-  APPLICATION_COMPLETE: { stageId: "commission-paid", stepId: "done" },
+  // Commission received and confirmed: every step is complete.
+  APPLICATION_COMPLETE: { stepId: "done" },
 };
 
 /** Statuses where the current step needs attention: a correction, rejection or re-upload. */

@@ -8,6 +8,7 @@ import type { ApplicationDetail } from "features/applications/shared/application
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { resolveStage, stageCodeOf, statusCodeOf, type ResolvedStage } from "features/applications/stages";
 import { unibexsVoice } from "lib/unibexsVoice";
+import { stageLabel, statusLabel } from "config/statusLabels";
 
 /** Backend actor ids used in stage.statuses[].next_actions. */
 export type ViewerActor = "2" | "3";
@@ -214,8 +215,10 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
     updatedAt: str(a.updated_at),
     arrivalDate: str(a.arrival_date),
     stage: {
-      apiName: voice(str(a.stage?.name)),
-      statusName: voice(str(status?.name)),
+      // One name per stage and status for every viewer (config/statusLabels.ts); unknown names
+      // fall back to the backend's own, in the Unibexs voice for Advisors.
+      apiName: voice(str(a.stage?.name) && stageLabel(stageCodeOf(a.stage) ?? a.stage?.name)),
+      statusName: voice(str(status?.name) && statusLabel(statusCode ?? status?.name)),
       statusCode,
       resolved: resolveStage({ stageCode: stageCodeOf(a.stage), statusCode, lifecycle: a.lifecycle_status }),
     },

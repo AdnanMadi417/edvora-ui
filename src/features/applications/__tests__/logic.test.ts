@@ -28,10 +28,10 @@ describe("stage → tag and hue", () => {
   it("maps every backend stage code to a configured stage", () => {
     Object.values(API_STAGE_MAP).forEach((m) => expect(getStage(m.stageId)).toBeDefined());
   });
-  it("uses the status override and flags attention", () => {
+  it("one tag per stage, whatever the status inside it, and flags attention", () => {
     const r = resolveStage({ stageCode: "OFFER_LETTER", statusCode: "SENT_TO_UNIVERSITY" });
-    expect(r?.stage?.id).toBe("institution-review");
-    expect(r?.stage?.hue).toBe("sky");
+    expect(r?.stage?.id).toBe("offer-received");
+    expect(r?.stage?.label).toBe("University and offer");
     expect(resolveStage({ stageCode: "OFFER_LETTER", statusCode: "WAITING_FOR_PAYMENT" })?.stage?.id).toBe("offer-received");
     expect(resolveStage({ stageCode: "APPLICATION_REVIEW", statusCode: "CORRECTION_REQUESTED" })?.attention).toBe(true);
   });
@@ -42,9 +42,10 @@ describe("stage → tag and hue", () => {
     expect(resolveStage({ stageCode: "SOMETHING_NEW" })).toBeNull();
   });
   it("tracker steps follow the stage", () => {
-    // The backend's Offer Letter stage holds both Submitted and Offer; the status decides.
+    // Five steps, one per backend stage, named like the stage tags.
     const steps = trackerStepsFor(resolveStage({ stageCode: "OFFER_LETTER", statusCode: "SENT_TO_UNIVERSITY" }));
-    expect(steps.map((s) => s.state)).toEqual(["complete", "complete", "current", "upcoming", "upcoming", "upcoming", "upcoming"]);
+    expect(steps.map((s) => s.label)).toEqual(["Unibexs review", "University and offer", "Visa", "Arrival and enrollment", "Commission"]);
+    expect(steps.map((s) => s.state)).toEqual(["complete", "current", "upcoming", "upcoming", "upcoming"]);
     // Arrival and Commission are steps of their own, not "all done".
     const at = (stageCode: string, statusCode?: string) =>
       trackerStepsFor(resolveStage({ stageCode, statusCode })).find((s) => s.state === "current")?.id;
@@ -54,7 +55,7 @@ describe("stage → tag and hue", () => {
     // Paid, but the Advisor still confirms receipt; only Application Complete finishes the tracker.
     expect(at("PARTNER_COMMISSION_INVOICING", "COMMISSION_PAID")).toBe("commission");
     expect(trackerStepsFor(resolveStage({ stageCode: "PARTNER_COMMISSION_INVOICING", statusCode: "APPLICATION_COMPLETE" })).every((s) => s.state === "complete")).toBe(true);
-    expect(trackerStepsFor(resolveStage({ stageCode: "APPLICATION_REVIEW", statusCode: "CORRECTION_REQUESTED" }))[1].state).toBe("attention");
+    expect(trackerStepsFor(resolveStage({ stageCode: "APPLICATION_REVIEW", statusCode: "CORRECTION_REQUESTED" }))[0].state).toBe("attention");
   });
 });
 
@@ -118,10 +119,10 @@ describe("timeline", () => {
     expect(e.title).toBe("Status changed to Submitted");
     expect(e.actor).toBe("Farid");
     expect(e.category).toBe("status");
-    expect(e.details).toContainEqual({ label: "From", text: "New" });
+    expect(e.details).toContainEqual({ label: "From", text: "Waiting for Unibexs review" });
     // Same stage: no stage line. A stage change says so.
     expect(e.details.find((d) => d.label.includes("tage"))).toBeUndefined();
-    expect(toTimelineEvents([{ id: "2", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "Submitted", to_status: "Offer", from_stage: "Review", to_stage: "Offer Letter", created_at: "2026-11-02T00:00:00Z" } as any])[0].details).toContainEqual({ label: "New stage", text: "Offer Letter" });
+    expect(toTimelineEvents([{ id: "2", application_id: "a", entry_type: "status_transition", actor_name: "Farid", from_status: "Submitted", to_status: "Offer", from_stage: "Review", to_stage: "Offer Letter", created_at: "2026-11-02T00:00:00Z" } as any])[0].details).toContainEqual({ label: "New stage", text: "University and offer" });
     expect(e.details).toContainEqual({ label: "Reason", text: "OK" });
   });
 });

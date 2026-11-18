@@ -10,8 +10,9 @@ import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
-import { ArrowLeft, ArrowRight, FileText, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Save, Send } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
+import Alert from "components/ub/feedback/notifications/Alert";
 import Collapse from "components/ub/core/motion/Collapse";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import FileUpload from "components/ub/forms/uploads/FileUpload";
@@ -62,6 +63,12 @@ export interface ApplicationFormViewProps {
   qualifications: { id: string | number; name: string }[];
   requiredFieldKeys: string[];
   intakeMonths: number[];
+  /** A draft saved on this device, offered until the Advisor resumes or discards it. */
+  draftOffer?: { studentName?: string; savedAt: number } | null;
+  resumeDraft?: () => unknown;
+  discardDraft?: () => unknown;
+  /** Shows "Save draft" in the footer when passed. */
+  saveDraft?: () => unknown;
   /** Page heading level; h3 when embedded in the style guide. */
   titleAs?: "h1" | "h2" | "h3";
 }
@@ -109,15 +116,15 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
         </h3>
         {mode === "programme" && (
           <Card extra="mt-4 gap-3 p-4">
-            <DescriptionList columns={2} fallback="Not chosen" items={[{ label: "Institution", value: uni?.name }, { label: "Programme", value: programme?.name }]} />
-            <Toggle checked={changeProgramme} onChange={setChangeProgramme} label="Choose a different programme" />
+            <DescriptionList columns={2} fallback="Not chosen" items={[{ label: "University", value: uni?.name }, { label: "Program", value: programme?.name }]} />
+            <Toggle checked={changeProgramme} onChange={setChangeProgramme} label="Choose a different program" />
           </Card>
         )}
         <Collapse open={changeProgramme}>
           <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
             <Combobox
               id={fieldId("university_id")}
-              label="Institution"
+              label="University"
               options={universities.map((u) => ({ value: String(u.id), label: u.name }))}
               value={formData.university_id || null}
               onChange={(v) => {
@@ -125,17 +132,17 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
                 update("program_id", "");
               }}
               error={errors.university_id}
-              placeholder="Search institutions"
+              placeholder="Search universities"
               required
             />
             <Combobox
               id={fieldId("program_id")}
-              label="Programme"
+              label="Program"
               options={(uni?.programs ?? []).map((p) => ({ value: p.id, label: p.name }))}
               value={formData.program_id || null}
               onChange={(v) => update("program_id", v ?? "")}
               error={errors.program_id}
-              placeholder={uni ? "Search programmes" : "Choose an Institution first"}
+              placeholder={uni ? "Search programs" : "Choose a university first"}
               disabled={!uni}
               required
             />
@@ -168,7 +175,7 @@ function DocumentsStep({ formData, errors, upload, removeDocument, documentTypes
     return <SectionCard title="Documents" state="loading" loadingRows={4} />;
   }
   if (!documentTypes.length) {
-    return <SectionCard title="Documents" state="empty" empty={{ icon: FileText, title: "Choose a programme first", description: "The documents depend on the programme and the student's nationality." }} />;
+    return <SectionCard title="Documents" state="empty" empty={{ icon: FileText, title: "Choose a program first", description: "The documents depend on the program and the student's nationality." }} />;
   }
   const slot = (t: DocumentType) => <DocumentSlot key={t.id} type={t} formData={formData} errors={errors} upload={upload} removeDocument={removeDocument} />;
   return (
@@ -306,13 +313,13 @@ function ReviewStep({ formData, universities, documentTypes, goTo, steps }: Pick
   const uploads = documentTypes.map((t) => ({ t, d: uploadedFor(formData.documents, t.id) })).filter(({ d }) => d?.file_key);
   return (
     <div className="grid gap-4">
-      <SectionCard title="Programme" as="h3" action={edit("student", "programme")}>
+      <SectionCard title="Program" as="h3" action={edit("student", "programme")}>
         <DescriptionList
           columns={2}
           fallback="Not chosen"
           items={[
-            { label: "Institution", value: uni?.name },
-            { label: "Programme", value: uni?.programs?.find((p) => p.id === formData.program_id)?.name },
+            { label: "University", value: uni?.name },
+            { label: "Program", value: uni?.programs?.find((p) => p.id === formData.program_id)?.name },
             { label: "Intake", value: formData.intake_date && <AppDate value={formData.intake_date} format="month-year" /> },
           ]}
         />
@@ -344,6 +351,23 @@ function ReviewStep({ formData, universities, documentTypes, goTo, steps }: Pick
   );
 }
 
+/** "You have an unfinished application…" with Resume / Discard, above the steps. */
+function DraftOfferPanel({ offer, onResume, onDiscard }: { offer: NonNullable<ApplicationFormViewProps["draftOffer"]>; onResume?: () => unknown; onDiscard?: () => unknown }) {
+  return (
+    <div className="border-b border-ub-border px-4 py-4 md:px-6">
+      <Alert tone="info" title="Unfinished application">
+        <p>
+          You have an unfinished application for {offer.studentName || "a student"}, saved <AppDate value={new Date(offer.savedAt)} format="relative" />. It's kept on this device only.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button variant="primary" size="sm" text="Resume draft" onClick={() => onResume?.()} />
+          <Button variant="secondary" size="sm" text="Discard" onClick={() => onDiscard?.()} />
+        </div>
+      </Alert>
+    </div>
+  );
+}
+
 // ── View ─────────────────────────────────────────────────────────────────
 
 /**
@@ -352,7 +376,7 @@ function ReviewStep({ formData, universities, documentTypes, goTo, steps }: Pick
  * error summary on a blocked step, and Back / Continue / Submit.
  */
 export default function ApplicationFormView(props: ApplicationFormViewProps) {
-  const { mode = "new", step, steps, completed, goTo, next, back, submit, submitting = false, errors, titleAs: Title = "h1" } = props;
+  const { mode = "new", step, steps, completed, goTo, next, back, submit, submitting = false, errors, draftOffer, resumeDraft, discardDraft, saveDraft, titleAs: Title = "h1" } = props;
   const index = steps.findIndex((s) => s.id === step);
   const last = index === steps.length - 1;
   const current = steps[index];
@@ -390,11 +414,13 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
         <IconTile icon={FileText} />
         <div className="min-w-0">
           <Title id="af-title" className="text-ub-heading-md text-ub-text-primary">
-            {mode === "programme" ? "Apply for this programme" : "New application"}
+            {mode === "programme" ? "Apply for this program" : "New application"}
           </Title>
           <p className="mt-0.5 text-ub-body-sm text-ub-text-secondary">Every field is required unless it says (optional). You can review everything before you submit.</p>
         </div>
       </header>
+
+      {draftOffer && <DraftOfferPanel offer={draftOffer} onResume={resumeDraft} onDiscard={discardDraft} />}
 
       <div className="border-b border-ub-border px-4 py-4 md:px-6">
         <StepIndicator aria-label="Application steps" steps={steps} currentId={step} completedIds={completed} onStepClick={(id) => move(() => goTo(id as ApplicationFormStepId))} />
@@ -427,6 +453,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
           {completed.length > 0 && ` · ${completed.length} done`}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:flex [&>button]:min-h-[44px]">
+          {saveDraft && <Button variant="secondary" text="Save draft" icon={<Save className="h-4 w-4" aria-hidden="true" />} onClick={() => saveDraft()} disabled={submitting} className="col-span-2 sm:col-span-1" />}
           {index > 0 ? <Button variant="secondary" text="Back" icon={<ArrowLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => move(back)} disabled={submitting} /> : <span />}
           {last ? (
             <Button variant="primary" text="Submit application" icon={<Send className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => submit()} loading={submitting} />

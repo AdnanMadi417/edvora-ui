@@ -179,7 +179,7 @@ export default function UniversityTypeDirectory({
     <div className="mt-6 min-w-0 rounded-ub-lg border border-ub-border bg-ub-surface">
       <header className="flex flex-col justify-between gap-4 border-b border-ub-border p-4 sm:flex-row sm:items-center sm:p-6">
         <p className="text-ub-body-sm text-ub-text-secondary">
-          Define the information needed for each institution category.
+          Define the information needed for each university category.
         </p>
         <LinkBtn
           href={`${basePath}/create`}
@@ -307,7 +307,7 @@ export default function UniversityTypeDirectory({
           open={!!target}
           onClose={() => setTarget(null)}
           title="Delete university type"
-          description="Remove this institution category and its field configuration."
+          description="Remove this university category and its field configuration."
           onSubmit={remove}
           submitLabel="Delete type"
           submitTone="destructive"

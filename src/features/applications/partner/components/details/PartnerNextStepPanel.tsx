@@ -100,7 +100,7 @@ export default function PartnerNextStepPanel({ mode, ownerName, visaFeeAmount, v
   }
 
   return (
-    <SectionCard title="Pay the visa fee" description="Pay using one of the Institution's payment methods, then upload the receipt.">
+    <SectionCard title="Pay the visa fee" description="Pay using one of the university's payment methods, then upload the receipt.">
       <div className="grid gap-4">
         {visaFeeAmount ? <KeyValueGrid columns={1} items={[{ label: "Amount due", value: <Amount value={visaFeeAmount} /> }]} /> : null}
         {visaFeeNote && <Alert tone="warning">{visaFeeNote}</Alert>}

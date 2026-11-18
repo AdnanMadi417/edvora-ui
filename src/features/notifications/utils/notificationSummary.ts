@@ -1,10 +1,12 @@
 import type { Notification } from "../types";
 import { getNotificationStageStatus, getSenderName } from "./notificationIcons";
 import { unibexsVoice } from "lib/unibexsVoice";
+import { relabelText } from "config/statusLabels";
 
 /** One subject/event and one useful message, shared by the inbox and bell preview. */
 export function getNotificationSummary(notification: Notification, { forAdvisor = false }: { forAdvisor?: boolean } = {}) {
-  const say = (text: string) => forAdvisor ? unibexsVoice(text) : text;
+  // Status and stage names read as everywhere else; Advisors also get the Unibexs voice.
+  const say = (text: string) => (forAdvisor ? unibexsVoice(relabelText(text)) : relabelText(text));
   const subject = notification.data?.student_name || getSenderName(notification, { forAdvisor });
   const events: Record<string, string> = {
     new_application: "New application",

@@ -184,10 +184,10 @@ export const validateFormData = (
       newErrors["student.nationality"] = "Choose the student's nationality.";
 
     if (isEmpty(formData.university_id))
-      newErrors["university_id"] = "Choose an Institution.";
+      newErrors["university_id"] = "Choose a university.";
 
     if (isEmpty(formData.program_id))
-      newErrors["program_id"] = "Choose a programme.";
+      newErrors["program_id"] = "Choose a program.";
   }
 
   if (stageNum === 2) {

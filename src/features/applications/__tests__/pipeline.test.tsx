@@ -30,7 +30,7 @@ it("keeps stage counts and filters without duplicating the summary cards", () =>
   const filters = screen.getByRole("group", { name: "Filter applications by stage" });
   expect(within(filters).getByText("12")).toBeInTheDocument();
   expect(within(filters).getByText("6")).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /Partner commission invoicing/ })).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: /^Commission:/ })).toBeInTheDocument();
   expect(screen.queryByText(/999/)).not.toBeInTheDocument();
 });
 
@@ -43,7 +43,7 @@ it("toggles a stage on and off without extra pipeline controls", async () => {
   }
   const user = userEvent.setup();
   render(<Harness />);
-  const stage = screen.getByRole("button", { name: /Application submission/ });
+  const stage = screen.getByRole("button", { name: /Unibexs review/ });
   await user.click(stage);
   expect(stage).toHaveAttribute("aria-pressed", "true");
   expect(screen.queryByText("Your pipeline")).not.toBeInTheDocument();
@@ -61,7 +61,7 @@ it("shows loading and error states without presenting missing stage counts as ze
     screen.getAllByRole("status", { name: "Loading" }).length
   ).toBeGreaterThan(0);
   expect(
-    screen.queryByRole("button", { name: /Application submission/ })
+    screen.queryByRole("button", { name: /Unibexs review/ })
   ).not.toBeInTheDocument();
   rerender(
     <PipelineCard

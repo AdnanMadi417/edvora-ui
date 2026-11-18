@@ -218,7 +218,7 @@ export default function UniversityFilterPanel({
         open={open}
         onClose={close}
         title="Filter universities"
-        description="Find institutions by type, language support and availability."
+        description="Find universities by type, language support and availability."
         footer={
           <div className="grid w-full grid-cols-2 gap-3">
             <Button

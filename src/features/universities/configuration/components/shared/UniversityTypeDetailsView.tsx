@@ -82,7 +82,7 @@ export default function UniversityTypeDetailsView({
       <SectionCard
         title="Application requirements"
         as="h2"
-        description="Institutions assigned to this type use these field requirements when applications are submitted."
+        description="Universities assigned to this type use these field requirements when applications are submitted."
       >
         <div className="mb-5 flex min-w-0 flex-col gap-3 sm:flex-row">
           <SearchInput

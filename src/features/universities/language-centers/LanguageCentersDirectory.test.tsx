@@ -276,7 +276,7 @@ it("filters public/private institutions and clears the filter", async () => {
   await user.click(screen.getByRole("button", { name: "University filters" }));
   await selectOption(
     user,
-    screen.getByRole("combobox", { name: /^Institution type/ }),
+    screen.getByRole("combobox", { name: /^University type/ }),
     "private"
   );
   expect(
@@ -330,7 +330,7 @@ it("keeps search and filters working in the advisor card layout", async () => {
   await user.click(screen.getByRole("button", { name: "University filters" }));
   await selectOption(
     user,
-    screen.getByRole("combobox", { name: /^Institution type/ }),
+    screen.getByRole("combobox", { name: /^University type/ }),
     "public"
   );
   await user.click(screen.getByRole("button", { name: "Apply filters" }));

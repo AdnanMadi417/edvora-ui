@@ -14,6 +14,7 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useUpdateCorrectionRequest } from "features/applications/hooks";
 import type { DocumentType } from "features/applications/hooks/stages/useApplicationActions";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
+import { statusLabel } from "config/statusLabels";
 
 /** Backend error codes → in-modal copy; anything else falls back to the API message. */
 const ERROR_MESSAGES: Record<string, string> = {
@@ -106,7 +107,7 @@ export default function UpdateCorrectionRequest({
       title="Update correction request"
       footerNote="Review the reason and requested documents before saving."
       description={statusName
-                ? `Request more documents for "${statusName}" without changing the status.`
+                ? `Request more documents for "${statusLabel(statusName)}" without changing the status.`
                 : "Request more documents without changing the status."}
       onSubmit={handleSubmit}
       submitLabel="Update request"

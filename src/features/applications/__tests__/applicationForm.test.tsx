@@ -85,8 +85,8 @@ describe("ApplicationFormView", () => {
   });
   it("programme mode shows the preset with a switch to change it", () => {
     render(<ApplicationFormView {...base} mode="programme" step="student" errors={{}} />);
-    expect(screen.getByRole("heading", { name: "Apply for this programme" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Apply for this program" })).toBeInTheDocument();
     expect(screen.getByText("Sunway University")).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: /Choose a different programme/ })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: /Choose a different program/ })).toBeInTheDocument();
   });
 });

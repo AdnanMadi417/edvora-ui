@@ -41,7 +41,7 @@ const LINK_COLUMNS: FooterColumn[] = [
     heading: "Partners",
     links: [
       { label: "Advisors", href: `${SITE_URL}/partners/advisors` },
-      { label: "Institutions", href: `${SITE_URL}/partners/institutions` },
+      { label: "Universities", href: `${SITE_URL}/partners/institutions` },
     ],
   },
   {
@@ -109,7 +109,7 @@ export default function SiteFooter({ className = "" }: SiteFooterProps) {
             <Logo size={28} />
 
             <p className="mt-4 max-w-ub-reading text-ub-body-sm text-ub-text-secondary">
-              Connecting students, Advisors and Institutions to make studying abroad simple.
+              Connecting students, Advisors and universities to make studying abroad simple.
             </p>
           </div>
 

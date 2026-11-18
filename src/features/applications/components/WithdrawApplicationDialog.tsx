@@ -20,7 +20,7 @@ export default function WithdrawApplicationDialog({ open, onClose, onConfirm, lo
       loading={loading}
       tone="danger"
       title="Withdraw this application?"
-      consequence="The Institution will be notified, and this can't be undone."
+      consequence="The university will be notified, and this can't be undone."
       confirmLabel="Withdraw application"
     />
   );

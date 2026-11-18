@@ -11,6 +11,7 @@ import Tag from "components/ub/data/badges/Tag";
 import { Avatar } from "components/ub/data/media/Avatar";
 import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import "./ApplicationsTable.css";
+import { stageLabel, statusLabel as toStatusLabel } from "config/statusLabels";
 
 /** The fields every role's list endpoint returns (admin adds account_manager_name). */
 export interface ApplicationListRow {
@@ -112,8 +113,8 @@ export default function ApplicationsTable({
       },
       {
         key: "programme",
-        header: "Programme",
-        mobileLabel: "Programme",
+        header: "Program",
+        mobileLabel: "Program",
         width: ownership === "none" ? "32%" : "24%",
         cell: (r) => (
           <span className="ub-application-programme block min-w-0 w-full">
@@ -167,14 +168,14 @@ export default function ApplicationsTable({
           <span className="ub-application-status flex w-full min-w-0 flex-col items-start gap-1">
             <span
               className="block w-full truncate text-ub-caption text-ub-text-tertiary"
-              title={r.stage}
+              title={stageLabel(r.stage)}
             >
-              {r.stage}
+              {stageLabel(r.stage)}
             </span>
             <span className="flex w-full min-w-0 flex-wrap items-center gap-1.5">
               <StatusTag
                 status={r.status}
-                label={statusLabel(r.status)}
+                label={toStatusLabel(statusLabel(r.status))}
                 size="sm"
               />
               {needsAction(r.status) && (

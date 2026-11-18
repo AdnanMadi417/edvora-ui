@@ -122,7 +122,7 @@ function buildCentre(
     entryRequirements:
       "Minimum age 16. Open to beginners and continuing learners. Bring a passport or identity document to registration.",
     placementTest:
-      "Required before enrolment: 45-minute online grammar and reading test, followed by a 10-minute speaking interview. The first test is included in the course fee.",
+      "Required before enrollment: 45-minute online grammar and reading test, followed by a 10-minute speaking interview. The first test is included in the course fee.",
     levels: levelNames.map((level, i) => ({
       id: `${intensiveId}-level-${i + 1}`,
       name: level,

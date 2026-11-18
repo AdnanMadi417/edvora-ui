@@ -50,7 +50,7 @@ export default function OfferCard({ status, offerLetter, conditions = [], expire
       title="Offer"
       action={<StatusTag status={s.label} label={s.label} tone={s.tone} size="md" />}
       state={resolved}
-      empty={{ icon: FileCheck2, title: s.label, description: "The offer letter appears here once the Institution decides." }}
+      empty={{ icon: FileCheck2, title: s.label, description: "The offer letter appears here once the university decides." }}
       errorMessage="The offer couldn't load."
       onRetry={onRetry}
       className={className}

@@ -115,7 +115,7 @@ export default function AssignUniversityTypeModal({
       size="md"
       icon={Layers}
       title="Assign university type"
-      description="Choose the category that best describes this institution."
+      description="Choose the category that best describes this university."
       onSubmit={async () => {
         await handleSubmit();
       }}

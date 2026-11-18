@@ -4,6 +4,7 @@ import { ClipboardCheck, ClipboardList, FileCheck2, MailCheck, PlaneLanding, Wal
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import { focusRing } from "components/ub/recipes";
 import { stageCodeOf } from "features/applications/stages";
+import { stageLabel } from "config/statusLabels";
 
 export interface PipelineStage {
   id: string;
@@ -73,7 +74,7 @@ export default function PipelineCard({
                 key={stage.id}
                 type="button"
                 aria-pressed={active}
-                aria-label={`${stage.name}: ${count.toLocaleString()} applications`}
+                aria-label={`${stageLabel(stage.code ?? stage.name)}: ${count.toLocaleString()} applications`}
                 onClick={() => onSelect(active ? null : stage.id)}
                 className={`flex min-w-0 snap-start flex-col rounded-ub-lg border p-2.5 text-start md:p-3 transition-colors duration-200 motion-reduce:transition-none ${focusRing} ${active
                   ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus"
@@ -88,8 +89,8 @@ export default function PipelineCard({
                 <span className="ub-tabular text-ub-heading-md text-ub-text-primary md:text-ub-heading-xl">
                   {count.toLocaleString()}
                 </span>
-                <span title={stage.name} className="mt-0.5 line-clamp-2 min-h-8 w-full break-words text-ub-label-sm text-ub-text-secondary md:line-clamp-none md:min-h-0">
-                  {stage.name}
+                <span title={stageLabel(stage.code ?? stage.name)} className="mt-0.5 line-clamp-2 min-h-8 w-full break-words text-ub-label-sm text-ub-text-secondary md:line-clamp-none md:min-h-0">
+                  {stageLabel(stage.code ?? stage.name)}
                 </span>
               </button>
             );

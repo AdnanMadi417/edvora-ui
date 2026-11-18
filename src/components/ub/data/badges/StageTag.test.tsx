@@ -7,7 +7,7 @@ import DescriptionList from "../display/DescriptionList";
 describe("StageTag", () => {
   it("shows the configured label for a stage id", () => {
     render(<StageTag stageId="offer-received" />);
-    expect(screen.getByText("Offer received")).toBeInTheDocument();
+    expect(screen.getByText("University and offer")).toBeInTheDocument();
   });
 
   it("falls back to the raw id for an unknown stage", () => {
@@ -17,7 +17,7 @@ describe("StageTag", () => {
 
   it("adds the separate Action needed flag", () => {
     render(<StageTag stageId="documents-pending" actionNeeded />);
-    expect(screen.getByText("Documents pending")).toBeInTheDocument();
+    expect(screen.getByText("Unibexs review")).toBeInTheDocument();
     expect(screen.getByText("Action needed")).toBeInTheDocument();
   });
 });
@@ -25,7 +25,7 @@ describe("StageTag", () => {
 describe("PipelineBar", () => {
   it("summarises totals for screen readers and skips empty stages", () => {
     render(<PipelineBar counts={{ enquiry: 2, "offer-received": 3, withdrawn: 0 }} />);
-    expect(screen.getByRole("img")).toHaveAccessibleName("Applications by stage: 5 total. Enquiry 2, Offer received 3");
+    expect(screen.getByRole("img")).toHaveAccessibleName("Applications by stage: 5 total. Enquiry 2, University and offer 3");
     expect(screen.queryByText("Withdrawn")).not.toBeInTheDocument();
   });
 

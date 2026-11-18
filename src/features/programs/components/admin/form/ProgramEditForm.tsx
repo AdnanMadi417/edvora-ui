@@ -519,7 +519,7 @@ const EditKnowledgeHubProgramDetails = ({
                       updateFormData={updateFormData}
                       onBlur={() => validateField('name')}
                     />
-                    <p className="mt-1 text-xs text-ub-text-tertiary">At least 5 characters. Advisors see this name in the programme list and on the programme page.</p>
+                    <p className="mt-1 text-xs text-ub-text-tertiary">At least 5 characters. Advisors see this name in the program list and on the program page.</p>
                   </div>
 
                   <SearchableDropdown

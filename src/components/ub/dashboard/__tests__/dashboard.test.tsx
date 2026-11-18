@@ -116,7 +116,7 @@ describe("dashboard widgets", () => {
     );
     expect(screen.getByText("Due today")).toBeInTheDocument();
     expect(screen.getByRole("rowheader", { name: /Sunway University/ })).toBeInTheDocument();
-    expect(screen.getByText("Offer received")).toBeInTheDocument();
+    expect(screen.getByText("University and offer")).toBeInTheDocument();
     expect(screen.getByText("Payment Rejected")).toBeInTheDocument();
   });
   it("feature cards", () => {

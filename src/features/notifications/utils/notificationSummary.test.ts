@@ -17,7 +17,7 @@ it("summarizes the subject and action without university or actor metadata", () 
 
 it("keeps a status change meaningful and uses the advisor voice", () => {
   expect(getNotificationSummary({ ...notification, type: "application_stage_changed", body: "Review Account Manager feedback.", data: { ...notification.data, to_status_name: "Under Review by Account Manager" } }, { forAdvisor: true })).toEqual({
-    heading: "Ruqayyah Zhang — Under Review by Unibexs",
+    heading: "Ruqayyah Zhang — Under review by Unibexs",
     message: "Review Unibexs feedback.",
   });
 });

@@ -21,7 +21,7 @@ export const ACTIVITY_FILTERS: { key: string; label: string }[] = [
   { key: "correction", label: "Corrections" },
   { key: "visa", label: "Visa and payments" },
   { key: "message", label: "Messages" },
-  { key: "program", label: "Programme and commission" },
+  { key: "program", label: "Program and commission" },
   { key: "other", label: "Other" },
 ];
 

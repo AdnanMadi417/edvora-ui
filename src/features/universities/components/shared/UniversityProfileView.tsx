@@ -153,12 +153,12 @@ export default function UniversityProfileView({
           >
             <DetailsSection
               title="University overview"
-              description="Institution details and study options at a glance."
+              description="University details and study options at a glance."
             >
               <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                 {[
                   [
-                    "Institution type",
+                    "University type",
                     university.is_public
                       ? "Public university"
                       : "Private university",

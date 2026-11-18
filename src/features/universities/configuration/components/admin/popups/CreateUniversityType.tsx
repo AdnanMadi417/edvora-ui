@@ -111,7 +111,7 @@ export default function CreateUniversityType({
       size="md"
       icon={Building2}
       title="Create university type"
-      description="Define an institution category for the Knowledge Hub."
+      description="Define a university category for the Knowledge Hub."
       onSubmit={async () => {
         await handleCreate();
       }}
@@ -137,7 +137,7 @@ export default function CreateUniversityType({
         <TextareaField
           label="Description"
           field="description"
-          placeholder="Describe the institutions in this category"
+          placeholder="Describe the universities in this category"
           required
           formData={formData}
           errors={errors}

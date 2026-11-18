@@ -8,9 +8,9 @@ export type ApplicationFormStepId = "student" | "documents" | "details" | "revie
 
 /** legacyStage is the stage number validateFormData expects. */
 export const APPLICATION_FORM_STEPS: Record<ApplicationFormStepId, { id: ApplicationFormStepId; label: string; description: string; legacyStage: number }> = {
-  student: { id: "student", label: "Student and programme", description: "Passport details and where they're applying", legacyStage: 1 },
-  documents: { id: "documents", label: "Documents", description: "What the Institution needs first", legacyStage: 2 },
-  details: { id: "details", label: "More details", description: "Fields this Institution asks for", legacyStage: 3 },
+  student: { id: "student", label: "Student and program", description: "Passport details and where they're applying", legacyStage: 1 },
+  documents: { id: "documents", label: "Documents", description: "What the university needs first", legacyStage: 2 },
+  details: { id: "details", label: "More details", description: "Fields this university asks for", legacyStage: 3 },
   review: { id: "review", label: "Review and submit", description: "Check everything once", legacyStage: 4 },
 };
 

@@ -624,7 +624,7 @@ const UniversityEdit = ({
 
       {/* University details */}
       <SectionCard
-        title="Institution details"
+        title="University details"
         as="h2"
         description="Update the university profile, intakes and availability."
       >

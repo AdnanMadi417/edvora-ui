@@ -411,7 +411,7 @@ mock.post("/applications/:id/offer-letter", ({ params, body }) => {
   if (body?.application_form_2_template_file_key) app.forms.application_form_2 = true;
   if (body?.english_form_template_file_key) app.forms.english_form = true;
   if (["SENT_TO_UNIVERSITY", "PROGRAM_CHANGE_SUGGESTED"].includes(app.statusCode)) {
-    transition(app, "UNIVERSITY_APPROVED", { notes: "Offer letter received from the Institution." });
+    transition(app, "UNIVERSITY_APPROVED", { notes: "Offer letter received from the university." });
   }
   app.updated_at = nowIso();
   return d;

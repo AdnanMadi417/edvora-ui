@@ -455,7 +455,7 @@ export default function LanguageCentersDirectory({
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         title="Filter language centers"
-        description="Filter centers by university, status, and institution type."
+        description="Filter centers by university, status, and university type."
         footer={
           <>
             <Button
@@ -504,9 +504,9 @@ export default function LanguageCentersDirectory({
           )}
           {!fixedUniversityId && (
             <Combobox
-              label="Institution type"
+              label="University type"
               options={[
-                { value: "all", label: "All institution types" },
+                { value: "all", label: "All university types" },
                 { value: "public", label: "Public university" },
                 { value: "private", label: "Private university" },
               ]}

@@ -28,8 +28,8 @@ export default function ApplicationSummaryCard({ programme, institution, qualifi
         columns={2}
         fallback="Not available"
         items={[
-          { label: "Programme", value: programme, fullWidth: true },
-          { label: "Institution", value: institution },
+          { label: "Program", value: programme, fullWidth: true },
+          { label: "University", value: institution },
           { label: "Level", value: qualificationLevel },
           { label: "Intake", value: intake && <AppDate value={intake} className="ub-tabular" /> },
           { label: "Duration", value: durationMonths ? <span dir="auto" className="ub-tabular">{durationMonths} months</span> : null },

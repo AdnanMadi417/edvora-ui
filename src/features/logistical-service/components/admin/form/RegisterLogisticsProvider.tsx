@@ -681,7 +681,7 @@ export default function RegisterLogisticsMarketplaceProvider({
           {
             id: "coverage",
             label: "Coverage",
-            description: "Languages and institutions",
+            description: "Languages and universities",
             validate: () => validateStep(3),
             content: (
               <div className="grid gap-6">

@@ -7,6 +7,7 @@ import type { TimelineEvent } from "components/ub/data/display/Timeline";
 import type { TagTone } from "components/ub/recipes";
 import { formatCurrency } from "lib/format";
 import { advisorActorName, unibexsVoice } from "lib/unibexsVoice";
+import { stageLabel, statusLabel } from "config/statusLabels";
 import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 
 export type Category = "status" | "documents" | "correction" | "visa" | "program" | "message" | "other";
@@ -59,6 +60,9 @@ export interface DescribeOptions {
 
 export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: DescribeOptions = {}): Described {
   const v = (text: string | null) => (forAdvisor ? unibexsVoice(text) : text);
+  // Status and stage names read the same as everywhere else (config/statusLabels.ts).
+  const status = (name: string | null) => v(name && statusLabel(name));
+  const stage = (name: string | null) => v(name && stageLabel(name));
   const d = item.detail ?? {};
   const category = ENTRY_CATEGORY[item.entry_type] ?? "other";
   const details: Described["details"] = [];
@@ -66,13 +70,13 @@ export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: 
   switch (item.entry_type) {
     case "status_transition": {
       // Lead with where it went; the old status and an unchanged stage are secondary.
-      if (item.from_status && item.to_status) details.push({ label: "From", text: v(item.from_status)! });
-      if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: v(item.to_stage)! });
+      if (item.from_status && item.to_status) details.push({ label: "From", text: status(item.from_status)! });
+      if (item.to_stage && item.to_stage !== item.from_stage) details.push({ label: item.from_stage ? "New stage" : "Stage", text: stage(item.to_stage)! });
       const requiredDocs = formatDocTypeList(item.required_document_types);
       if (requiredDocs) details.push({ label: "Requested documents", text: requiredDocs, items: item.required_document_types!.map(formatDocType) });
       if (item.reason_text) details.push({ label: "Reason", text: item.reason_text });
       if (item.notes) details.push({ label: "Notes", text: item.notes });
-      const title = item.to_status ? `Status changed to ${v(item.to_status)}` : "Status changed";
+      const title = item.to_status ? `Status changed to ${status(item.to_status)}` : "Status changed";
       return { category, title, details };
     }
 
@@ -110,7 +114,7 @@ export function describe(item: ApplicationTimelineItem, { forAdvisor = false }: 
     case "arrival_date_updated":
       return { category, title: "Arrival date updated", details };
     case "program_changed":
-      return { category, title: "Programme changed", details };
+      return { category, title: "Program changed", details };
     case "lifecycle_status_changed":
       return { category, title: "Application status changed", details };
     case "commission_disputed":

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import type { Notification } from "../types";
 import { advisorActorName } from "lib/unibexsVoice";
+import { stageLabel, statusLabel } from "config/statusLabels";
 
 export type NotificationIconConfig = {
   icon: LucideIcon;
@@ -209,7 +210,7 @@ export function getNotificationPhotoKey(notification: Notification): string | nu
   return (data?.student_photo_key as string) || null;
 }
 
-/** The "Stage" / "Status" display-label pair for a notification, if it has
+/** The "Stage" / "Status" display-label pair for a notification, in the app-wide names (config/statusLabels.ts), if it has
  *  one — application_stage_changed and new_application each carry these
  *  under different field names for the same concept (current stage/status). */
 export function getNotificationStageStatus(
@@ -217,10 +218,10 @@ export function getNotificationStageStatus(
 ): { stage?: string; status?: string } {
   const data = notification.data as Record<string, unknown>;
   if (notification.type === "application_stage_changed") {
-    return { stage: data?.to_stage_name as string, status: data?.to_status_name as string };
+    return { stage: stageLabel((data?.to_stage_code ?? data?.to_stage_name) as string) || undefined, status: statusLabel((data?.to_status_code ?? data?.to_status_name) as string) || undefined };
   }
   if (notification.type === "new_application") {
-    return { stage: data?.stage_name as string, status: data?.status_name as string };
+    return { stage: stageLabel((data?.stage_code ?? data?.stage_name) as string) || undefined, status: statusLabel((data?.status_code ?? data?.status_name) as string) || undefined };
   }
   return {};
 }

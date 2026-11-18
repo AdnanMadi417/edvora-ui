@@ -30,7 +30,7 @@ const SEED: [string, string, string, boolean, boolean, boolean, boolean][] = [
   ["English Form Template", "english_form", "English language declaration form required by some Institutions.", false, false, true, true],
   ["Health Declaration Form", "health_declaration_form", "EMGS Lampiran B health declaration, signed by the student.", false, false, true, true],
   ["Medical Report (EMGS)", "medical_report_emgs", "Post-arrival medical screening report from an EMGS-registered clinic.", false, false, false, false],
-  ["Offer Letter", "offer_letter", "Conditional or unconditional offer letter issued by the Institution.", false, false, false, false],
+  ["Offer Letter", "offer_letter", "Conditional or unconditional offer letter issued by the university.", false, false, false, false],
   ["Signed Offer Letter", "signed_offer_letter", "Offer letter countersigned by the student to accept the place.", false, false, false, false],
   ["Visa Invoice", "visa_invoice", "Invoice for the EMGS visa processing fee (RM2,500).", false, false, true, false],
   ["Visa Payment Receipt", "visa_payment_receipt", "Proof of payment for the visa processing fee.", false, false, false, false],

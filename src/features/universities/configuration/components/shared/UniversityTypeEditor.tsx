@@ -57,7 +57,7 @@ export default function UniversityTypeEditor({
       title={
         mode === "edit" ? "Edit university type" : "Create university type"
       }
-      description="Define an institution category and the information advisors need to submit an application."
+      description="Define a university category and the information advisors need to submit an application."
       className="mx-auto max-w-6xl"
       icon={Layers}
       onSubmit={onSubmit}
@@ -111,7 +111,7 @@ export default function UniversityTypeEditor({
               <TextareaField
                 label="Description"
                 field="description"
-                placeholder="Explain which institutions use this category and what makes their application requirements different."
+                placeholder="Explain which universities use this category and what makes their application requirements different."
                 required
                 formData={formData}
                 errors={errors}
@@ -278,7 +278,7 @@ export default function UniversityTypeEditor({
               aria-hidden="true"
             />
             <span>
-              Institutions assigned to this type use these application
+              Universities assigned to this type use these application
               requirements.
             </span>
           </p>

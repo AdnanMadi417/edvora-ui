@@ -33,6 +33,7 @@ import Textarea from "components/ub/forms/text/Textarea";
 import Checkbox from "components/ub/forms/choices/Checkbox";
 import Chip from "components/ub/data/badges/Chip";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
+import { statusLabel } from "config/statusLabels";
 
 const DocumentRequestList = ({
   documents,
@@ -199,7 +200,8 @@ export default function UpdateStatusPopup({
 
       return {
         id: s.id,
-        label: s.name,
+        // The same status label staff and Advisors see everywhere else.
+        label: statusLabel(s.name),
         description: "",
         nextAction: matchingAction?.next_action ?? "",
         ...getStatusIcon(s.name),

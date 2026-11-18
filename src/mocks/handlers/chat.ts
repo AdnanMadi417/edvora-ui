@@ -20,13 +20,13 @@ type Line = { from: "partner" | "manager"; text: string };
 const THREADS: Line[][] = [
   [
     { from: "partner", text: "Hello, the student has uploaded a new passport scan. The previous one had glare over the MRZ line." },
-    { from: "manager", text: "Thanks, the new scan is clear. I have moved the application forward to the Institution." },
-    { from: "manager", text: "The Institution has acknowledged receipt. Expect an update within 5 working days." },
+    { from: "manager", text: "Thanks, the new scan is clear. I have moved the application forward to the university." },
+    { from: "manager", text: "The university has acknowledged receipt. Expect an update within 5 working days." },
   ],
   [
     { from: "manager", text: "The Institution needs a certified English translation of the secondary school transcript. Please upload it under Academic Documents." },
     { from: "partner", text: "Understood. The student is getting it certified this week. Can we submit by Friday?" },
-    { from: "manager", text: "Friday works. I will flag it to the Institution so the file is not closed." },
+    { from: "manager", text: "Friday works. I will flag it to the university so the file is not closed." },
   ],
   [
     { from: "partner", text: "The student has paid the visa processing fee. The bank receipt is attached in Payments." },

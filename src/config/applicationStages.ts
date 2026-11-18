@@ -31,14 +31,17 @@ export interface ApplicationStage {
 /** The 10 stage tags (brief §4.3; hues suggested by the guide's screenshots). */
 export const APPLICATION_STAGES = [
   { id: "enquiry", label: "Enquiry", hue: "grey" },
-  { id: "documents-pending", label: "Documents pending", hue: "amber" },
-  { id: "submitted", label: "Submitted to institution", hue: "indigo" },
-  { id: "institution-review", label: "In Institution review", hue: "sky" },
-  { id: "offer-received", label: "Offer received", hue: "teal" },
-  { id: "visa-in-progress", label: "Visa in progress", hue: "plum" },
-  { id: "arrival-logistics", label: "Arrival and logistics", hue: "pink" },
+  // The five backend stages carry the same names as config/statusLabels.ts STAGE_LABELS,
+  // so a stage reads the same on its tag, the tracker, lists and notifications.
+  // "submitted" and "institution-review" are older ids for the same stage.
+  { id: "documents-pending", label: "Unibexs review", hue: "amber" },
+  { id: "submitted", label: "University and offer", hue: "teal" },
+  { id: "institution-review", label: "University and offer", hue: "teal" },
+  { id: "offer-received", label: "University and offer", hue: "teal" },
+  { id: "visa-in-progress", label: "Visa", hue: "plum" },
+  { id: "arrival-logistics", label: "Arrival and enrollment", hue: "pink" },
   { id: "enrolled", label: "Enrolled", hue: "success" },
-  { id: "commission-paid", label: "Commission paid", hue: "success" },
+  { id: "commission-paid", label: "Commission", hue: "success" },
   { id: "withdrawn", label: "Withdrawn", hue: "grey" },
 ] as const satisfies readonly ApplicationStage[];
 
@@ -71,10 +74,13 @@ export const GLASS_BOX_STEPS: readonly TrackerStepConfig[] = [
   { id: "arrival", label: "Arrival", stageId: "arrival-logistics" },
 ];
 
-/** 7-step tracker on the application page: the student's journey through arrival,
- *  then the Advisor's commission, which is where the application ends for them. */
+/** Tracker on the application page: the five backend stages, with the same names
+ *  as their tags, ending at the Advisor's commission. */
 export const APPLICATION_PAGE_STEPS: readonly TrackerStepConfig[] = [
-  ...GLASS_BOX_STEPS,
+  { id: "review", label: "Unibexs review", stageId: "documents-pending" },
+  { id: "offer", label: "University and offer", stageId: "offer-received" },
+  { id: "visa", label: "Visa", stageId: "visa-in-progress" },
+  { id: "arrival", label: "Arrival and enrollment", stageId: "arrival-logistics" },
   { id: "commission", label: "Commission", stageId: "commission-paid" },
 ];
 
@@ -84,7 +90,7 @@ const API_STAGE_TAGS: Record<string, ApplicationStageId> = {
   OFFER_LETTER: "offer-received",
   VISA_PROCESSING: "visa-in-progress",
   STUDENT_ARRIVAL_ENROLLMENT: "arrival-logistics",
-  PARTNER_COMMISSION_INVOICING: "enrolled",
+  PARTNER_COMMISSION_INVOICING: "commission-paid",
 };
 const key = (value: string) => value.trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 export function getApiStageTagId(stage: {

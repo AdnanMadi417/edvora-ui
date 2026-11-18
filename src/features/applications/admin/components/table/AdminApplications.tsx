@@ -14,6 +14,7 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import api from "lib/useApi";
 import { useMediaQuery } from "hooks/useMediaQuery";
+import { stageLabel, statusFilterOptions } from "config/statusLabels";
 
 const ACTION_REQUIRED_STATUSES = new Set([
   "new_application",
@@ -280,7 +281,7 @@ const ModernApplicationsTable = () => {
             setSelectedStages(val === "all" ? null : val);
             setCurrentPage(1);
           }}
-          stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
+          stageOptions={stages.map((s) => ({ label: stageLabel(s.name), value: s.id }))}
           selectedUniversity={selectedUniversity}
           onUniversityChange={(val) => {
             setSelectedUniversity(val);
@@ -295,10 +296,7 @@ const ModernApplicationsTable = () => {
             setSelectedStageStatus(val);
             setCurrentPage(1);
           }}
-          stageStatusOptions={stageStatuses.map((s) => ({
-            label: s.name,
-            value: s.id,
-          }))}
+          stageStatusOptions={statusFilterOptions(stageStatuses)}
           stageStatusLoading={stageStatusesLoading}
           showLifecycleFilter
           selectedLifecycle={selectedLifecycle}

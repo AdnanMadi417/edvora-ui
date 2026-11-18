@@ -54,14 +54,14 @@ const STATE = {
   expired: { tone: tagTones.danger, Icon: ShieldX, status: "Expired" },
 } as const;
 
-export const VERIFICATION_EXPIRED_NOTE = "Confirm with the Institution before quoting";
+export const VERIFICATION_EXPIRED_NOTE = "Confirm with the university before quoting";
 
 export interface VerificationStampProps {
   /** When the data was last verified. */
   date: Date | string;
   /** Reference "today", for tests and demos. Default: the current date. */
   now?: Date | string;
-  /** Hide the "Confirm with the Institution before quoting" line on expired stamps (e.g. very tight layouts). Default false. */
+  /** Hide the "Confirm with the university before quoting" line on expired stamps (e.g. very tight layouts). Default false. */
   hideExpiredNote?: boolean;
   className?: string;
 }

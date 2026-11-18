@@ -16,6 +16,7 @@ import type {
   OverviewItem,
   ResourcePlan,
 } from "../model/types";
+import { relabelText, statusLabel } from "config/statusLabels";
 const staffActions = new Set([
   "new_application",
   "payment_submitted",
@@ -88,17 +89,15 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
               id: item.id,
               title:
                 context.role === "partner"
-                  ? unibexsVoice(item.next_action || "Review application")
-                  : item.next_action || "Review application",
+                  ? unibexsVoice(relabelText(item.next_action || "Review application"))
+                  : relabelText(item.next_action || "Review application"),
               description: [item.student_name, item.university_name]
                 .filter(Boolean)
                 .join(" · "),
               href: `${base}/applications/${encodeURIComponent(item.id)}`,
               status: item.status,
-              statusLabel:
-                context.role === "partner"
-                  ? unibexsVoice(item.status.replace(/_/g, " "))
-                  : item.status.replace(/_/g, " "),
+              // The same status label as every other screen.
+              statusLabel: statusLabel(item.status),
             })
           ),
         };
@@ -207,7 +206,7 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
     plans.push({
       id: "languageCenters",
       title: "Language centers",
-      subtitle: "Centers available in the institution catalogue.",
+      subtitle: "Centers available in the university catalogue.",
       href: `${base}/language-centers`,
       emptyMessage: "No language centers yet.",
       load: async () => {

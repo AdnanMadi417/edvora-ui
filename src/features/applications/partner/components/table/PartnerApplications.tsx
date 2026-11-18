@@ -22,6 +22,7 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
 import { isAdvisorAction } from "features/applications/stages";
 import { unibexsVoice } from "lib/unibexsVoice";
+import { stageLabel, statusFilterOptions, statusLabel as toStatusLabel } from "config/statusLabels";
 
 
 const PartnerApplications = () => {
@@ -232,11 +233,13 @@ const PartnerApplications = () => {
     const match = stageStatuses.find(
       (s) => s.name.toLowerCase().replace(/\s+/g, "_") === normalized
     );
-    // Advisors read status names in the Unibexs voice ("Under Review by Unibexs").
+    // The app-wide status label first (it already speaks as Unibexs); the Unibexs
+    // voice only rewrites a name the copy map doesn't know yet.
     return unibexsVoice(
-      match?.name ??
-      (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
-        "Unknown")
+      toStatusLabel(
+        match?.name ??
+          (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Unknown")
+      )
     );
   };
 
@@ -262,7 +265,7 @@ const PartnerApplications = () => {
             variant="primary"
             onClick={() => router.push("/partner/applications/apply-now")}
             icon={<FilePlus className="h-4 w-4" aria-hidden="true" />}
-            text="Create application"
+            text="New application"
           />
         }
         className="border-b border-ub-border p-4 sm:p-6"
@@ -321,7 +324,7 @@ const PartnerApplications = () => {
             setSelectedStages(val === "all" ? null : val);
             setCurrentPage(1);
           }}
-          stageOptions={stages.map((s) => ({ label: unibexsVoice(s.name), value: s.id }))}
+          stageOptions={stages.map((s) => ({ label: stageLabel(s.name), value: s.id }))}
           selectedUniversity={selectedUniversity}
           onUniversityChange={(val) => {
             setSelectedUniversity(val);
@@ -336,10 +339,7 @@ const PartnerApplications = () => {
             setSelectedStageStatus(val);
             setCurrentPage(1);
           }}
-          stageStatusOptions={stageStatuses.map((s) => ({
-            label: unibexsVoice(s.name),
-            value: s.id,
-          }))}
+          stageStatusOptions={statusFilterOptions(stageStatuses)}
           stageStatusLoading={stageStatusesLoading}
           showLifecycleFilter
           selectedLifecycle={selectedLifecycle}
