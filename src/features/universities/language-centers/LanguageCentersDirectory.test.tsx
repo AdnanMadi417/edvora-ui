@@ -7,8 +7,8 @@ import { rowAction, queryRowAction } from "testUtils/rowActions";
 
 /** The row (or card) link for a centre, not its "View …" row action. */
 const named = (name: string) => new RegExp(`^(?!View ).*${name}`);
-/** On Advisor cards the whole card is a pointer shortcut; the accessible link is its View action. */
-const cardLink = (name: string) => `View ${name}`;
+/** On Advisor cards the whole card is a pointer shortcut; the accessible link is its View details button. */
+const cardLink = (name: string) => `View details of ${name}`;
 
 jest.mock("./api", () => ({
   languageCentersApi: {
@@ -393,6 +393,6 @@ it("shows independent language centres as advisor cards without a university req
   expect(
     await screen.findByRole("article", { name: "Independent Academy" })
   ).toBeVisible();
-  expect(screen.getByText("Independent language centre")).toBeInTheDocument();
+  expect(screen.getByText("Independent language center")).toBeInTheDocument();
   expect(screen.queryByText("University unavailable")).not.toBeInTheDocument();
 });

@@ -23,6 +23,7 @@ import { UniversityTypeFormDemo, UniversityTypeDetailsDemo } from "./patterns/Un
 import { UniversityTableDemo, UniversityProfileDemo } from "./patterns/UniversityDemos";
 import ProgramCards from "./sections/ProgramCards";
 import UniversityCards from "./sections/UniversityCards";
+import CatalogCards from "./sections/CatalogCards";
 import LogisticsProviderCards from "./sections/LogisticsProviderCards";
 import CurrencyButtons from "./sections/CurrencyButtons";
 import ProgramDetailsDemo from "./patterns/ProgramDetailsDemo";
@@ -152,6 +153,7 @@ export function ContentSection() {
         <ApplicationFormDemo />
       </Pick>
       <ProgramCards />
+      <CatalogCards />
       <UniversityCards />
       <LogisticsProviderCards />
       <ProgramDetailsDemo />

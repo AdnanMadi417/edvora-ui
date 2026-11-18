@@ -132,7 +132,7 @@ export default function LanguageCenterDetails({
           <div className="flex flex-wrap items-start justify-between gap-4">
             {center.centre_type === "independent" ? (
               <p className="text-ub-label-md text-ub-text-secondary">
-                Independent language centre
+                Independent language center
               </p>
             ) : (
               <UniversityIdentity
@@ -270,7 +270,7 @@ export default function LanguageCenterDetails({
           >
             <p className="mb-4 text-ub-body-sm text-ub-text-secondary">
               {center.centre_type === "independent"
-                ? "Independent language centre"
+                ? "Independent language center"
                 : university?.name || "University unavailable"}
             </p>
             <div className="flex flex-col gap-3">

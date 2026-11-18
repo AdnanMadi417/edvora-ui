@@ -21,7 +21,7 @@ export default function LanguageCenterIdentity({
 }) {
   const subtitle =
     center.centre_type === "independent"
-      ? "Independent language centre"
+      ? "Independent language center"
       : showUniversity
       ? university?.name || "University unavailable"
       : undefined;

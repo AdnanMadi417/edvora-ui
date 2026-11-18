@@ -1,12 +1,11 @@
 "use client";
-import Link from "next/link";
-import { Eye, MapPin } from "lucide-react";
-import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
+import CatalogCard from "components/ub/data/cards/CatalogCard";
+import { Avatar } from "components/ub/data/media/Avatar";
+import UniversityLogo from "features/universities/components/shared/UniversityLogo";
 import type { University } from "features/universities/types";
 import type { LanguageCenter } from "../types";
-import LanguageCenterIdentity from "./LanguageCenterIdentity";
 
-/** The whole Advisor card opens the centre; the name, status and location match the admin table row. */
+/** The Advisor card: same anatomy as the program and university cards; the name, status and university match the admin table row. */
 export default function LanguageCenterCard({
   center,
   university,
@@ -16,42 +15,27 @@ export default function LanguageCenterCard({
   university?: University;
   href: string;
 }) {
+  const independent = center.centre_type === "independent";
+  const branches = center.branches?.length ?? 0;
   return (
-    <article
-      aria-label={center.name}
-      className="relative flex h-full min-w-0 flex-col gap-3 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none"
-    >
-      {/* Pointer shortcut only: keyboard and screen-reader users get the View action. */}
-      <Link
-        href={href}
-        aria-hidden="true"
-        tabIndex={-1}
-        className="absolute inset-0 z-10 rounded-ub-lg"
-      />
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="min-w-0 flex-1">
-          <LanguageCenterIdentity center={center} university={university} />
-        </h3>
-        <div className="relative z-20 -me-2 -mt-1 shrink-0">
-          <TableActions label={center.name}>
-            <TableAction
-              primary
-              label={`View ${center.name}`}
-              icon={<Eye className="h-4 w-4" />}
-              href={href}
-            />
-          </TableActions>
-        </div>
-      </div>
-      {center.location && (
-        <p className="flex items-start gap-2 text-ub-body-sm text-ub-text-secondary">
-          <MapPin
-            aria-hidden="true"
-            className="mt-0.5 h-4 w-4 shrink-0 text-ub-icon"
-          />
-          <span className="min-w-0 break-words">{center.location}</span>
-        </p>
-      )}
-    </article>
+    <CatalogCard
+      name={center.name}
+      avatar={
+        center.logo_url ? (
+          <Avatar name={center.name} src={center.logo_url} size={40} alt="" />
+        ) : (
+          <UniversityLogo name={center.name} fileKey={university?.logo_file_key} />
+        )
+      }
+      status={{ status: center.is_active }}
+      subtitle={independent ? "Independent language center" : university?.name || "University unavailable"}
+      href={href}
+      facts={[
+        { label: "Type", value: independent ? "Independent" : "University-linked" },
+        { label: "Branches", value: branches ? `${branches} ${branches === 1 ? "branch" : "branches"}` : "Main campus only" },
+        { label: "Location", value: center.location || "To be confirmed", wide: true },
+      ]}
+      actions={[{ label: "View details", href, ariaLabel: `View details of ${center.name}`, variant: "primary" }]}
+    />
   );
 }

@@ -1,4 +1,3 @@
-import { rowAction } from "testUtils/rowActions";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LogisticsMarketplace from "./LogisticsMarketplace";
@@ -28,12 +27,14 @@ jest.mock("components/ub/data/media/PresignedImage", () => ({
   __esModule: true,
   default: ({ fallback }: any) => fallback,
 }));
-it("offers the card's view and WhatsApp actions top-right, with the status on the logo", () => {
+it("offers View details and WhatsApp as text buttons, with the status on the logo", () => {
   const { container } = render(<LogisticsMarketplace />);
   expect(
-    screen.getByRole("link", { name: "View Airport Assist" })
+    screen.getByRole("link", { name: "View details of Airport Assist" })
   ).toHaveAttribute("href", "/partner/logistics-marketplace/provider");
-  expect(rowAction("WhatsApp Airport Assist")).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: "WhatsApp Airport Assist" })
+  ).toHaveAttribute("href", expect.stringMatching(/^https:\/\/wa\.me\//));
   const status = container.querySelector("[data-entity-status]");
   expect(status).toHaveAttribute("data-entity-status", "active");
   expect(status).toHaveAttribute("title", "Active");
@@ -62,12 +63,12 @@ it("searches by service and location", async () => {
   );
   await user.type(search, "Selangor");
   expect(
-    screen.getByRole("link", { name: "View Airport Assist" })
+    screen.getByRole("link", { name: "View details of Airport Assist" })
   ).toBeInTheDocument();
   await user.clear(search);
   await user.type(search, "not found");
   expect(
-    screen.queryByRole("link", { name: "View Airport Assist" })
+    screen.queryByRole("link", { name: "View details of Airport Assist" })
   ).not.toBeInTheDocument();
   expect(screen.getByText("No providers found")).toBeInTheDocument();
 });

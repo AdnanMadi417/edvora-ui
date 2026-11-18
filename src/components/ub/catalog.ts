@@ -49,6 +49,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Advisor applications", "Admin applications", "Account-manager applications"],
     avoid: "Showing a single student’s progress: use ApplicationTrackerCard.",
   },
+  CatalogCard: {
+    category: "data",
+    imports: [imp("CatalogCard", "data/cards/CatalogCard")],
+    useFor: "Any catalogue card Advisors browse: header with status circle and name tooltip, short tags, labelled facts in two columns, up to two text buttons at the bottom.",
+    usedIn: ["ProgramCard", "UniversityCard", "LanguageCenterCard", "LogisticsProviderCard"],
+    avoid: "Icon-only actions or descriptions on the card: use text buttons; descriptions belong on the detail page.",
+  },
   UniversityCard: {
     category: "data",
     imports: [imp("UniversityCard", "data/cards/UniversityCard")],
