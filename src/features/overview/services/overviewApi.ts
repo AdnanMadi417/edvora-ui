@@ -266,8 +266,7 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             href: idPath(`${base}/advisors`, item.id),
             at: item.created_at,
             avatar: { name: item.name },
-            status: "unverified",
-            statusLabel: "Awaiting review",
+            // No status tag: the list is "awaiting review", so every row would repeat it.
             waitingDays: daysSince(item.created_at),
             actionLabel: "Review profile",
           })).sort(byOldest),

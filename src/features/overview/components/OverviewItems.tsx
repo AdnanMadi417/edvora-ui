@@ -8,16 +8,6 @@ import type { OverviewItem } from "../model/types";
 // People lists: advisors and registrations are always rows, never an avatar carousel.
 const PEOPLE = new Set(["reviews", "advisors", "registrations"]);
 
-/** The row's one verb + object button; it opens the item. Same words and style on every role. */
-function RowAction({ item }: { item: OverviewItem }) {
-  const label = item.actionLabel ?? "Open";
-  return (
-    <TextButton href={item.href} size="sm" aria-label={`${label}: ${item.title}`} className="[@media(pointer:coarse)]:min-h-11 [@media(pointer:coarse)]:min-w-11">
-      {label}
-    </TextButton>
-  );
-}
-
 /** Every home list in the shared row; activity in the dated timeline. */
 export default function OverviewItems({
   resourceId,
@@ -58,7 +48,9 @@ export default function OverviewItems({
             status={item.status}
             statusLabel={item.statusLabel}
             waitingDays={item.waitingDays}
-            action={<RowAction item={item} />}
+            // The whole row opens the item; the verb is read first by screen readers.
+            href={item.href}
+            hrefLabel={item.actionLabel}
           />
         ))}
       </PeopleList>
@@ -76,7 +68,8 @@ export default function OverviewItems({
           status={item.status}
           statusLabel={item.statusLabel ?? item.status?.replace(/_/g, " ")}
           waitingDays={item.waitingDays}
-          action={<RowAction item={item} />}
+          href={item.href}
+          hrefLabel={item.actionLabel}
         />
       ))}
     </TaskList>

@@ -16,11 +16,15 @@ export interface PeopleListItemProps {
   waitingDays?: number | null;
   /** End-side action: one verb + object TextButton. */
   action?: ReactNode;
+  /** Makes the whole row a link to the item (no separate button). */
+  href?: string;
+  /** Read before the row by screen readers, e.g. "Review payment". */
+  hrefLabel?: string;
   className?: string;
 }
 
 /** A person, in the shared row: avatar · name + status tag · one line · days tag · action. */
-export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, waitingDays, action, className }: PeopleListItemProps) {
+export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, waitingDays, action, href, hrefLabel, className }: PeopleListItemProps) {
   return (
     <ListRow
       leading={<RowAvatar name={name} src={avatarSrc} />}
@@ -30,6 +34,8 @@ export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, wai
       meta={work}
       waitingDays={waitingDays}
       action={action}
+      href={href}
+      hrefLabel={hrefLabel}
       className={className}
     />
   );

@@ -22,11 +22,15 @@ export interface TaskListItemProps {
   waitingDays?: number | null;
   /** End-side action: one verb + object TextButton. */
   action?: ReactNode;
+  /** Makes the whole row a link to the item (no separate button). */
+  href?: string;
+  /** Read before the row by screen readers, e.g. "Review payment". */
+  hrefLabel?: string;
   className?: string;
 }
 
 /** One task, in the shared row: avatar or icon tile · title + status tag · meta · days tag · action. */
-export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", status, statusLabel, dueInDays, waitingDays, action, className }: TaskListItemProps) {
+export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", status, statusLabel, dueInDays, waitingDays, action, href, hrefLabel, className }: TaskListItemProps) {
   return (
     <ListRow
       leading={avatar ? <RowAvatar name={avatar.name} src={avatar.src} /> : icon ? <IconTile icon={icon} tone={iconTone} size="sm" /> : undefined}
@@ -37,6 +41,8 @@ export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", st
       dueInDays={dueInDays}
       waitingDays={waitingDays}
       action={action}
+      href={href}
+      hrefLabel={hrefLabel}
       className={className}
     />
   );

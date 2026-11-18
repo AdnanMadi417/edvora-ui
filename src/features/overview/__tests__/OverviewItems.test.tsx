@@ -22,9 +22,14 @@ test("advisors are rows (never a carousel) with one verb + object action", () =>
     screen.getByRole("list", { name: "Advisors awaiting review" })
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Review profile: Education agency" })
+    // The whole row is the link: verb first, then the row's details. No separate button.
+    screen.getByRole("link", { name: /^Review profile: Education agency/ })
   ).toHaveAttribute("href", item.href);
-  expect(screen.getByText("Waiting 3 days")).toBeInTheDocument();
+  expect(screen.queryByRole("button")).toBeNull();
+  // Shown as "3 days" by a clock; screen readers hear "Waiting 3 days".
+  expect(screen.getByText((_, el) => el?.tagName === "SPAN" && el.textContent === "Waiting 3 days")).toBeInTheDocument();
+  // Every row here awaits review, so no row repeats it as a tag.
+  expect(screen.queryByText("Awaiting review")).toBeNull();
   expect(screen.getByText(item.description)).toBeInTheDocument();
 });
 test("activity uses a dated timeline and retains notification links", () => {
@@ -49,7 +54,7 @@ test("activity uses a dated timeline and retains notification links", () => {
     "2026-01-01T12:00:00.000Z"
   );
 });
-test("application tasks name the student and offer one verb + object button", () => {
+test("application tasks name the student and the whole row opens the application", () => {
   render(
     <OverviewItems
       resourceId="active"
@@ -67,5 +72,6 @@ test("application tasks name the student and offer one verb + object button", ()
   );
   expect(screen.getByText("Nadia Rahman")).toBeInTheDocument();
   expect(screen.getByText("INTI International University")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Open application: Nadia Rahman" })).toHaveAttribute("href", "/admin/applications/a");
+  expect(screen.getByRole("link", { name: /^Open application: Nadia Rahman/ })).toHaveAttribute("href", "/admin/applications/a");
+  expect(screen.getAllByRole("link")).toHaveLength(1);
 });
