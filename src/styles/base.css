@@ -41,9 +41,13 @@
     min-height: 24px;
   }
   /* Row links can wrap block content, where inline padding has no effect;
-     the negative margin keeps the row height unchanged. */
+     the negative margin keeps the row height unchanged. max-width keeps an
+     inline-block from growing to its content: long names truncate inside the
+     cell instead of running under the row's actions. */
   [data-row-link] {
     display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
     margin-block: -4px;
   }
 }

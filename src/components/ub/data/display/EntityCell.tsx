@@ -6,7 +6,7 @@ import EntityStatusBadge, { entityStatusOf, type EntityStatus, type EntityStatus
 export type EntityCellStatus = { status: string | boolean | null | undefined; label?: string } | ReactElement<EntityStatusBadgeProps>;
 
 export interface EntityCellProps {
-  /** The record's name. One line; long names truncate with the full name in a tooltip. */
+  /** The record's name. One line on desktop (full name in a tooltip); up to two lines on phones, where there's no hover. */
   name: string;
   /** Photo or logo URL; initials on a neutral background when missing or broken. */
   imageSrc?: string | null;
@@ -60,7 +60,7 @@ export default function EntityCell({ name, imageSrc, avatar, noAvatar = false, s
       <span className="min-w-0 flex-1">
         <span className="flex min-w-0 items-center gap-2">
           {noAvatar && dot("h-2.5 w-2.5", "shrink-0")}
-          <span title={name} className="min-w-0 truncate text-ub-label-md text-ub-text-primary">
+          <span title={name} className="min-w-0 truncate text-ub-label-md text-ub-text-primary max-md:line-clamp-2 max-md:whitespace-normal max-md:break-words">
             {name}
           </span>
         </span>

@@ -80,7 +80,7 @@ it.each([
     );
     expect(
       screen.getAllByRole("columnheader").map((th) => th.textContent?.trim())
-    ).toEqual(expect.arrayContaining(["Program", "Commission", "Intakes", "Actions"]));
+    ).toEqual(expect.arrayContaining(["Program", "Level", "Tuition / commission", "English", "Intakes", "Actions"]));
     expect(screen.queryByRole("columnheader", { name: /Requirements|Quick links|Status/ })).toBeNull();
     const row = screen.getByRole("link", {
       name: new RegExp(

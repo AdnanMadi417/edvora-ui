@@ -22,6 +22,9 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import EntityCell from "components/ub/data/display/EntityCell";
 import UniversityLogo from "features/universities/components/shared/UniversityLogo";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import Tag from "components/ub/data/badges/Tag";
+import { courseTypeLabel } from "features/programs/utils/courseType";
+import { getIeltsLabel } from "constants/lists";
 import IntakeMonthsChips from "../IntakeMonthsChips";
 import type { Program } from "features/programs/types";
 
@@ -32,9 +35,12 @@ export const programStatus = (program: { is_hidden?: boolean }) =>
     : { status: "active", label: "Visible" };
 
 /** The one short line under a program's name: its university and branch. */
-export const programSubtitle = (program: Pick<Program, "university" | "branch">) =>
-  [program.university?.name, program.branch?.name].filter(Boolean).join(" · ") ||
-  "University unavailable";
+export const programSubtitle = (
+  program: Pick<Program, "university" | "branch">
+) =>
+  [program.university?.name, program.branch?.name]
+    .filter(Boolean)
+    .join(" · ") || "University unavailable";
 
 interface KnowledgeHubTableProps {
   basePath?: "/admin" | "/data-entry";
@@ -97,7 +103,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     {
       key: "name",
       header: "Program",
-      width: "320px",
+      width: "240px",
       cell: (program) => (
         <EntityCell
           name={program.name}
@@ -114,25 +120,89 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       ),
     },
     {
-      key: "commission",
-      header: "Commission",
+      key: "level",
+      width: "150px",
+      header: "Level",
+      cell: (program) => {
+        const details = [
+          courseTypeLabel(program.course_type),
+          program.duration
+            ? `${program.duration} ${program.duration === 1 ? "year" : "years"}`
+            : null,
+        ].filter(Boolean);
+        return (
+          <span className="flex min-w-0 flex-col items-start gap-1">
+            {program.qualification_level ? (
+              <Tag hue="indigo" size="sm">
+                {program.qualification_level}
+              </Tag>
+            ) : (
+              <span className="text-ub-text-tertiary">Not set</span>
+            )}
+            {details.length > 0 && (
+              <span className="text-ub-caption text-ub-text-secondary">
+                {details.join(" · ")}
+              </span>
+            )}
+          </span>
+        );
+      },
+    },
+    {
+      key: "fees",
+      width: "150px",
+      header: "Tuition / commission",
       align: "end",
       cell: (program) => (
-        <span className="text-ub-label-md text-ub-tone-success-text">
-          {money(program.commission_amount, program.commission_currency)}
+        <span className="ub-tabular flex flex-col items-start gap-0.5 md:items-end">
+          <span
+            className="text-ub-body-sm text-ub-text-primary"
+            title="First-year tuition"
+          >
+            {money(program.first_year_tuition, program.yearly_fee_currency)}
+          </span>
+          <span
+            className="text-ub-label-md text-ub-tone-success-text"
+            title="Commission"
+          >
+            {money(program.commission_amount, program.commission_currency)}
+          </span>
         </span>
       ),
     },
     {
+      key: "english",
+      width: "120px",
+      header: "English",
+      cell: (program) => {
+        const ielts = program.english_required_score
+          ? getIeltsLabel(program.english_required_score)
+          : null;
+        return (
+          <span className="flex min-w-0 flex-col items-start gap-1">
+            <span className="text-ub-body-sm">
+              {ielts ? `IELTS ${ielts.replace(/^Band\s*/i, "")}` : "Not set"}
+            </span>
+            {program.has_scholarship && (
+              <Tag hue="amber" size="sm">
+                Scholarship
+              </Tag>
+            )}
+          </span>
+        );
+      },
+    },
+    {
       key: "intakes",
+      width: "170px",
       header: "Intakes",
       cell: (program) =>
         program.intake_months?.length ? (
           <IntakeMonthsChips
             months={program.intake_months}
             size="sm"
-            className="!flex flex-wrap md:!grid md:grid-cols-[max-content_max-content] justify-items-start !gap-x-4 !gap-y-2"
-            maxVisible={3}
+            className="!gap-1.5 md:flex-nowrap [&>*]:shrink-0 [&>*]:whitespace-nowrap"
+            maxVisible={2}
           />
         ) : (
           "To be confirmed"
@@ -140,6 +210,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "actions",
+      width: "104px",
       header: "Actions",
       align: "end",
       cell: (program) => {
