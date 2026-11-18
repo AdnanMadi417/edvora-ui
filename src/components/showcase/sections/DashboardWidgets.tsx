@@ -38,6 +38,7 @@ import {
   GroupedBarChart,
   AreaLineChart,
   AvatarStrip,
+  RadialStatsCard,
   TaskList,
   TaskListItem,
   type DashboardPeriod,
@@ -254,6 +255,21 @@ export default function DashboardWidgets() {
             ]}
           />
         </div>
+      </Demo>
+
+      <Demo
+        name="RadialStatsCard and RadialRingsChart"
+        path="components/ub/dashboard/cards/RadialStatsCard.tsx"
+        description="Several measures of one whole as concentric rings (outermost first), each filled to its share, the total in the hole. The legend gives each count and share; with onSelect each row filters the list below and the other rings dim. Colours are the checked categorical slots in fixed order."
+        code={`<RadialStatsCard title="Advisors" total={21} totalLabel="advisors" items={[{ id: "active", label: "Active", value: 15 }, { id: "inactive", label: "Suspended", value: 6 }]} selectedId={filter} onSelect={setFilter} />`}
+        props={[
+          { name: "items", type: "{ id, label, value }[]", description: "Outermost ring first; max five." },
+          { name: "total / totalLabel", type: "number / string", description: "The whole, shown in the hole." },
+          { name: "onSelect / selectedId", type: "(id | null) => void / string | null", description: "Legend rows become filter toggles." },
+          { name: "framed", type: "boolean", default: "true", description: "false inside a section that has its own border." },
+        ]}
+      >
+        <RadialStatsDemo />
       </Demo>
 
       <Demo
@@ -575,4 +591,26 @@ export default function DashboardWidgets() {
 function PipelineFlowDemo() {
   const [stage, setStage] = useState<string | null>(null);
   return <PipelineFlow stages={FLOW_STAGES} selectedId={stage} onSelect={setStage} />;
+}
+
+function RadialStatsDemo() {
+  const [filter, setFilter] = useState<string | null>(null);
+  return (
+    <div className="max-w-3xl">
+      <RadialStatsCard
+        title="Advisors"
+        subtitle="Press a group to show only those advisors."
+        total={21}
+        totalLabel="advisors"
+        selectedId={filter}
+        onSelect={setFilter}
+        items={[
+          { id: "active", label: "Active", value: 15 },
+          { id: "inactive", label: "Suspended", value: 6 },
+          { id: "agency", label: "Company", value: 6 },
+          { id: "individual", label: "Individual", value: 15 },
+        ]}
+      />
+    </div>
+  );
 }

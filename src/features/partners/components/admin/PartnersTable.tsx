@@ -12,19 +12,15 @@ import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
 import AdvisorEntityCell, { advisorName } from "../shared/AdvisorEntityCell";
 
 import { useId as useTabId } from "react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil,
   RefreshCw,
   SlidersHorizontal,
-  Building2,
   UserCog,
   Users,
-  CheckCircle,
-  XCircle,
   BadgeCheck,
-  User,
   ShieldCheck,
   CalendarDays,
   Mail,
@@ -52,9 +48,7 @@ import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
 import PendingRegistrationOtpsTable from "./PendingRegistrationOtpsTable";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import DeletePartner from "./DeletePartner";
-import StatsFilterCards, {
-  type FilterCardItem,
-} from "components/ub/navigation/controls/StatsFilterCards";
+import AdvisorStatsRings from "features/partners/components/shared/AdvisorStatsRings";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
@@ -186,52 +180,6 @@ export default function PartnersTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
-  // Every advisor is active or suspended, and individual or company, so each
-  // card's share is of the same whole.
-  const advisorTotal = (stats?.active ?? 0) + (stats?.inactive ?? 0);
-  const shareOf = (n: number | undefined) => (advisorTotal > 0 ? ((n ?? 0) / advisorTotal) * 100 : undefined);
-  const statsCards = useMemo<FilterCardItem[]>(
-    () => [
-      {
-        id: "active",
-        label: "Active",
-        count: stats?.active ?? 0,
-        progress: shareOf(stats?.active),
-        shareOf: "of advisors",
-        icon: CheckCircle,
-        colorScheme: "emerald",
-      },
-      {
-        id: "inactive",
-        label: "Suspended",
-        count: stats?.inactive ?? 0,
-        progress: shareOf(stats?.inactive),
-        shareOf: "of advisors",
-        icon: XCircle,
-        colorScheme: "rose",
-      },
-      {
-        id: "individual",
-        label: "Individual",
-        count: stats?.individual ?? 0,
-        progress: shareOf(stats?.individual),
-        shareOf: "of advisors",
-        icon: User,
-        colorScheme: "violet",
-      },
-      {
-        id: "agency",
-        label: "Company",
-        count: stats?.agency ?? 0,
-        progress: shareOf(stats?.agency),
-        shareOf: "of advisors",
-        icon: Building2,
-        colorScheme: "cyan",
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stats]
-  );
 
   const displayTotal =
     partners.length < ITEMS_PER_PAGE
@@ -453,12 +401,7 @@ export default function PartnersTable() {
               <>
                 {/* Stats Cards */}
                 <div className="border-b border-ub-border p-4 sm:p-6">
-                  <StatsFilterCards
-                    className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&_button]:gap-2 [&_button]:p-3"
-                    cards={statsCards}
-                    selectedId={selectedStatus}
-                    onSelect={handleCardSelect}
-                  />
+                  <AdvisorStatsRings stats={stats} loading={loading} selectedId={selectedStatus} onSelect={handleCardSelect} />
                 </div>
 
                 <div className="border-b border-ub-border p-4 sm:p-6">

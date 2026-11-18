@@ -58,6 +58,7 @@ import {
   GroupedBarChart,
   AreaLineChart,
   AvatarStrip,
+  RadialStatsCard,
   TaskList,
   TaskListItem,
   WidgetStatus,
@@ -77,8 +78,8 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
-  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "RadialStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "RadialRingsChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
@@ -348,6 +349,20 @@ export default function DummyDashboard() {
             </DashboardCard>
           </Block>
         </div>
+
+        <Block show={labels} names={["RadialStatsCard", "RadialRingsChart"]}>
+          <RadialStatsCard
+            title="Advisors"
+            total={21}
+            totalLabel="advisors"
+            items={[
+              { id: "active", label: "Active", value: 15 },
+              { id: "inactive", label: "Suspended", value: 6 },
+              { id: "agency", label: "Company", value: 6 },
+              { id: "individual", label: "Individual", value: 15 },
+            ]}
+          />
+        </Block>
 
         <Block show={labels} names={["DashboardCard", "PipelineFlow", "PipelineBar"]}>
           <DashboardCard title="Pipeline" subtitle="Press a stage to filter; press it again to clear.">

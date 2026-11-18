@@ -353,6 +353,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Role home: active applications by stage and by university"],
     avoid: "Change over time (use AreaLineChart) or comparing many categories (use a bar chart).",
   },
+  RadialStatsCard: {
+    category: "data",
+    imports: ['import { RadialStatsCard } from "components/ub/dashboard";'],
+    useFor: "Several measures of one whole as concentric rings with the total in the hole, and a legend (count, share) whose rows can filter the list below.",
+    usedIn: ["Admin and reviewer Advisors: active, suspended, company, individual"],
+    avoid: "Parts that add up to the whole and nothing else (use DonutStatsCard), or more than five measures.",
+  },
   GroupedBarChart: {
     category: "data",
     imports: ['import { GroupedBarChart } from "components/ub/dashboard";'],
