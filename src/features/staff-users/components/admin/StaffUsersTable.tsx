@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -28,7 +28,7 @@ import DataTable, {
 } from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import StatusBadge from "components/ub/data/badges/StatusBadge";
+import EntityCell from "components/ub/data/display/EntityCell";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
@@ -39,7 +39,6 @@ import InviteStaffUserModal from "./InviteStaffUserModal";
 import ResendStaffInvitationOtpModal from "./ResendStaffInvitationOtpModal";
 import FilterButton from "components/ub/core/buttons/FilterButton";
 import { FEATURES } from "config/featureFlags";
-import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -138,24 +137,17 @@ export default function StaffUsersTable() {
       key: "name",
       header: "Staff user",
       cell: (user) => (
-        <div className="flex min-w-0 items-center gap-3">
-          <span aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
-            {getInitials(user.name ?? "") || "?"}
-          </span>
-          <span
-            className="line-clamp-2 break-words font-medium"
-            title={user.name}
-          >
-            {user.name}
-          </span>
-        </div>
+        <EntityCell
+          name={user.name || "Unnamed user"}
+          status={{ status: user.is_active, label: user.is_active ? "Active" : "Suspended" }}
+        />
       ),
     },
     {
       key: "email",
       header: "Email",
       cell: (user) => (
-        <span className="break-all text-ub-text-secondary" title={user.email}>
+        <span className="block truncate text-ub-text-secondary" title={user.email}>
           {user.email}
         </span>
       ),
@@ -163,24 +155,14 @@ export default function StaffUsersTable() {
     {
       key: "role",
       header: "Role",
-      cell: (user) => (
-        <StatusBadge variant="info">{user.role?.name ?? "—"}</StatusBadge>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      cell: (user) => (
-        <StatusBadge variant={user.is_active ? "success" : "neutral"}>
-          {user.is_active ? "Active" : "Suspended"}
-        </StatusBadge>
-      ),
+      cell: (user) => user.role?.name ?? "—",
     },
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (user) => (
-        <TableActions>
+        <TableActions label={user.name}>
           <TableAction
             label={user.is_active ? "Suspend account" : "Reactivate account"}
             icon={

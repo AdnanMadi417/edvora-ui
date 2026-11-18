@@ -16,6 +16,7 @@ import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Tag from "components/ub/data/badges/Tag";
+import EntityCell from "components/ub/data/display/EntityCell";
 const base = "/admin/document-types";
 export const templateStatus = (type: DocumentType) =>
   !type.has_static_template
@@ -43,17 +44,7 @@ export default function DocumentTypesDirectory() {
       header: "Document type",
       sortable: true,
       cell: (type) => (
-        <div className="max-w-sm space-y-1">
-          <p
-            className="line-clamp-2 break-words font-medium text-ub-text-primary"
-            title={type.type}
-          >
-            {type.type}
-          </p>
-          <p className="break-all text-ub-caption text-ub-text-secondary">
-            {type.code}
-          </p>
-        </div>
+        <EntityCell name={type.type} noAvatar subtitle={type.code} />
       ),
     },
     {
@@ -78,8 +69,15 @@ export default function DocumentTypesDirectory() {
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (type) => (
         <TableActions>
+          <TableAction
+            label={`View ${type.type}`}
+            icon={<Eye className="h-4 w-4" />}
+            href={`${base}/${type.id}`}
+            primary
+          />
           {type.has_static_template && (
             <TableAction
               label={`${type.static_template_file_key ? "Replace" : "Upload"} ${
@@ -148,7 +146,7 @@ export default function DocumentTypesDirectory() {
           scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No document types found",
-            description: "Try another name, code, or description.",
+            description: "Try another name or code.",
           }}
           footer={
             <TablePagination

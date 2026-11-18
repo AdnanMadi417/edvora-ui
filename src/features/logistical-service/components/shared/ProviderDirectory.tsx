@@ -4,14 +4,7 @@ import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
 import { useState } from "react";
-import {
-  Eye,
-  Pencil,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-  Truck,
-} from "lucide-react";
+import { Pencil, Plus, Trash2, Truck } from "lucide-react";
 import {
   useLogisticProviders,
   useDeleteLogisticProvider,
@@ -25,7 +18,8 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
+import ProviderAvatar from "./ProviderAvatar";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Tag from "components/ub/data/badges/Tag";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
@@ -83,17 +77,12 @@ export default function ProviderDirectory({
       header: "Provider",
       sortable: true,
       cell: (provider) => (
-        <div className="max-w-xs space-y-1">
-          <p
-            className="line-clamp-2 break-words font-medium text-ub-text-primary"
-            title={provider.name}
-          >
-            {provider.name}
-          </p>
-          <p className="text-ub-body-sm text-ub-text-secondary">
-            {provider.nationality || "Nationality not provided"}
-          </p>
-        </div>
+        <EntityCell
+          name={provider.name}
+          avatar={<ProviderAvatar provider={provider} />}
+          status={{ status: provider.is_active }}
+          subtitle={provider.nationality || "Nationality not provided"}
+        />
       ),
     },
     {
@@ -107,7 +96,7 @@ export default function ProviderDirectory({
       ),
     },
     {
-      key: "services", mobileSecondary: true,
+      key: "services",
       header: "Services",
       cell: (provider) => (
         <div className="flex max-w-xs flex-wrap gap-2">
@@ -126,17 +115,9 @@ export default function ProviderDirectory({
       ),
     },
     {
-      key: "is_active",
-      header: "Status",
-      cell: (provider) => (
-        <Tag hue={provider.is_active ? "teal" : "grey"}>
-          {provider.is_active ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (provider) => (
         <TableActions>
           <TableAction

@@ -101,7 +101,8 @@ export const searchField = `${fieldControl} ${fieldControlHeight} ps-10 pe-[17px
 
 export type TagTone = "success" | "danger" | "warning" | "attention" | "info" | "neutral" | "brand" | "positive";
 
-export const tagBase = "inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-ub-sm border px-2 text-ub-label-sm";
+// One line, never wraps: long labels truncate (the badge components put the full text in `title`).
+export const tagBase = "inline-flex h-6 min-w-0 max-w-[14rem] shrink-0 items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-ub-sm border px-2 text-ub-label-sm";
 export const tagSm = "h-5 px-1.5";
 
 /** Tinted tags: 700 text on 50 with a 200 border; warning uses 800 text. */

@@ -6,35 +6,23 @@ import DataTable, {
 import type { AccountManagerPartnerListItem } from "features/partners/types";
 import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
 
+import AdvisorEntityCell, {
+  advisorName,
+  advisorSubtitle,
+} from "../shared/AdvisorEntityCell";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
+
 import React, { useEffect, useRef, useState } from "react";
-import {
-  ChevronRight,
-  Users,
-  Mail,
-  BadgeCheck,
-  Building2,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  FileText,
-  CalendarDays,
-  Share2,
-  Handshake,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import { Eye } from "lucide-react";
 import { useAccountManagerPartners } from "features/partners/hooks";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import AppDate from "components/ub/data/formatting/AppDate";
-import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Button from "components/ub/core/buttons/Button";
-import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AccountManagerPartnersList() {
-  const router = useRouter();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,105 +65,46 @@ export default function AccountManagerPartnersList() {
 
   const columns: DataTableColumn<AccountManagerPartnerListItem>[] = [
     {
-      key: "0",
+      key: "advisor",
       header: "Advisor",
       cell: (partner) => (
-        <>
-          <div className="flex items-center gap-2">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
-              {partner.name ? getInitials(partner.name) : "NA"}
-              <span
-                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${
-                  partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
-                }`}
-              />
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-ub-text-primary">
-                {partner.name || "Unknown Advisor"}
-              </div>
-              <div className="truncate text-xs text-ub-text-secondary capitalize">
-                {partner.type || "—"} · {partner.country || "—"}
-              </div>
-            </div>
-          </div>
-        </>
+        <AdvisorEntityCell
+          advisor={partner}
+          subtitle={
+            partner.is_shared
+              ? `${advisorSubtitle(partner)} · Shared`
+              : undefined
+          }
+        />
       ),
     },
     {
-      key: "1",
-      mobileSecondary: true,
-      header: "Contact info",
-      cell: (partner) => (
-        <>
-          <div className="truncate text-sm text-ub-text-primary">
-            {partner.phone || "—"}
-          </div>
-          <div className="truncate text-xs text-ub-text-secondary">
-            {partner.email || "—"}
-          </div>
-        </>
-      ),
-    },
-    {
-      key: "2",
+      key: "applications",
       header: "Applications",
       cell: (partner) => (
-        <>
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-ub-border bg-ub-surface-subtle px-2.5 py-1 text-xs font-medium text-ub-text-secondary">
-            {partner.applications_count}
-          </span>
-        </>
+        <span className="ub-tabular">{partner.applications_count}</span>
       ),
     },
     {
-      key: "3",
-      header: "Status",
-      cell: (partner) => (
-        <>
-          <div className="flex flex-wrap items-center gap-2">
-            {partner.is_active ? (
-              <StatusBadge
-                variant="success"
-                icon={<CheckCircle className="h-3 w-3" />}
-              >
-                Active
-              </StatusBadge>
-            ) : (
-              <StatusBadge
-                variant="neutral"
-                icon={<XCircle className="h-3 w-3" />}
-              >
-                Inactive
-              </StatusBadge>
-            )}
-            {partner.is_shared && (
-              <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>
-                Shared
-              </StatusBadge>
-            )}
-            {partner.agency_membership && (
-              <StatusBadge
-                variant="info"
-                icon={<Building2 className="h-3 w-3" />}
-              >
-                Member of {partner.agency_membership.agency_name}
-              </StatusBadge>
-            )}
-          </div>
-        </>
-      ),
-    },
-    {
-      key: "4",
-      mobileSecondary: true,
+      key: "registered",
       header: "Registered",
       cell: (partner) => (
-        <>
-          <div className="text-sm text-ub-text-primary">
-            <AppDate value={partner.created_at} format="short" fallback="—" />
-          </div>
-        </>
+        <AppDate value={partner.created_at} format="short" fallback="—" />
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "end",
+      cell: (partner) => (
+        <TableActions label={advisorName(partner)}>
+          <TableAction
+            label="View advisor"
+            icon={<Eye className="h-4 w-4" />}
+            href={`/account-manager/advisors/${partner.id}`}
+            primary
+          />
+        </TableActions>
       ),
     },
   ];

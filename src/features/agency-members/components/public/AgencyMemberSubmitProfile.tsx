@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { Briefcase, CircleCheck, Clock, GraduationCap, Link2Off, Presentation, UserCheck, UserRound } from "lucide-react";
 
 import { useSubmitAgencyMemberProfile } from "features/agency-members/hooks";
 import { COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
@@ -12,17 +10,28 @@ import InputField from "components/ub/forms/text/InputField";
 import SelectField from "components/ub/forms/selection/SelectField";
 import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
 import PhoneInputField from "components/ub/forms/text/PhoneInputField";
-import { isValidWebsiteUrl } from "utils/socialMedia";
+import RadioCardGroup from "components/ub/forms/choices/RadioCardGroup";
+import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import PublicFileUploadField, { type PublicUploadResult } from "components/ub/forms/uploads/PublicFileUploadField";
 import ImageUpload from "components/ub/forms/uploads/ImageUpload";
+import Button from "components/ub/core/buttons/Button";
+import Alert from "components/ub/feedback/notifications/Alert";
+import { isValidWebsiteUrl } from "utils/socialMedia";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
-import { parseApiError } from "utils/parseApiError";
+import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import Button from "components/ub/core/buttons/Button";
-import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
+import { fieldWrapper } from "components/ub/recipes";
+import { InviteShell, LinkButton, StatusView } from "./InviteLayout";
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
+
+const BACKGROUND_ICONS: Record<string, typeof UserRound> = {
+  agent: Briefcase,
+  teacher: Presentation,
+  student: GraduationCap,
+  other: UserRound,
+};
 
 const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
   phone: "phone_number",
@@ -32,13 +41,17 @@ const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
   profile_photo_file_url: "profile_photo",
 };
 
-function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+type View = "form" | "done" | "link_invalid" | "link_expired" | "already_submitted" | "has_account";
+
+const ASK_FOR_NEW_LINK = "Ask your agency admin to resend your profile link. You won't need a new code.";
+
+function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="border-b border-slate-200 p-6 last:border-b-0">
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      {subtitle && <p className="mt-0.5 text-sm text-slate-600">{subtitle}</p>}
+    <section className="border-b border-ub-border p-5 last:border-b-0 sm:p-6">
+      <h2 className="text-ub-heading-sm text-ub-text-primary">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-ub-body-sm text-ub-text-secondary">{subtitle}</p>}
       <div className="mt-4">{children}</div>
-    </div>
+    </section>
   );
 }
 
@@ -82,11 +95,11 @@ function usePublicPhotoUpload() {
 
 export default function AgencyMemberSubmitProfile() {
   const searchParams = useSearchParams();
-  const submissionToken = searchParams.get("token") ?? "";
+  const submissionToken = (searchParams.get("token") ?? "").trim();
 
   const { submitProfile, loading: submitting } = useSubmitAgencyMemberProfile();
 
-  const [submitted, setSubmitted] = useState(false);
+  const [view, setView] = useState<View>("form");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState("");
 
@@ -101,9 +114,13 @@ export default function AgencyMemberSubmitProfile() {
   });
 
   const [formData, setFormData] = useState({
-    phone_code: "+60", phone_number: "",
-    country: "", nationality: "", background: "",
-    date_of_birth: "", passport_number: "",
+    phone_code: "+60",
+    phone_number: "",
+    country: "",
+    nationality: "",
+    background: "",
+    date_of_birth: "",
+    passport_number: "",
     social_media_url: "",
     linkedin_url: "",
   });
@@ -118,27 +135,20 @@ export default function AgencyMemberSubmitProfile() {
 
   const computeErrors = () => {
     const e: Record<string, string> = {};
-    if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
-    if (!formData.country) e.country = "Country is required";
-    else if (!isKnownCountry(formData.country)) e.country = "Select a country from the list";
-    if (!formData.nationality) e.nationality = "Nationality is required";
-    if (!formData.background) e.background = "Please select your background";
-    if (!formData.date_of_birth) e.date_of_birth = "Date of birth is required";
-    if (!formData.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!profilePhoto.fileKey) e.profile_photo = "Profile photo is required";
-    if (!passportPhoto) e.passport_photo = "Please upload your passport photo";
-    if (!formData.social_media_url.trim()) e.social_media_url = "Social media URL is required";
-    else if (!isValidWebsiteUrl(formData.social_media_url)) e.social_media_url = "Enter a valid URL starting with https://";
+    if (!profilePhoto.fileKey) e.profile_photo = "Add a profile photo";
+    if (!formData.phone_number.trim()) e.phone_number = "Enter your phone number";
+    if (!formData.country) e.country = "Choose your country of residence";
+    else if (!isKnownCountry(formData.country)) e.country = "Choose a country from the list";
+    if (!formData.nationality) e.nationality = "Choose your nationality";
+    if (!formData.date_of_birth) e.date_of_birth = "Enter your date of birth";
+    if (!formData.passport_number.trim()) e.passport_number = "Enter your passport number";
+    if (!formData.background) e.background = "Choose the option that best describes you";
+    if (!passportPhoto) e.passport_photo = "Upload a photo of your passport";
+    if (!formData.social_media_url.trim()) e.social_media_url = "Enter a link to one of your social media accounts";
+    else if (!isValidWebsiteUrl(formData.social_media_url)) e.social_media_url = "Enter a full link starting with https://";
     if (formData.linkedin_url && !isValidWebsiteUrl(formData.linkedin_url))
-      e.linkedin_url = "Enter a valid URL starting with https://";
+      e.linkedin_url = "Enter a full link starting with https://";
     return e;
-  };
-
-  const validate = () => {
-    const e = computeErrors();
-    setErrors(e);
-    if (Object.keys(e).length > 0) scrollToFirstError(e);
-    return Object.keys(e).length === 0;
   };
 
   const validateField = (field: string) => {
@@ -146,10 +156,15 @@ export default function AgencyMemberSubmitProfile() {
     setErrors((p) => ({ ...p, [field]: e[field] ?? "" }));
   };
 
-  const isFormComplete = Object.keys(computeErrors()).length === 0;
-
-  const handleSubmit = async () => {
-    if (!validate()) return;
+  const handleSubmit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
+    const e = computeErrors();
+    setErrors(e);
+    if (Object.keys(e).length > 0) {
+      scrollToFirstError(e);
+      return;
+    }
+    setApiError("");
 
     try {
       await submitProfile({
@@ -165,70 +180,85 @@ export default function AgencyMemberSubmitProfile() {
         ...(formData.social_media_url && { social_media_url: formData.social_media_url }),
         ...(formData.linkedin_url && { linkedin_url: formData.linkedin_url }),
       });
-      setSubmitted(true);
+      setView("done");
     } catch (err: unknown) {
-      handleApiError(err, "Failed to submit your profile. Please try again.");
+      switch (getApiErrorCode(err)) {
+        case "submission_link_invalid":
+          setView("link_invalid");
+          return;
+        case "submission_link_expired":
+          setView("link_expired");
+          return;
+        case "already_submitted":
+          setView("already_submitted");
+          return;
+        case "email_already_registered":
+          setView("has_account");
+          return;
+        default:
+          handleApiError(err, "We couldn't save your profile. Please try again.");
+      }
     }
   };
 
   if (!submissionToken) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 text-center shadow-sm">
-          <div className="mb-6 flex justify-center">
-            <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
-          </div>
-          <AlertCircle className="mx-auto mb-4 h-8 w-8 text-red-500" />
-          <h1 className="text-xl font-bold text-slate-900">Invalid Link</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            This link is missing or invalid. Please use the link from your invitation email.
-          </p>
-        </div>
-      </div>
+      <InviteShell>
+        <StatusView icon={Link2Off} tint="amber" title="This link is incomplete" support>
+          <p>The link you opened is missing part of its address, so we can&apos;t tell whose profile this is.</p>
+          <p>Open the link from your invite email again. If it still doesn&apos;t work, ask your agency admin to resend your profile link.</p>
+        </StatusView>
+      </InviteShell>
     );
   }
 
-  if (submitted) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 text-center shadow-sm">
-          <div className="mb-5 flex justify-center">
-            <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
-          </div>
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
-          </div>
-          <h1 className="text-xl font-bold text-slate-900">Profile Submitted!</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Your account has been created. Check your email for your login details.
-          </p>
-          <Link href="/"
-            className="mt-6 block w-full rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    );
+  if (view !== "form") {
+    const status = {
+      done: (
+        <StatusView icon={CircleCheck} tint="green" title="You're all set" actions={<LinkButton href="/">Go to sign in</LinkButton>}>
+          <p>Your account is ready. We&apos;ve emailed you your sign-in details.</p>
+        </StatusView>
+      ),
+      link_invalid: (
+        <StatusView icon={Link2Off} tint="amber" title="This link doesn't work" support>
+          <p>It may have been replaced by a newer link. Open the latest email from Unibexs about your invite.</p>
+          <p>If that doesn&apos;t work either, {ASK_FOR_NEW_LINK.charAt(0).toLowerCase() + ASK_FOR_NEW_LINK.slice(1)}</p>
+        </StatusView>
+      ),
+      link_expired: (
+        <StatusView icon={Clock} tint="amber" title="This link has expired" support>
+          <p>Profile links work for 48 hours, and this one has run out. Nothing you entered was saved.</p>
+          <p>{ASK_FOR_NEW_LINK}</p>
+        </StatusView>
+      ),
+      already_submitted: (
+        <StatusView icon={CircleCheck} tint="green" title="Your profile is already complete" actions={<LinkButton href="/">Go to sign in</LinkButton>} support>
+          <p>This invite has already been used to set up your account. Check your email for your sign-in details.</p>
+        </StatusView>
+      ),
+      has_account: (
+        <StatusView icon={UserCheck} tint="blue" title="You already have an account" actions={<LinkButton href="/">Go to sign in</LinkButton>} support>
+          <p>This email address already has a Unibexs account. Sign in with it instead.</p>
+        </StatusView>
+      ),
+    }[view];
+    return <InviteShell>{status}</InviteShell>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <div className="mb-6 flex justify-center">
-          <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
+    <InviteShell wide>
+      <form noValidate onSubmit={handleSubmit}>
+        <div className="border-b border-ub-border p-5 sm:p-6">
+          <h1 className="text-ub-heading-md text-ub-text-primary">Complete your profile</h1>
+          <p className="mt-1 text-ub-body-sm text-ub-text-secondary">
+            Your email is verified. Add a few details and we&apos;ll create your Unibexs account. Every field is required unless it says optional.
+          </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 p-6">
-            <h1 className="text-xl font-bold text-blue-600">Complete Your Profile</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Just a few more details to finish setting up your account.
-            </p>
-          </div>
-
-          <SectionCard title="Basic Information">
+        <Section title="Basic information">
+          <div className={fieldWrapper}>
             <ImageUpload
-              label="Profile Photo"
+              label="Profile photo"
               id="profile_photo"
               required
               file={profilePhoto.file}
@@ -238,97 +268,126 @@ export default function AgencyMemberSubmitProfile() {
               progress={profilePhoto.progress}
               error={profilePhoto.error || errors.profile_photo}
             />
-            <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
-              formData={formData} errors={errors} updateFormData={updateForm}
-              onBlur={() => validateField("phone_number")} />
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("country")} />
-              <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("nationality")} />
-            </div>
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <InputField label="Date of Birth" field="date_of_birth" type="date"
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("date_of_birth")} />
-              <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("passport_number")} />
-            </div>
-          </SectionCard>
+          </div>
+          <PhoneInputField
+            dialCodeField="phone_code"
+            numberField="phone_number"
+            formData={formData}
+            errors={errors}
+            updateFormData={updateForm}
+            onBlur={() => validateField("phone_number")}
+          />
+          <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <SelectField
+              label="Country of residence"
+              field="country"
+              options={COUNTRY_OPTIONS}
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("country")}
+            />
+            <SearchableDropdown
+              label="Nationality"
+              field="nationality"
+              options={NATIONALITY_OPTIONS}
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("nationality")}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <InputField
+              label="Date of birth"
+              field="date_of_birth"
+              type="date"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("date_of_birth")}
+            />
+            <InputField
+              label="Passport number"
+              field="passport_number"
+              placeholder="A12345678"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("passport_number")}
+            />
+          </div>
+        </Section>
 
-          <SectionCard title="Background" subtitle="Which best describes you?">
-            <div className="space-y-2" data-field="background">
-              {BACKGROUND_OPTIONS.map((opt) => (
-                <label key={opt.value}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition ${
-                    formData.background === opt.value
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-slate-200 bg-white hover:bg-slate-50"
-                  }`}>
-                  <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                    formData.background === opt.value ? "border-blue-500" : "border-slate-300"
-                  }`}>
-                    {formData.background === opt.value && <div className="h-2 w-2 rounded-full bg-blue-500" />}
-                  </div>
-                  <input type="radio" name="background" value={opt.value} className="hidden"
-                    checked={formData.background === opt.value}
-                    onChange={() => updateForm("background", opt.value)} />
-                  <span className="text-sm text-slate-700">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-            {errors.background && <p className="mt-2 text-xs text-red-600">{errors.background}</p>}
-          </SectionCard>
+        <Section title="Background" subtitle="Which best describes you?">
+          <div data-field="background">
+            <RadioCardGroup
+              ariaLabel="Which best describes you?"
+              compact
+              options={BACKGROUND_OPTIONS.map((opt) => ({
+                value: opt.value,
+                label: opt.label,
+                hint: "",
+                icon: BACKGROUND_ICONS[opt.value] ?? UserRound,
+              }))}
+              value={formData.background}
+              onChange={(value) => updateForm("background", value)}
+            />
+            <FieldError>{errors.background}</FieldError>
+          </div>
+        </Section>
 
-          <SectionCard title="Identity Verification"
-            subtitle="To ensure trust and authenticity, all members must verify their identity.">
+        <Section title="Identity check" subtitle="Unibexs checks every account holder's identity to keep students safe.">
+          <div className={fieldWrapper}>
             <PublicFileUploadField
-              label="Passport Photo"
+              label="Passport photo"
               fieldId="member-passport-photo"
               field="passport_photo"
               required
               result={passportPhoto}
               fileName={passportPhotoName}
-              onUpload={(res, name) => { setPassportPhoto(res); setPassportPhotoName(name); }}
-              onRemove={() => { setPassportPhoto(null); setPassportPhotoName(""); }}
+              onUpload={(res, name) => {
+                setPassportPhoto(res);
+                setPassportPhotoName(name);
+                setErrors((p) => ({ ...p, passport_photo: "" }));
+              }}
+              onRemove={() => {
+                setPassportPhoto(null);
+                setPassportPhotoName("");
+              }}
               error={errors.passport_photo}
             />
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <InputField label="Social Media Account" field="social_media_url" type="url"
-                placeholder="https://..."
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("social_media_url")} />
-              <InputField label="LinkedIn Profile" field="linkedin_url" type="url"
-                required={false} placeholder="https://linkedin.com/in/yourname"
-                formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => validateField("linkedin_url")} />
-            </div>
-          </SectionCard>
-
-          <div className="space-y-3 p-6">
-            {apiError && (
-              <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                {apiError}
-              </div>
-            )}
-            <Button
-              onClick={handleSubmit}
-              disabled={submitting || !isFormComplete}
-              text={submitting ? "Submitting..." : "Complete Profile"}
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="w-full py-3 hover:bg-blue-700"
+          </div>
+          <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <InputField
+              label="Social media account"
+              field="social_media_url"
+              type="url"
+              placeholder="https://..."
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("social_media_url")}
+            />
+            <InputField
+              label="LinkedIn profile"
+              field="linkedin_url"
+              type="url"
+              required={false}
+              placeholder="https://linkedin.com/in/yourname"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateForm}
+              onBlur={() => validateField("linkedin_url")}
             />
           </div>
+        </Section>
+
+        <div className="flex flex-col gap-3 p-5 sm:p-6">
+          {apiError && <Alert tone="danger">{apiError}</Alert>}
+          <Button type="submit" loading={submitting} text="Create my account" variant="primary" className="w-full" />
         </div>
-      </div>
-    </div>
+      </form>
+    </InviteShell>
   );
 }

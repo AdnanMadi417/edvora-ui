@@ -15,7 +15,7 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import CreateServiceType from "../admin/popups/CreateServiceType";
@@ -53,14 +53,13 @@ export default function LogisticsServicesDirectory({
       header: "Service name",
       sortable: true,
       cell: (service) => (
-        <p className="max-w-xl break-words font-medium text-ub-text-primary">
-          {service.name}
-        </p>
+        <EntityCell name={service.name} noAvatar />
       ),
     },
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       width: "144px",
       cell: (service) => (
         <TableActions>

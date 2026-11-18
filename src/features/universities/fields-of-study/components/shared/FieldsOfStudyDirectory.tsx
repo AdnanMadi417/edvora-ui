@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
+import { focusRing, tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -23,7 +23,7 @@ import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
-import Tag from "components/ub/data/badges/Tag";
+import EntityCell from "components/ub/data/display/EntityCell";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import SelectInput from "components/ub/forms/selection/SelectInput";
@@ -72,10 +72,14 @@ export default function FieldsOfStudyDirectory({
         <button
           type="button"
           onClick={() => setViewing(field)}
-          className="max-w-sm break-words text-start font-medium text-ub-text-primary hover:text-ub-primary focus-visible:outline focus-visible:outline-2"
-          title={field.name}
+          className={`block w-full min-w-0 max-w-sm rounded-ub-xs text-start ${focusRing}`}
+          aria-label={`View ${field.name}`}
         >
-          {field.name}
+          <EntityCell
+            name={field.name}
+            noAvatar
+            status={{ status: field.is_active }}
+          />
         </button>
       ),
     },
@@ -88,17 +92,9 @@ export default function FieldsOfStudyDirectory({
       ),
     },
     {
-      key: "is_active",
-      header: "Status",
-      cell: (field) => (
-        <Tag hue={field.is_active ? "teal" : "grey"}>
-          {field.is_active ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (field) => (
         <TableActions>
           <TableAction

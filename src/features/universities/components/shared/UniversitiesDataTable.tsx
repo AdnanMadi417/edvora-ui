@@ -6,7 +6,6 @@ import TableActions, {
 import {
   Eye,
   EyeOff,
-  GraduationCap,
   Pencil,
   Trash2,
   Wallet,
@@ -16,9 +15,10 @@ import DataTable, {
   type DataTableSort,
 } from "components/ub/data/tables/DataTable";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import PresignedImage from "components/ub/data/media/PresignedImage";
-import IconButton from "components/ub/core/buttons/IconButton";
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
+import EntityCell from "components/ub/data/display/EntityCell";
+import UniversityLogo, {
+  universityStatus,
+} from "features/universities/components/shared/UniversityLogo";
 import Tag from "components/ub/data/badges/Tag";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import type { University } from "features/universities/types";
@@ -48,39 +48,12 @@ export default function UniversitiesDataTable(props: Props) {
       width: "320px",
       sortable: true,
       cell: (university) => (
-        <div className="flex min-w-[240px] max-w-[360px] items-start gap-3 py-1 text-start">
-          <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-ub-md border border-ub-border bg-ub-tone-brand-bg">
-            <PresignedImage
-              fileKey={university.logo_file_key}
-              alt=""
-              className="h-full w-full object-contain"
-              fallback={
-                <GraduationCap className="h-5 w-5 text-ub-tone-brand-text" />
-              }
-            />
-          </div>
-          <div className="min-w-0 space-y-1.5">
-            <p
-              className="line-clamp-2 text-ub-label-md text-ub-text-primary"
-              title={university.name}
-            >
-              {university.name}
-            </p>
-            <p className="text-ub-body-sm text-ub-text-secondary">
-              {university.country || "Country to be confirmed"}
-            </p>
-            <div className="hidden flex-wrap gap-1.5 md:flex">
-              <Tag hue="indigo" size="sm">
-                {university.is_public ? "Public" : "Private"}
-              </Tag>
-              {props.canManage && university.is_hidden && (
-                <Tag hue="amber" size="sm">
-                  Hidden
-                </Tag>
-              )}
-            </div>
-          </div>
-        </div>
+        <EntityCell
+          name={university.name}
+          avatar={<UniversityLogo name={university.name} fileKey={university.logo_file_key} />}
+          status={universityStatus(university)}
+          subtitle={university.country || "Country to be confirmed"}
+        />
       ),
     },
     {
@@ -95,7 +68,6 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "intake_months",
-      mobileSecondary: true,
       header: "Intakes",
       cell: (university) =>
         university.intake_months?.length ? (
@@ -111,7 +83,6 @@ export default function UniversitiesDataTable(props: Props) {
     },
     {
       key: "has_language_center",
-      mobileSecondary: true,
       header: "Language center",
       sortable: true,
       cell: (university) => (
@@ -121,18 +92,9 @@ export default function UniversitiesDataTable(props: Props) {
       ),
     },
     {
-      key: "is_active",
-      header: "Status",
-      sortable: true,
-      cell: (university) => (
-        <Tag hue={university.is_active ? "teal" : "grey"}>
-          {university.is_active ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (university) => (
         <TableActions>
           {props.canManage && (
@@ -180,10 +142,6 @@ export default function UniversitiesDataTable(props: Props) {
   ];
   return (
     <div className="min-w-0">
-      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
-        Swipe across for more columns. Scroll within the table for more
-        universities.
-      </p>
       <DataTable
         columns={columns}
         rows={props.universities}

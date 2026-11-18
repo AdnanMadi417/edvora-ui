@@ -5,7 +5,7 @@ import TableActions, {
 } from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import {
   useUniversityTypes,
   useDeleteUniversityType,
@@ -19,7 +19,7 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
 import Button from "components/ub/core/buttons/Button";
 import Tag from "components/ub/data/badges/Tag";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
@@ -56,20 +56,7 @@ export default function UniversityTypeDirectory({
       width: "320px",
       sortable: true,
       cell: (type) => (
-        <div className="min-w-0 max-w-[340px] space-y-2 md:min-w-[220px] md:py-3">
-          <p
-            className="line-clamp-2 break-words text-ub-label-md text-ub-text-primary"
-            title={type.name}
-          >
-            {type.name}
-          </p>
-          <p
-            className="line-clamp-2 break-words text-ub-body-sm text-ub-text-secondary"
-            title={type.description}
-          >
-            {type.description || "No description provided."}
-          </p>
-        </div>
+        <EntityCell name={type.name} noAvatar />
       ),
     },
     {
@@ -81,7 +68,6 @@ export default function UniversityTypeDirectory({
     },
     {
       key: "optional",
-      mobileSecondary: true,
       header: "Optional fields",
       sortable: true,
       sortValue: (type) => type.required_fields.length - requiredCount(type),
@@ -92,39 +78,9 @@ export default function UniversityTypeDirectory({
       ),
     },
     {
-      key: "requirements",
-      mobileSecondary: true,
-      header: "Required at submission",
-      cell: (type) => (
-        <div className="min-w-[200px] max-w-[280px] space-y-1">
-          {type.required_fields
-            .filter((field) => field.is_required)
-            .slice(0, 3)
-            .map((field) => (
-              <p
-                key={field.id}
-                className="truncate text-ub-body-sm text-ub-text-secondary"
-                title={field.field_name}
-              >
-                {field.field_name}
-              </p>
-            ))}
-          {requiredCount(type) > 3 && (
-            <p className="text-ub-label-sm text-ub-text-link">
-              +{requiredCount(type) - 3} more fields
-            </p>
-          )}
-          {requiredCount(type) === 0 && (
-            <span className="text-ub-text-tertiary">
-              No additional required fields
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (type) => (
         <TableActions>
           <TableAction
@@ -221,9 +177,6 @@ export default function UniversityTypeDirectory({
         />
       </div>
       <div className={`min-w-0 ${tableSectionPadding}`}>
-        <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
-          Swipe across for more columns. Scroll within the table for more types.
-        </p>
         <DataTable
           columns={columns}
           rows={rows}

@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -11,11 +11,8 @@ import {
   Mail,
   Percent,
   BadgeCheck,
-  ChevronRight,
-  CheckCircle,
-  XCircle,
+  Eye,
   RefreshCw,
-  SlidersHorizontal,
   Ban,
   Power,
   Settings,
@@ -41,14 +38,13 @@ import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 import SuspendReactivateMemberModal from "./SuspendReactivateMemberModal";
 import EditMemberCommissionModal from "./EditMemberCommissionModal";
 import FilterButton from "components/ub/core/buttons/FilterButton";
-import { getInitials } from "components/ub/data/media/Avatar";
+import EntityCell from "components/ub/data/display/EntityCell";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -249,22 +245,13 @@ export default function AgencyMembersTable({
             />
           }
         >
-          <table className="ub-legacy-table w-full min-w-[800px]">
+          <table className="ub-legacy-table w-full min-w-[720px]">
             <thead>
               <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
-                  {
-                    icon: User,
-                    label: "Name",
-                    minW: "min-w-[140px] sm:min-w-[200px]",
-                  },
-                  {
-                    icon: Mail,
-                    label: "Email",
-                    minW: "min-w-[160px] sm:min-w-[200px]",
-                  },
+                  { icon: User, label: "Name", minW: "min-w-[220px]" },
+                  { icon: Mail, label: "Email", minW: "min-w-[200px]" },
                   { icon: Percent, label: "Commission" },
-                  { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th
                     key={label}
@@ -278,9 +265,9 @@ export default function AgencyMembersTable({
                     </div>
                   </th>
                 ))}
-                <th className="w-10 px-4 py-4" />
-                <th className="w-10 px-4 py-4" />
-                <th className="w-10 px-4 py-4" />
+                <th className="w-32 px-4 py-4 text-end text-sm font-semibold text-ub-text-primary">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -290,16 +277,16 @@ export default function AgencyMembersTable({
               }`}
             >
               {isInitialLoad && (
-                <TableSkeletonRows columns={7} rows={ITEMS_PER_PAGE} />
+                <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />
               )}
 
               {!isInitialLoad && error && (
-                <TableErrorRow colSpan={7} message={error} onRetry={refetch} />
+                <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
               )}
 
               {!isInitialLoad && !error && members.length === 0 && (
                 <TableEmptyRow
-                  colSpan={7}
+                  colSpan={4}
                   title={
                     activeFiltersCount > 0
                       ? "No members found"
@@ -331,85 +318,66 @@ export default function AgencyMembersTable({
                   members.map((member) => (
                     <AnimatedTableRow
                       key={member.id}
-                      className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
+                      className="cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                       onClick={() =>
                         router.push(
                           `/partner/team-members/${member.partner_id}`
                         )
                       }
                     >
-                      <td data-label="Name" data-primary className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="flex items-center gap-3">
-                          <div aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
-                            {getInitials(member.name ?? "") || "?"}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="truncate text-sm font-medium text-ub-text-primary">
-                              {member.name}
-                            </div>
-                          </div>
-                        </div>
+                      <td data-label="Name" data-primary className="min-w-[220px] px-6 py-4">
+                        <EntityCell
+                          name={member.name || member.email}
+                          status={{ status: member.is_active, label: member.is_active ? "Active" : "Suspended" }}
+                        />
                       </td>
 
-                      <td data-label="Email" className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="truncate text-sm text-ub-text-secondary">
+                      <td data-label="Email" className="min-w-[200px] px-6 py-4">
+                        <div className="truncate text-sm text-ub-text-secondary" title={member.email}>
                           {member.email}
                         </div>
                       </td>
 
-                      <td data-label="Commission" data-mobile-secondary className="px-6 py-4">
+                      <td data-label="Commission" className="px-6 py-4">
                         {member.commission_visible ? (
                           <Tooltip
                             position="right"
-                            content={`This member can see ${member.commission_display_percentage}% of their commission. Use the settings icon to change this.`}
+                            content={`This member can see ${member.commission_display_percentage}% of their commission. Use Edit commission settings to change this.`}
                           >
                             <StatusBadge variant="info">
-                              {member.commission_display_percentage}% Visible
+                              {member.commission_display_percentage}% visible
                             </StatusBadge>
                           </Tooltip>
                         ) : (
                           <Tooltip
                             position="right"
-                            content="This member can't see any commission info. Use the settings icon to make it visible."
+                            content="This member can't see any commission info. Use Edit commission settings to make it visible."
                           >
                             <StatusBadge variant="neutral">Hidden</StatusBadge>
                           </Tooltip>
                         )}
                       </td>
 
-                      <td data-label="Status" className="px-6 py-4">
-                        {member.is_active ? (
-                          <StatusBadge
-                            variant="success"
-                            icon={<CheckCircle className="h-3 w-3" />}
-                          >
-                            Active
-                          </StatusBadge>
-                        ) : (
-                          <StatusBadge
-                            variant="neutral"
-                            icon={<XCircle className="h-3 w-3" />}
-                          >
-                            Suspended
-                          </StatusBadge>
-                        )}
-                      </td>
-
-                      <td data-label="Actions"
-                        colSpan={2}
-                        className="px-4 py-4"
+                      <td
+                        data-label="Actions"
+                        className="px-4 py-4 text-end"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <TableActions label={member.name}>
                           <TableAction
-                            label={"Edit commission settings"}
+                            label={`View ${member.name}`}
+                            icon={<Eye className="h-4 w-4" />}
+                            href={`/partner/team-members/${member.partner_id}`}
+                            primary
+                          />
+                          <TableAction
+                            label="Edit commission settings"
                             icon={<Settings className="h-4 w-4" />}
                             onSelect={() => {
                               setCommissionTarget(member);
                               setIsCommissionOpen(true);
                             }}
                           />
-
                           <TableAction
                             label={
                               member.is_active
@@ -429,10 +397,6 @@ export default function AgencyMembersTable({
                             }}
                           />
                         </TableActions>
-                      </td>
-
-                      <td data-label="" className="px-4 py-4">
-                        <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                       </td>
                     </AnimatedTableRow>
                   ))}

@@ -4,14 +4,7 @@ import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
 import { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Landmark,
-  Pencil,
-  Plus,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Eye, EyeOff, Landmark, Pencil, Plus } from "lucide-react";
 import DataTable, {
   sortRows,
   type DataTableColumn,
@@ -20,11 +13,10 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
 import Button from "components/ub/core/buttons/Button";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import SelectField from "components/ub/forms/selection/SelectField";
-import Tag from "components/ub/data/badges/Tag";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { ISO_COUNTRIES, getCountryName } from "constants/lists";
@@ -85,12 +77,10 @@ export default function BanksTable({
       header: "Bank name",
       sortable: true,
       cell: (bank) => (
-        <p
-          className="line-clamp-2 max-w-xs break-words font-medium"
-          title={bank.name}
-        >
-          {bank.name}
-        </p>
+        <EntityCell
+          name={bank.name}
+          status={{ status: bank.is_active }}
+        />
       ),
     },
     {
@@ -107,33 +97,23 @@ export default function BanksTable({
     },
     {
       key: "code",
-      mobileSecondary: true,
-      header: "Bank code",
+      header: "Code / SWIFT",
+      mobileLabel: "Code / SWIFT",
       sortable: true,
-      cell: (bank) => <span className="break-all ub-tabular">{bank.code}</span>,
-    },
-    {
-      key: "swift_code",
-      mobileSecondary: true,
-      header: "SWIFT code",
       cell: (bank) => (
         <span className="break-all ub-tabular">
-          {bank.swift_code || "Not provided"}
+          {bank.code}
+          <span className="text-ub-text-tertiary">
+            {" · "}
+            {bank.swift_code || "No SWIFT"}
+          </span>
         </span>
-      ),
-    },
-    {
-      key: "is_active",
-      header: "Status",
-      cell: (bank) => (
-        <Tag hue={bank.is_active ? "teal" : "grey"}>
-          {bank.is_active ? "Active" : "Inactive"}
-        </Tag>
       ),
     },
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (bank) => (
         <TableActions>
           <TableAction

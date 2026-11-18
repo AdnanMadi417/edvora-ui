@@ -895,6 +895,20 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Small count on nav items, tabs and the bell (99+ cap).",
     usedIn: ["Sidebar: Application Tracker (count)", "Bell icon", "Tabs with counts"],
   },
+  EntityStatusBadge: {
+    category: "data",
+    imports: [imp("EntityStatusBadge", "data/badges/EntityStatusBadge")],
+    useFor: "Whether a record is live (active / inactive / pending) as a badge, where a circle on an avatar doesn't fit (detail pages, headers).",
+    usedIn: ["Advisors, staff, account managers and team lists", "Universities, language centres, providers, banks"],
+    avoid: "Workflow statuses (application status, commission state): use StatusTag.",
+  },
+  EntityCell: {
+    category: "data",
+    imports: [imp("EntityCell", "data/display/EntityCell")],
+    useFor: "Name cell for table rows and phone cards: avatar or initials with the record status as a small circle on it, the name, one short sub-line. Replaces Status columns.",
+    usedIn: ["Every directory table and its phone card"],
+    avoid: "Descriptions or long text: those go on the detail page or drawer.",
+  },
   StatusBadge: {
     category: "data",
     imports: [imp("StatusBadge", "data/badges/StatusBadge")],

@@ -25,7 +25,7 @@ export default function StatusBadge({ variant, icon, children, className }: Stat
   return (
     <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${tagBase} ${tagTones[STATUS_BADGE_TONE[variant]]} ${className ?? ""}`}>
       {icon && <span className="flex shrink-0 items-center">{icon}</span>}
-      <span data-ub-badge-label>{children}</span>
+      <span data-ub-badge-label className="min-w-0 truncate">{children}</span>
     </span>
   );
 }

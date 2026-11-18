@@ -190,25 +190,8 @@ table [data-ub-badge-label] {
     font-weight: 500;
   }
 
-  .ub-data-table
-    table[data-layout="table"][data-mobile-layout="stacked"]
-    td[data-column]
-    [data-ub-badge],
-  .ub-legacy-table td[data-label] [data-ub-badge] {
-    height: auto;
-    min-height: 20px;
-    white-space: normal;
-    padding-block: 2px;
-  }
-
-  .ub-data-table
-    table[data-layout="table"][data-mobile-layout="stacked"]
-    [data-ub-badge-label],
-  .ub-legacy-table [data-ub-badge-label] {
-    white-space: normal;
-    overflow-wrap: anywhere;
-    text-overflow: clip;
-  }
+  /* Badges stay one line on cards too: the label truncates and the full
+     text is in the badge's title tooltip (Tag, StatusBadge). */
 
   .ub-data-table
     table[data-layout="table"][data-mobile-layout="stacked"]
@@ -411,5 +394,22 @@ table [data-ub-badge-label] {
     min-height: 32px;
     padding-inline: 8px;
     margin-inline-start: -8px;
+  }
+}
+
+/* Actions: the last column, right-aligned (left in RTL), header included.
+   On phones TableActions already sits at the card's top-right. */
+@media (min-width: 768px) {
+  .ub-data-table td:has([data-row-action]),
+  .ub-legacy-table td:has([data-row-action]),
+  .ub-data-table table:has(tbody td:last-child [data-row-action]) thead th:last-child,
+  .ub-legacy-table:has(tbody td:last-child [data-row-action]) thead th:last-child {
+    text-align: end;
+  }
+
+  .ub-data-table td:has([data-row-action]) > span,
+  .ub-data-table td:has([data-row-action]) > span > span {
+    text-align: end;
+    justify-content: flex-end;
   }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { tableSectionPadding, avatarInitials } from "components/ub/recipes";
+import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -9,8 +9,6 @@ import {
   ArrowRightLeft,
   Eye,
   Pencil,
-  Share2,
-  Users,
   UserCog,
   Trash2,
   SlidersHorizontal,
@@ -32,7 +30,7 @@ import DataTable, {
 } from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import StatusBadge from "components/ub/data/badges/StatusBadge";
+import EntityCell from "components/ub/data/display/EntityCell";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
@@ -40,7 +38,6 @@ import Drawer from "components/ub/feedback/dialogs/Drawer";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import { useRouter } from "next/navigation";
 import FilterButton from "components/ub/core/buttons/FilterButton";
-import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -189,21 +186,17 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
       key: "name",
       header: "Account manager",
       cell: (m) => (
-        <div className="flex min-w-0 items-center gap-3">
-          <span aria-hidden="true" className={`${avatarInitials} h-10 w-10 text-ub-label-md`}>
-            {getInitials(m.name ?? "") || "?"}
-          </span>
-          <span className="line-clamp-2 break-words font-medium" title={m.name}>
-            {m.name}
-          </span>
-        </div>
+        <EntityCell
+          name={m.name || "Unnamed manager"}
+          status={{ status: m.is_active }}
+        />
       ),
     },
     {
       key: "email",
       header: "Email",
       cell: (m) => (
-        <span className="break-all text-ub-text-secondary" title={m.email}>
+        <span className="block truncate text-ub-text-secondary" title={m.email}>
           {m.email}
         </span>
       ),
@@ -211,38 +204,33 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
     {
       key: "advisors",
       header: "Assigned advisors",
-      cell: (m) => (
-        <div className="flex flex-wrap gap-2">
-          <StatusBadge
-            variant={
-              Number(m.assigned_partners_count) > 0 ? "success" : "neutral"
-            }
-            icon={<Users className="h-3 w-3" />}
-          >
-            {Number(m.assigned_partners_count) || 0} assigned
-          </StatusBadge>
-          {Number(m.shared_partners_count) > 0 && (
-            <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>
-              {Number(m.shared_partners_count)} shared
-            </StatusBadge>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      cell: (m) => (
-        <StatusBadge variant={m.is_active ? "success" : "neutral"}>
-          {m.is_active ? "Active" : "Inactive"}
-        </StatusBadge>
-      ),
+      cell: (m) => {
+        const assigned = Number(m.assigned_partners_count) || 0;
+        const shared = Number(m.shared_partners_count) || 0;
+        return (
+          <span className="ub-tabular">
+            {assigned} assigned
+            {shared > 0 && (
+              <span className="text-ub-text-tertiary"> · {shared} shared</span>
+            )}
+          </span>
+        );
+      },
     },
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (m) => (
-        <TableActions>
+        <TableActions label={m.name}>
+          {readOnly && (
+            <TableAction
+              label={`View ${m.name}`}
+              icon={<Eye className="h-4 w-4" />}
+              href={`${basePath}/profile/${m.id}`}
+              primary
+            />
+          )}
           {!readOnly && (
             <>
               <TableAction

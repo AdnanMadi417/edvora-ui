@@ -81,7 +81,7 @@ export default function Tag({ children, tone = "neutral", hue, size = "md", vari
       ) : (
         dot && <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-ub-full ${dotColor}`} />
       )}
-      <span data-ub-badge-label>{children}</span>
+      <span data-ub-badge-label className="min-w-0 truncate">{children}</span>
     </span>
   );
 }

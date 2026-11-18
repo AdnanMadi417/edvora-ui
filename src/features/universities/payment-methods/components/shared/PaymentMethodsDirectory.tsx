@@ -5,7 +5,7 @@ import TableActions, {
 } from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import { CreditCard, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { CreditCard, Pencil, Plus, Trash2 } from "lucide-react";
 import { useAllPaymentMethods, useDeletePaymentMethod } from "../../hooks";
 import type { PaymentMethod } from "../../types";
 import DataTable, {
@@ -16,7 +16,7 @@ import DataTable, {
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -61,31 +61,13 @@ export default function PaymentMethodsDirectory({
       header: "Payment method",
       sortable: true,
       cell: (method) => (
-        <span
-          title={method.name}
-          className="line-clamp-2 max-w-sm break-words font-medium text-ub-text-primary hover:text-ub-primary"
-        >
-          {method.name}
-        </span>
-      ),
-    },
-    {
-      key: "description",
-      header: "Description",
-      sortable: true,
-      sortValue: (method) => descriptionText(method.description),
-      cell: (method) => (
-        <p
-          className="line-clamp-2 max-w-xl break-words text-ub-text-secondary"
-          title={descriptionText(method.description)}
-        >
-          {descriptionText(method.description) || "No description provided."}
-        </p>
+        <EntityCell name={method.name} noAvatar />
       ),
     },
     {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (method) => (
         <TableActions>
           <TableAction

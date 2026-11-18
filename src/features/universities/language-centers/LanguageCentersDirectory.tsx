@@ -2,17 +2,15 @@
 import { tableSectionPadding } from "components/ub/recipes";
 import { WORKSPACE_EVENT } from "features/language-centre-admin/services/centreWorkspace";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   Eye,
   Languages,
   MapPin,
   Pencil,
   Plus,
-  SlidersHorizontal,
   Trash2,
 } from "lucide-react";
-import IconButton from "components/ub/core/buttons/IconButton";
 import Button from "components/ub/core/buttons/Button";
 import Combobox from "components/ub/forms/selection/Combobox";
 import DataTable, {
@@ -25,11 +23,10 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
-import UniversityIdentity from "./UniversityIdentity";
+import LanguageCenterIdentity from "./components/LanguageCenterIdentity";
 import LanguageCenterCard from "./components/LanguageCenterCard";
 import Loading from "components/ub/feedback/states/Loading";
 import EmptyData from "components/ub/feedback/states/EmptyData";
-import Tag from "components/ub/data/badges/Tag";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import { ConfirmDialog } from "components/ub/feedback/dialogs/Modal";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
@@ -52,7 +49,6 @@ export default function LanguageCentersDirectory({
   fixedUniversityId?: string;
 }) {
   const params = useSearchParams();
-  const router = useRouter();
   const detailsHref = (center: LanguageCenter) =>
     `${basePath}/language-centers/${encodeURIComponent(center.id)}`;
   const linkedUniversity =
@@ -159,29 +155,13 @@ export default function LanguageCentersDirectory({
           : `${universityName(center.university_id)} ${center.name}`,
       sortable: true,
       width: "52%",
-      cell: (center) => {
-        const name = (
-          <span className="block break-words text-start text-[13px] font-medium leading-5 text-ub-text-link">
-            {center.name}
-          </span>
-        );
-        if (center.centre_type === "independent")
-          return (
-            <div className="space-y-1">
-              <span className="text-ub-label-sm text-ub-text-secondary">
-                Independent language centre
-              </span>
-              {name}
-            </div>
-          );
-        return fixedUniversityId ? (
-          name
-        ) : (
-          <UniversityIdentity university={universityFor(center.university_id)}>
-            {name}
-          </UniversityIdentity>
-        );
-      },
+      cell: (center) => (
+        <LanguageCenterIdentity
+          center={center}
+          university={universityFor(center.university_id)}
+          showUniversity={!fixedUniversityId}
+        />
+      ),
     },
     {
       key: "location",
@@ -197,56 +177,36 @@ export default function LanguageCentersDirectory({
       ),
     },
     {
-      key: "is_active",
-      header: "Status",
-      width: "100px",
-      cell: (center) => (
-        <Tag hue={center.is_active ? "teal" : "grey"}>
-          {center.is_active ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
-      mobileSecondary: readOnly,
-      width: "80px",
-      cell: (center) =>
-        readOnly ? (
-          <IconButton
-            variant="tertiary"
-            size="sm"
-            aria-label={`View ${center.name}`}
+      align: "end",
+      cell: (center) => (
+        <TableActions label={center.name}>
+          <TableAction
+            primary
+            label={`View ${center.name}`}
             icon={<Eye className="h-4 w-4" />}
-            onClick={() => router.push(detailsHref(center))}
+            href={detailsHref(center)}
           />
-        ) : (
-          <TableActions label={center.name}>
+          {!readOnly && center.centre_type !== "independent" && (
             <TableAction
-              primary={readOnly}
-              label={`View ${center.name}`}
-              icon={<Eye className="h-4 w-4" />}
-              href={detailsHref(center)}
+              label={`Edit ${center.name}`}
+              icon={<Pencil className="h-4 w-4" />}
+              onSelect={() => setForm(center)}
             />
-            {!readOnly && center.centre_type !== "independent" && (
+          )}
+          {!readOnly &&
+            allowDelete &&
+            center.centre_type !== "independent" && (
               <TableAction
-                label={`Edit ${center.name}`}
-                icon={<Pencil className="h-4 w-4" />}
-                onSelect={() => setForm(center)}
+                label={`Delete ${center.name}`}
+                danger
+                icon={<Trash2 className="h-4 w-4" />}
+                onSelect={() => setDeleting(center)}
               />
             )}
-            {!readOnly &&
-              allowDelete &&
-              center.centre_type !== "independent" && (
-                <TableAction
-                  label={`Delete ${center.name}`}
-                  danger
-                  icon={<Trash2 className="h-4 w-4" />}
-                  onSelect={() => setDeleting(center)}
-                />
-              )}
-          </TableActions>
-        ),
+        </TableActions>
+      ),
     },
   ];
   const columns = allColumns;

@@ -17,6 +17,8 @@ import DetailStatusBadge from "components/ub/data/badges/DetailStatusBadge";
 import type { StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import FilterChip from "components/ub/data/badges/FilterChip";
+import EntityStatusBadge from "components/ub/data/badges/EntityStatusBadge";
+import EntityCell from "components/ub/data/display/EntityCell";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { Demo, ShowcaseSection, StateSwitch, ThemePreviews, Variant } from "../Showcase";
 
@@ -178,6 +180,30 @@ export function Badges() {
 
   return (
     <ShowcaseSection id="badges" title="Badges and chips" description="Status variants share one StatusBadgeVariant type across the three badge styles.">
+      <Demo
+        name="EntityStatusBadge"
+        path="components/ub/data/badges/EntityStatusBadge.tsx"
+        description="Whether a record is live, next to its name in every list. Three tones: success active, neutral inactive, warning pending. Long labels truncate; hover for the full text."
+        className="flex flex-wrap gap-3"
+      >
+        <EntityStatusBadge status="active" />
+        <EntityStatusBadge status="suspended" label="Suspended" />
+        <EntityStatusBadge status="unverified" label="Pending verification" />
+        <EntityStatusBadge status="pending" label="Waiting for the university to confirm the campus details" />
+      </Demo>
+
+      <Demo
+        name="EntityCell"
+        path="components/ub/data/display/EntityCell.tsx"
+        description="The name cell for every table row and its phone card: 40px avatar (photo, or initials on neutral) with the record's status as a small circle on it (green active, grey inactive, amber pending; hover for the word), the name, one short line under it. No Status column, no descriptions."
+        className="grid max-w-md gap-4"
+      >
+        <EntityCell name="KL Student Arrival Services" subtitle="Kuala Lumpur" status={{ status: "active" }} />
+        <EntityCell name="Global Pathways Education International Sdn Bhd" subtitle="Agency · Nigeria" status={{ status: "unverified", label: "Pending verification" }} />
+        <EntityCell name="Farah Aziz" subtitle="farah@unibexs.com" status={{ status: false, label: "Inactive" }} />
+        <EntityCell name="Computer Science and IT" noAvatar status={{ status: false }} />
+      </Demo>
+
       <Demo name="StatusBadge" path="components/ub/data/badges/StatusBadge.tsx" className="flex flex-wrap gap-3">
         {VARIANTS.map((v) => {
           const Icon = VARIANT_ICON[v];

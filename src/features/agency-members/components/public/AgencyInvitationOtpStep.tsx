@@ -1,164 +1,328 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { Clock, Lock, MailCheck, SearchX, ShieldCheck, UserCheck } from "lucide-react";
 
 import { useVerifyAgencyInvitationOtp, useResendAgencyInvitationOtp } from "features/agency-members/hooks";
 import OtpInputField from "components/ub/forms/text/OtpInputField";
 import InputField from "components/ub/forms/text/InputField";
 import Button from "components/ub/core/buttons/Button";
-import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
+import Alert from "components/ub/feedback/notifications/Alert";
+import { getApiErrorCode, getApiErrorDetails, parseApiError } from "utils/parseApiError";
+import { InviteShell, LinkButton, StatusView, inviteTextLink } from "./InviteLayout";
+
+/** Matches the backend's OTP_COOLDOWN_SECONDS. */
+export const RESEND_COOLDOWN_SECONDS = 60;
+const OTP_LENGTH = 6;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type View =
+  | "enter"
+  | "verified"
+  | "expired"
+  | "locked"
+  | "resends_used"
+  | "no_invite"
+  | "already_verified"
+  | "has_account";
+
+type Notice = { tone: "success" | "info" | "danger"; text: string } | null;
+
+const ASK_FOR_NEW_INVITE = "Ask your agency admin to send you a new invite.";
 
 export default function AgencyInvitationOtpStep() {
   const searchParams = useSearchParams();
+  const urlEmail = (searchParams.get("email") ?? "").trim();
+  const urlEmailValid = EMAIL_RE.test(urlEmail);
 
-  const { verifyOtp, loading: verifyLoading, error: otpError } = useVerifyAgencyInvitationOtp();
-  const { resendOtp, loading: resendLoading, maxResendsReached } = useResendAgencyInvitationOtp();
+  const { verifyOtp, loading: verifying } = useVerifyAgencyInvitationOtp();
+  const { resendOtp, loading: resending } = useResendAgencyInvitationOtp();
 
-  const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
+  const [view, setView] = useState<View>("enter");
+  const [email, setEmail] = useState(urlEmailValid ? urlEmail : "");
+  // Ask for the email when the link didn't carry a usable one.
+  const [editingEmail, setEditingEmail] = useState(!urlEmailValid);
   const [otp, setOtp] = useState("");
-  const [verified, setVerified] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(60);
-  const [emailError, setEmailError] = useState("");
-
-  const validateEmail = () => {
-    if (!email.trim()) {
-      setEmailError("Email is required");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setEmailError("Enter a valid email address");
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
+  const [errors, setErrors] = useState<{ email?: string; otp?: string }>({});
+  const [notice, setNotice] = useState<Notice>(null);
+  // The invite email has just delivered a code, so the first resend waits a minute.
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
 
   useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const t = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
     return () => clearInterval(t);
-  }, [resendCooldown]);
+  }, [cooldown]);
 
-  const handleVerify = async () => {
-    if (!validateEmail() || otp.length < 6) return;
+  const cleanEmail = email.trim().toLowerCase();
+
+  const emailError = (): string => {
+    if (!email.trim()) return "Enter the email address your invite was sent to";
+    if (!EMAIL_RE.test(email.trim())) return "Enter a full email address, like name@example.com";
+    return "";
+  };
+
+  const handleVerify = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const next = {
+      email: emailError(),
+      otp: otp.length < OTP_LENGTH ? `Enter all ${OTP_LENGTH} digits of the code` : "",
+    };
+    setErrors(next);
+    if (next.email || next.otp) {
+      if (next.email) setEditingEmail(true);
+      return;
+    }
+    setNotice(null);
     try {
-      await verifyOtp(email.trim(), otp);
-      setVerified(true);
-    } catch { /* error shown via hook */ }
+      await verifyOtp(cleanEmail, otp);
+      setView("verified");
+    } catch (err) {
+      const code = getApiErrorCode(err);
+      switch (code) {
+        case "otp_invalid": {
+          const left = Number(getApiErrorDetails(err)?.attempts_remaining);
+          const tries = Number.isFinite(left) ? ` ${left} ${left === 1 ? "try" : "tries"} left.` : "";
+          setOtp("");
+          setErrors({ otp: `That code isn't right. Check the latest email from Unibexs and try again.${tries}` });
+          return;
+        }
+        case "otp_expired":
+          // The code is hours old, so the backend's resend cooldown has long passed.
+          setCooldown(0);
+          setView("expired");
+          return;
+        case "otp_max_attempts":
+          setView("locked");
+          return;
+        case "otp_not_found":
+          setView("no_invite");
+          return;
+        case "already_verified":
+          setView("already_verified");
+          return;
+        case "email_already_registered":
+          setView("has_account");
+          return;
+        default:
+          setNotice({ tone: "danger", text: parseApiError(err, "We couldn't check your code. Please try again.") });
+      }
+    }
   };
 
   const handleResend = async () => {
-    if (!validateEmail()) return;
-    setResendSuccess(false);
+    const problem = emailError();
+    if (problem) {
+      setErrors({ email: problem });
+      setEditingEmail(true);
+      setView("enter");
+      return;
+    }
+    setNotice(null);
     try {
-      await resendOtp(email.trim());
-      setResendSuccess(true);
+      await resendOtp(cleanEmail);
+      setOtp("");
+      setErrors({});
+      setView("enter");
+      setNotice({ tone: "success", text: `We sent a new code to ${cleanEmail}. It works for 2 hours.` });
+      setCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
-      // This is a public, unauthenticated endpoint — don't let its response
-      // reveal whether the email has an account, a pending invitation, or
-      // neither (that's an enumeration oracle). Only a genuine rate-limit
-      // gets a distinct message; every other outcome looks like success.
-      const code = (err as { response?: { data?: { code?: string } } })?.response?.data?.code;
-      if (code !== "otp_max_resends") {
-        setResendSuccess(true);
+      switch (getApiErrorCode(err)) {
+        case "otp_recently_sent":
+          setView("enter");
+          setNotice({ tone: "info", text: "We sent you a code less than a minute ago. Check your inbox, or ask again when the timer ends." });
+          setCooldown(RESEND_COOLDOWN_SECONDS);
+          return;
+        case "otp_max_resends":
+          setView("resends_used");
+          return;
+        case "no_pending_invitation":
+          setView("no_invite");
+          return;
+        case "already_verified":
+          setView("already_verified");
+          return;
+        case "email_already_registered":
+          setView("has_account");
+          return;
+        default:
+          setNotice({ tone: "danger", text: parseApiError(err, "We couldn't send a new code. Please try again.") });
       }
-    } finally {
-      setResendCooldown(60);
     }
   };
 
-  if (verified) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 text-center shadow-sm">
-          <div className="mb-6 flex justify-center">
-            <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
-          </div>
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            <CheckCircle2 className="h-6 w-6" />
-          </div>
-          <h1 className="text-xl font-bold text-slate-900">Check your email</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            We&apos;ve sent a link to <span className="font-medium text-slate-700">{email}</span> to finish
-            setting up your account.
-          </p>
-        </div>
-      </div>
+  const switchEmail = () => {
+    setView("enter");
+    setEditingEmail(true);
+    setOtp("");
+    setErrors({});
+    setNotice(null);
+  };
+
+  const resendControl = (primary: boolean) =>
+    cooldown > 0 ? (
+      <p className="text-ub-body-sm text-ub-text-secondary">
+        You can ask for a new code in <span className="ub-tabular font-medium text-ub-text-primary">{cooldown}s</span>
+      </p>
+    ) : (
+      <Button
+        onClick={handleResend}
+        loading={resending}
+        text="Send a new code"
+        variant={primary ? "primary" : "tertiary"}
+        size={primary ? "md" : "sm"}
+        className={primary ? "w-full" : undefined}
+      />
     );
+
+  const emailLabel = <span className="font-medium text-ub-text-primary">{cleanEmail}</span>;
+
+  let content: React.ReactNode;
+  switch (view) {
+    case "verified":
+      content = (
+        <StatusView icon={MailCheck} tint="green" title="Check your email">
+          <p>We sent a link to {emailLabel} to complete your profile. The link works for 48 hours.</p>
+          <p>Nothing there? Check your spam folder. If it still hasn&apos;t arrived, ask your agency admin to resend your profile link.</p>
+        </StatusView>
+      );
+      break;
+    case "expired":
+      content = (
+        <StatusView
+          icon={Clock}
+          tint="amber"
+          title="Your code has expired"
+          actions={
+            <>
+              {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+              {resendControl(true)}
+            </>
+          }
+          support
+        >
+          <p>Codes work for 2 hours. Send a new code to {emailLabel} and enter it on the next screen.</p>
+          <p>If you can&apos;t get a new code, {ASK_FOR_NEW_INVITE.toLowerCase()}</p>
+        </StatusView>
+      );
+      break;
+    case "locked":
+      content = (
+        <StatusView icon={Lock} tint="red" title="This invite is locked" support>
+          <p>The code was entered wrong 3 times, so to keep your account safe this invite can&apos;t be used any more.</p>
+          <p>{ASK_FOR_NEW_INVITE} You&apos;ll get a fresh code by email.</p>
+        </StatusView>
+      );
+      break;
+    case "resends_used":
+      content = (
+        <StatusView icon={Lock} tint="amber" title="No more new codes for this invite" support>
+          <p>You&apos;ve asked for the most new codes one invite allows.</p>
+          <p>{ASK_FOR_NEW_INVITE} You&apos;ll get a fresh code by email.</p>
+        </StatusView>
+      );
+      break;
+    case "no_invite":
+      content = (
+        <StatusView
+          icon={SearchX}
+          tint="slate"
+          title="We can't find an open invite"
+          actions={<Button onClick={switchEmail} text="Use a different email" variant="secondary" className="w-full" />}
+          support
+        >
+          <p>There&apos;s no open invite for {emailLabel}. It may have been replaced by a newer invite, or already used.</p>
+          <p>Check the email address, or {ASK_FOR_NEW_INVITE.toLowerCase()}</p>
+        </StatusView>
+      );
+      break;
+    case "already_verified":
+      content = (
+        <StatusView icon={ShieldCheck} tint="green" title="Your email is already verified" support>
+          <p>When you verified {emailLabel}, we emailed you a link to complete your profile. Open that email to carry on.</p>
+          <p>If the link is lost or has expired, ask your agency admin to resend your profile link. You won&apos;t need a new code.</p>
+        </StatusView>
+      );
+      break;
+    case "has_account":
+      content = (
+        <StatusView icon={UserCheck} tint="blue" title="You already have an account" actions={<LinkButton href="/">Go to sign in</LinkButton>} support>
+          <p>{emailLabel} already has a Unibexs account. Sign in with it instead.</p>
+        </StatusView>
+      );
+      break;
+    default:
+      content = (
+        <form noValidate onSubmit={handleVerify}>
+          <h1 className="text-center text-ub-heading-md text-ub-text-primary">Verify your email</h1>
+          <p className="mt-2 text-center text-ub-body-sm text-ub-text-secondary">
+            Your agency invited you to join them on Unibexs.{" "}
+            {editingEmail ? (
+              <>Enter your email and the {OTP_LENGTH}-digit code from your invite.</>
+            ) : (
+              <>
+                Enter the {OTP_LENGTH}-digit code we sent to <span className="font-medium text-ub-text-primary [overflow-wrap:anywhere]">{cleanEmail}</span>.
+              </>
+            )}
+          </p>
+
+          {!urlEmailValid && (
+            <Alert tone="warning" className="mt-5" title={urlEmail ? "We can't read the email in this link" : "This link is missing your email"}>
+              Enter the email address your invite was sent to. If you can, open the link from your invite email again.
+            </Alert>
+          )}
+
+          <div className="mt-6">
+            {editingEmail ? (
+              <InputField
+                label="Email address"
+                field="email"
+                type="email"
+                placeholder="name@example.com"
+                formData={{ email }}
+                errors={errors}
+                updateFormData={(_field: string, value: string) => {
+                  setEmail(value);
+                  setErrors((p) => ({ ...p, email: "" }));
+                }}
+                onBlur={() => email && setErrors((p) => ({ ...p, email: emailError() }))}
+              />
+            ) : (
+              <div className="-mt-2 mb-4 flex justify-center">
+                <button type="button" onClick={switchEmail} className={inviteTextLink}>
+                  Not your email? Use a different one
+                </button>
+              </div>
+            )}
+
+            <OtpInputField
+              label="Verification code"
+              field="otp"
+              formData={{ otp }}
+              errors={errors}
+              updateFormData={(_field: string, value: string) => {
+                setOtp(value);
+                setErrors((p) => ({ ...p, otp: "" }));
+              }}
+            />
+          </div>
+
+          {notice && (
+            <Alert tone={notice.tone} className="mb-4">
+              {notice.text}
+            </Alert>
+          )}
+
+          <Button type="submit" loading={verifying} text="Verify" variant="primary" className="w-full" />
+
+          <div className="mt-4 flex flex-col items-center gap-1 text-center">
+            <p className="text-ub-body-sm text-ub-text-secondary">Didn&apos;t get a code? Check your spam folder.</p>
+            {resendControl(false)}
+          </div>
+        </form>
+      );
   }
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 shadow-sm">
-        <div className="mb-6 flex justify-center">
-          <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
-        </div>
-
-        <h1 className="text-center text-xl font-bold text-slate-900">Verify your invitation</h1>
-        <p className="mt-2 text-center text-sm text-slate-500">
-          Enter the email you were invited with and the 6-digit code sent to your inbox.
-        </p>
-
-        <div className="mt-6">
-          <InputField
-            label="Email"
-            field="email"
-            type="email"
-            placeholder="you@example.com"
-            formData={{ email }}
-            errors={{ email: emailError }}
-            updateFormData={(_field: string, value: string) => { setEmail(value); setEmailError(""); }}
-            onBlur={validateEmail}
-          />
-
-          <OtpInputField
-            label="Verification Code"
-            field="otp"
-            formData={{ otp }}
-            errors={{ otp: otpError || "" }}
-            updateFormData={(_field: string, value: string) => setOtp(value)}
-          />
-        </div>
-
-        <Button
-          onClick={handleVerify}
-          disabled={verifyLoading || !email.trim() || otp.length < 6}
-          text={verifyLoading ? "Verifying..." : "Verify Code"}
-          bgColor="bg-blue-600"
-          textColor="text-white"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-white"
-          hoverBorderColor="hover:border-blue-700"
-          className="w-full py-3 hover:bg-blue-700"
-        />
-
-        <div className="mt-4 space-y-2 text-center">
-          {resendSuccess && !maxResendsReached && (
-            <p className="text-sm text-green-600">If this email is eligible, a code has been sent.</p>
-          )}
-          {maxResendsReached && (
-            <p className="text-sm text-red-600">You&apos;ve requested too many codes. Please wait a bit before trying again.</p>
-          )}
-          {resendCooldown > 0 ? (
-            <p className="text-sm text-ub-text-tertiary">
-              Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
-            </p>
-          ) : (
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resendLoading || !email.trim()}
-              className="text-sm text-slate-500 transition hover:text-blue-600 disabled:opacity-50"
-            >
-              {resendLoading ? "Sending..." : "Didn't receive it? Resend code"}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  return <InviteShell>{content}</InviteShell>;
 }

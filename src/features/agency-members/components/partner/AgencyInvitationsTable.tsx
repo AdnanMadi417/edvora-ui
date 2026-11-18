@@ -38,7 +38,7 @@ import StatusBadge from "components/ub/data/badges/StatusBadge";
 import type { StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
@@ -283,7 +283,7 @@ export default function AgencyInvitationsTable() {
                   {
                     icon: User,
                     label: "Name",
-                    minW: "min-w-[140px] sm:min-w-[200px]",
+                    minW: "min-w-[200px]",
                   },
                   {
                     icon: Mail,
@@ -305,7 +305,9 @@ export default function AgencyInvitationsTable() {
                     </div>
                   </th>
                 ))}
-                <th className="w-10 px-4 py-4" />
+                <th className="w-32 px-4 py-4 text-end text-sm font-semibold text-ub-text-primary">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -358,19 +360,17 @@ export default function AgencyInvitationsTable() {
                       key={invitation.id}
                       className="transition-colors hover:bg-ub-surface-subtle"
                     >
-                      <td data-label="Name" data-primary className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="truncate text-sm font-medium text-ub-text-primary">
-                          {invitation.name}
-                        </div>
+                      <td data-label="Name" data-primary className="min-w-[200px] px-6 py-4">
+                        <EntityCell name={invitation.name || invitation.email} />
                       </td>
 
                       <td data-label="Email" className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="truncate text-sm text-ub-text-secondary">
+                        <div className="truncate text-sm text-ub-text-secondary" title={invitation.email}>
                           {invitation.email}
                         </div>
                       </td>
 
-                      <td data-label="Status" data-mobile-secondary className="px-6 py-4">
+                      <td data-label="Progress" className="px-6 py-4">
                         <Tooltip
                           content={PROGRESS_TOOLTIPS[invitation.progress]}
                           position="right"
@@ -384,7 +384,7 @@ export default function AgencyInvitationsTable() {
                         </Tooltip>
                       </td>
 
-                      <td data-label="Invited" data-mobile-secondary className="px-6 py-4">
+                      <td data-label="Invited" className="px-6 py-4">
                         <div className="text-sm text-ub-text-primary">
                           <AppDate
                             value={invitation.created_at}
@@ -394,8 +394,8 @@ export default function AgencyInvitationsTable() {
                         </div>
                       </td>
 
-                      <td data-label="Actions" className="px-4 py-4">
-                        <TableActions label={invitation.email}>
+                      <td data-label="Actions" className="px-4 py-4 text-end">
+                        <TableActions label={invitation.name || invitation.email}>
                           {RESENDABLE_PROGRESS.includes(
                             invitation.progress
                           ) && (

@@ -7,7 +7,7 @@ import TableActions, {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus } from "lucide-react";
+import { ShieldCheck, KeyRound, BadgeCheck, Eye, Trash2, Plus } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
 import { useRoles, useDeleteRole } from "../../hooks";
@@ -153,7 +153,9 @@ export default function RolesTable() {
                     </div>
                   </th>
                 ))}
-                <th className="w-10 px-4 py-4" />
+                <th className="w-32 px-4 py-4 text-end text-sm font-semibold text-ub-text-primary">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -215,7 +217,7 @@ export default function RolesTable() {
                         </code>
                       </td>
 
-                      <td data-label="Type" data-mobile-secondary className="px-6 py-4">
+                      <td data-label="Type" className="px-6 py-4">
                         {role.is_system ? (
                           <StatusBadge variant="neutral">System</StatusBadge>
                         ) : (
@@ -223,8 +225,14 @@ export default function RolesTable() {
                         )}
                       </td>
 
-                      <td data-label="Actions" className="px-4 py-4">
+                      <td data-label="Actions" className="px-4 py-4 text-end">
                         <TableActions label={role.name}>
+                          <TableAction
+                            label={`View ${role.name}`}
+                            icon={<Eye className="h-4 w-4" />}
+                            href={`/admin/roles/${role.id}`}
+                            primary
+                          />
                           {!role.is_system && (
                             <TableAction
                               label={"Delete role"}

@@ -8,6 +8,7 @@ import DataTable, {
 } from "components/ub/data/tables/DataTable";
 import type { Partner } from "features/partners/types";
 import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
+import AdvisorEntityCell, { advisorName } from "../shared/AdvisorEntityCell";
 
 import { useId as useTabId } from "react";
 import React, { useEffect, useMemo, useState } from "react";
@@ -223,171 +224,61 @@ export default function ReviewerPartnersTable() {
 
   const columns: DataTableColumn<Partner>[] = [
     {
-      key: "0",
+      key: "advisor",
       header: "Advisor",
-      cell: (partner) => (
-        <>
-          <div className="flex items-center gap-2">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
-              <PresignedImage
-                fileKey={
-                  (partner.type === "individual"
-                    ? partner.individual_details?.profile_photo_file_key
-                    : partner.company_details?.logo_file_key) ?? undefined
-                }
-                alt={partner.name}
-                className="h-full w-full object-cover"
-                fallback={
-                  partner.name ? getInitials(partner.name) : "NA"
-                }
-              />
-              <span
-                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${
-                  partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
-                }`}
-              />
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-ub-text-primary">
-                {partner.type === "agency"
-                  ? partner.company_details?.company_name ||
-                    partner.name ||
-                    "Unknown Advisor"
-                  : partner.name || "Unknown Advisor"}
-              </div>
-              <div className="truncate text-xs text-ub-text-secondary capitalize">
-                {partner.type === "agency" &&
-                partner.company_details?.company_name
-                  ? `${partner.name} · `
-                  : ""}
-                {partner.type || "—"} · {partner.country || "—"}
-              </div>
-            </div>
-          </div>
-        </>
-      ),
+      cell: (partner) => <AdvisorEntityCell advisor={partner} />,
     },
     {
-      key: "1",
-      mobileSecondary: true,
-      header: "Contact info",
-      cell: (partner) => (
-        <>
-          <div className="truncate text-sm text-ub-text-primary">
-            {partner.phone || "—"}
-          </div>
-          <div className="truncate text-xs text-ub-text-secondary">
-            {partner.email || "—"}
-          </div>
-        </>
-      ),
-    },
-    {
-      key: "2",
+      key: "manager",
       header: "Assigned manager",
-      cell: (partner) => (
-        <>
-          <div className="truncate text-sm text-ub-text-primary">
-            {partner.assigned_manager_name || (
-              <span className="text-ub-text-tertiary">Unassigned</span>
-            )}
-          </div>
-        </>
-      ),
+      cell: (partner) =>
+        partner.assigned_manager_name || (
+          <span className="text-ub-text-tertiary">Unassigned</span>
+        ),
     },
     {
-      key: "3",
-      header: "Status",
-      cell: (partner) => (
-        <>
-          <div className="flex flex-wrap items-center gap-2">
-            {!partner.is_verified && !partner.is_active ? (
-              <StatusBadge
-                variant="warning"
-                icon={<Clock className="h-3 w-3" />}
-              >
-                Pending review
-              </StatusBadge>
-            ) : partner.is_active ? (
-              <StatusBadge
-                variant="success"
-                icon={<CheckCircle className="h-3 w-3" />}
-              >
-                Active
-              </StatusBadge>
-            ) : (
-              <StatusBadge
-                variant="neutral"
-                icon={<XCircle className="h-3 w-3" />}
-              >
-                Inactive
-              </StatusBadge>
-            )}
-            {partner.agency_membership && (
-              <StatusBadge
-                variant="info"
-                icon={<Building2 className="h-3 w-3" />}
-              >
-                Member of {partner.agency_membership.agency_name}
-              </StatusBadge>
-            )}
-          </div>
-        </>
-      ),
-    },
-    {
-      key: "4",
-      mobileSecondary: true,
+      key: "registered",
       header: "Registered",
       cell: (partner) => (
-        <>
-          <div className="text-sm text-ub-text-primary">
-            <AppDate value={partner.created_at} format="short" fallback="—" />
-          </div>
-        </>
+        <AppDate value={partner.created_at} format="short" fallback="—" />
       ),
     },
     {
-      key: "5",
+      key: "actions",
       header: "Actions",
+      align: "end",
       cell: (partner) => (
-        <>
-          <TableActions>
-            {!partner.is_verified && !partner.is_active && (
-              <>
-                <TableAction
-                  label={"Review registration"}
-                  icon={<ShieldCheck className="h-4 w-4" />}
-                  onSelect={() => {
-                    setReviewPartner({
-                      id: partner.id,
-                      name: partner.name || "",
-                      assignedManagerId:
-                        partner.assigned_manager_id || undefined,
-                    });
-                    setIsReviewOpen(true);
-                  }}
-                />
-                <div className="h-5 border-l border-ub-border" />
-              </>
-            )}
-
+        <TableActions label={advisorName(partner)}>
+          {!partner.is_verified && !partner.is_active && (
             <TableAction
-              label={partner.is_active ? "Suspend account" : "Activate account"}
-              icon={
-                partner.is_active ? (
-                  <Ban className="h-4 w-4" />
-                ) : (
-                  <Power className="h-4 w-4" />
-                )
-              }
+              label="Review registration"
+              icon={<ShieldCheck className="h-4 w-4" />}
+              primary
               onSelect={() => {
-                setSuspendTarget(partner);
-                setIsSuspendOpen(true);
+                setReviewPartner({
+                  id: partner.id,
+                  name: partner.name || "",
+                  assignedManagerId: partner.assigned_manager_id || undefined,
+                });
+                setIsReviewOpen(true);
               }}
             />
-          </TableActions>
-        </>
+          )}
+          <TableAction
+            label={partner.is_active ? "Suspend account" : "Activate account"}
+            icon={
+              partner.is_active ? (
+                <Ban className="h-4 w-4" />
+              ) : (
+                <Power className="h-4 w-4" />
+              )
+            }
+            onSelect={() => {
+              setSuspendTarget(partner);
+              setIsSuspendOpen(true);
+            }}
+          />
+        </TableActions>
       ),
     },
   ];

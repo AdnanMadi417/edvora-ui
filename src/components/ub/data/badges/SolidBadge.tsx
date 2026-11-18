@@ -18,5 +18,5 @@ interface SolidBadgeProps {
 export default function SolidBadge({ variant, children, className }: SolidBadgeProps) {
   const tone = tagSolidTones[STATUS_BADGE_TONE[variant]];
   const shape = className ? "inline-flex items-center justify-center font-semibold" : tagBase;
-  return <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${shape} ${tone} ${className ?? ""}`}><span data-ub-badge-label>{children}</span></span>;
+  return <span data-ub-badge title={typeof children === "string" ? children : undefined} className={`${shape} ${tone} ${className ?? ""}`}><span data-ub-badge-label className="min-w-0 truncate">{children}</span></span>;
 }

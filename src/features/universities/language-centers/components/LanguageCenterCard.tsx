@@ -1,14 +1,14 @@
 "use client";
 import { useId } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { Eye, MapPin } from "lucide-react";
 import { focusRing } from "components/ub/recipes";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import type { University } from "features/universities/types";
 import type { LanguageCenter } from "../types";
-import UniversityIdentity from "../UniversityIdentity";
+import LanguageCenterIdentity from "./LanguageCenterIdentity";
 
-/** A single keyboard-accessible link makes the whole advisor card clickable. */
+/** The whole Advisor card opens the centre; the name, status and location match the admin table row. */
 export default function LanguageCenterCard({
   center,
   university,
@@ -20,55 +20,39 @@ export default function LanguageCenterCard({
 }) {
   const titleId = useId();
   return (
-    <article aria-labelledby={titleId} className="min-w-0">
+    <article
+      aria-labelledby={titleId}
+      className="relative flex h-full min-w-0 flex-col gap-3 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none"
+    >
       <Link
         href={href}
-        className={`flex h-full min-w-0 flex-col gap-4 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none ${focusRing}`}
-      >
-        {center.logo_url && (
-          <Image
-            src={center.logo_url}
-            alt={`${center.name} logo`}
-            width={48}
-            height={48}
-            unoptimized
-            className="h-12 w-12 rounded-ub-md object-contain"
-          />
-        )}
-        {center.centre_type === "independent" ? (
-          <p className="text-ub-label-sm text-ub-text-secondary">
-            Independent language centre
-          </p>
-        ) : (
-          <UniversityIdentity university={university} />
-        )}
-        <h3
-          id={titleId}
-          className="break-words text-ub-heading-sm text-ub-text-primary"
-        >
-          {center.name}
+        aria-label={`View ${center.name}`}
+        className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`}
+      />
+      <div className="flex items-start justify-between gap-2">
+        <h3 id={titleId} className="min-w-0 flex-1">
+          <LanguageCenterIdentity center={center} university={university} />
         </h3>
-        {center.description && (
-          <p className="line-clamp-3 break-words text-ub-body-sm text-ub-text-secondary">
-            {center.description}
-          </p>
-        )}
-        <div className="mt-auto space-y-4">
-          {center.location && (
-            <p className="flex items-start gap-2 text-ub-body-sm text-ub-text-secondary">
-              <MapPin
-                aria-hidden="true"
-                className="mt-0.5 h-4 w-4 shrink-0 text-ub-icon"
-              />
-              <span className="min-w-0 break-words">{center.location}</span>
-            </p>
-          )}
-          <span className="flex items-center justify-between gap-2 border-t border-ub-border pt-4 text-ub-label-sm text-ub-text-link">
-            View details
-            <ArrowUpRight aria-hidden="true" className="h-4 w-4 shrink-0" />
-          </span>
+        <div className="relative z-20 -me-2 -mt-1 shrink-0">
+          <TableActions label={center.name}>
+            <TableAction
+              primary
+              label={`View ${center.name}`}
+              icon={<Eye className="h-4 w-4" />}
+              href={href}
+            />
+          </TableActions>
         </div>
-      </Link>
+      </div>
+      {center.location && (
+        <p className="flex items-start gap-2 text-ub-body-sm text-ub-text-secondary">
+          <MapPin
+            aria-hidden="true"
+            className="mt-0.5 h-4 w-4 shrink-0 text-ub-icon"
+          />
+          <span className="min-w-0 break-words">{center.location}</span>
+        </p>
+      )}
     </article>
   );
 }

@@ -2,25 +2,19 @@
 import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
 import {
-  ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Handshake,
+  Users, RefreshCw, Handshake, Eye, SlidersHorizontal,
 } from "lucide-react";
 import { usePartners } from "features/partners/hooks";
+import type { Partner } from "features/partners/types";
+import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
+import AppDate from "components/ub/data/formatting/AppDate";
+import AdvisorEntityCell, { advisorName } from "features/partners/components/shared/AdvisorEntityCell";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import SearchInput from "components/ub/forms/selection/SearchInput";
-import TableWrapper from "components/ub/data/tables/TableWrapper";
-import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
-import TableErrorRow from "components/ub/data/tables/TableErrorRow";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
-import StatusBadge from "components/ub/data/badges/StatusBadge";
-import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
-import { getInitials } from "components/ub/data/media/Avatar";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -50,7 +44,6 @@ interface ReviewerAccountManagerPartnersTableProps {
 }
 
 export default function ReviewerAccountManagerPartnersTable({ managerId }: ReviewerAccountManagerPartnersTableProps) {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>("all");
@@ -94,6 +87,34 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
     setSelectedStatus("all");
     setCurrentPage(1);
   };
+
+  const columns: DataTableColumn<Partner>[] = [
+    {
+      key: "advisor",
+      header: "Advisor",
+      cell: (partner) => <AdvisorEntityCell advisor={partner} subtitle={undefined} />,
+    },
+    {
+      key: "last-login",
+      header: "Last login",
+      cell: (partner) => <AppDate value={partner.last_login} format="short" fallback="Never" />,
+    },
+    {
+      key: "registered",
+      header: "Registered",
+      cell: (partner) => <AppDate value={partner.created_at} format="short" fallback="—" />,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "end",
+      cell: (partner) => (
+        <TableActions label={advisorName(partner)}>
+          <TableAction label="View advisor" icon={<Eye className="h-4 w-4" />} href={`/reviewer/advisors/${partner.id}`} primary />
+        </TableActions>
+      ),
+    },
+  ];
 
   return (
     <div className="mb-5 rounded-lg border border-ub-border bg-ub-surface">
@@ -159,8 +180,32 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
       </div>
 
       <div className={tableSectionPadding}>
-        <TableWrapper
-          scrollLabel="Scroll to see all columns and rows"
+        <DataTable
+          columns={columns}
+          rows={partners}
+          getRowId={(partner) => partner.id}
+          getRowHref={(partner) => `/reviewer/advisors/${partner.id}`}
+          caption="Assigned advisors"
+          loading={isInitialLoad}
+          error={error}
+          onRetry={refetch}
+          skeletonRows={ITEMS_PER_PAGE}
+          getRowClassName={() => (isRefetching ? "opacity-60 transition-opacity" : undefined)}
+          empty={{
+            title: "No advisors found",
+            description: activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned advisors yet.",
+            icon: <Handshake className="h-8 w-8 text-ub-text-tertiary" />,
+            action:
+              activeFiltersCount > 0 ? (
+                <Button
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-3.5 w-3.5" />}
+                  text="Clear filters"
+                  variant="secondary"
+                  className="hover:bg-ub-surface-subtle"
+                />
+              ) : undefined,
+          }}
           footer={
             <TablePagination
               currentPage={currentPage}
@@ -172,100 +217,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
               loading={loading}
             />
           }
-        >
-          <table className="ub-legacy-table w-full min-w-[800px]">
-            <thead>
-              <tr className="border-b border-ub-border bg-ub-surface-subtle">
-                {[
-                  { icon: Users,      label: "Advisor",      minW: "min-w-[220px]" },
-                  { icon: Mail,       label: "Contact info", minW: "min-w-[200px]" },
-                  { icon: BadgeCheck, label: "Status" },
-                ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-ub-text-tertiary" />
-                      {label}
-                    </div>
-                  </th>
-                ))}
-                <th className="w-10 px-4 py-4" />
-              </tr>
-            </thead>
-
-            <tbody className={`divide-y divide-ub-border bg-ub-surface ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
-
-              {!isInitialLoad && error && (
-                <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
-              )}
-
-              {!isInitialLoad && !error && partners.length === 0 && (
-                <TableEmptyRow
-                  colSpan={4}
-                  title="No advisors found"
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned advisors yet."}
-                  icon={<Handshake className="h-8 w-8 text-ub-text-tertiary" />}
-                  action={
-                    activeFiltersCount > 0 ? (
-                      <Button
-                        onClick={clearFilters}
-                        icon={<RefreshCw className="h-3.5 w-3.5" />}
-                        text="Clear filters"
-                        variant="secondary"
-                        className="hover:bg-ub-surface-subtle"
-                      />
-                    ) : undefined
-                  }
-                />
-              )}
-
-              <AnimatePresence>
-              {!isInitialLoad && !error && partners.map((partner) => (
-                <AnimatedTableRow
-                  key={partner.id}
-                  className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
-                  onClick={() => router.push(`/reviewer/advisors/${partner.id}`)}
-                >
-                  <td data-label="Advisor" data-primary className="min-w-[220px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
-                        <PresignedImage
-                          fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
-                          alt={partner.name}
-                          className="h-full w-full object-cover"
-                          fallback={partner.name ? getInitials(partner.name) : "NA"}
-                        />
-                        <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"}`} />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-ub-text-primary">{partner.name || "Unknown Advisor"}</div>
-                        <div className="truncate text-xs text-ub-text-secondary capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td data-label="Contact info" className="px-6 py-4">
-                    <div className="truncate text-sm text-ub-text-primary">{partner.phone || "—"}</div>
-                    <div className="truncate text-xs text-ub-text-secondary">{partner.email || "—"}</div>
-                  </td>
-
-                  <td data-label="Status" data-mobile-secondary className="px-6 py-4">
-                    {partner.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                    )}
-                  </td>
-
-                  <td data-label="" className="px-4 py-4">
-                    <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
-                  </td>
-                </AnimatedTableRow>
-              ))}
-              </AnimatePresence>
-            </tbody>
-          </table>
-        </TableWrapper>
+        />
       </div>
     </div>
   );
