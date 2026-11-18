@@ -171,3 +171,13 @@ export async function completeCollection(
   }
   throw Error("Dashboard dataset requires a server summary.");
 }
+
+/** Whole days since an ISO date (0 for today or a missing date). */
+export function daysSince(iso: string | null | undefined, now = Date.now()): number | undefined {
+  if (!iso) return undefined;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) ? Math.max(0, Math.floor((now - t) / 86_400_000)) : undefined;
+}
+
+/** Oldest first: what has waited longest leads every work list. */
+export const byOldest = <T extends { waitingDays?: number }>(a: T, b: T) => (b.waitingDays ?? -1) - (a.waitingDays ?? -1);

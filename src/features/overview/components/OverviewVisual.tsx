@@ -41,6 +41,7 @@ export default function OverviewVisual({
         errorMessage={resource?.error}
         onRetry={onRetry}
         actions={<CardLinkButton href={pipeline.href} label="Open application tracker" />}
+        // One dimension: stages, in workflow order (the same colours on every role).
         views={[
           {
             id: "stage",
@@ -56,10 +57,7 @@ export default function OverviewVisual({
               href: `${pipeline.href}?stage=${encodeURIComponent(stage.key)}`,
             })),
           },
-          ...(universities?.length
-            ? [{ id: "university", label: "By university", centerLabel: "Active applications", items: universities }]
-            : []),
-        ]}
+]}
       />
     );
   }

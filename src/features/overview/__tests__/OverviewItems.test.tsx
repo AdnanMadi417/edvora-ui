@@ -7,8 +7,10 @@ const item = {
   title: "Education agency",
   description: "Agency · Malaysia",
   href: "/admin/advisors/advisor-1",
+  actionLabel: "Review profile",
+  waitingDays: 3,
 };
-test("advisor lists use people rows with accessible profile links", () => {
+test("advisors are rows (never a carousel) with one verb + object action", () => {
   render(
     <OverviewItems
       resourceId="reviews"
@@ -20,8 +22,9 @@ test("advisor lists use people rows with accessible profile links", () => {
     screen.getByRole("list", { name: "Advisors awaiting review" })
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Open advisor: Education agency" })
+    screen.getByRole("link", { name: "Review profile: Education agency" })
   ).toHaveAttribute("href", item.href);
+  expect(screen.getByText("Waiting 3 days")).toBeInTheDocument();
   expect(screen.getByText(item.description)).toBeInTheDocument();
 });
 test("activity uses a dated timeline and retains notification links", () => {
@@ -57,6 +60,7 @@ test("application tasks name the student and offer one verb + object button", ()
           title: "Nadia Rahman",
           description: "INTI International University",
           href: "/admin/applications/a",
+          actionLabel: "Open application",
         },
       ]}
     />

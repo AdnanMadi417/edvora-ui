@@ -18,7 +18,7 @@ const value: SessionContextValue = {
   refetchPartner: jest.fn(),
 };
 
-test("hides exception cards at zero and has no refresh button", async () => {
+test("keeps the On hold KPI at zero but hides its empty list, and has no refresh button", async () => {
   // "On hold" and unread come back as 0; active applications as 12.
   get.mockImplementation((url: string, config: any) =>
     Promise.resolve({
@@ -35,7 +35,9 @@ test("hides exception cards at zero and has no refresh button", async () => {
     </SessionContext.Provider>
   );
   await waitFor(() => expect(screen.getAllByText("12").length).toBeGreaterThan(0));
-  expect(screen.queryByText(/on hold/i)).not.toBeInTheDocument();
+  // KPIs are always there (0 is an answer); an empty list isn't.
+  expect(screen.getByRole("heading", { name: "On hold" })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Applications on hold" })).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /refresh/i })).not.toBeInTheDocument();
-  expect(screen.queryByRole("heading", { name: "Quick actions" })).not.toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Quick actions" })).toBeInTheDocument();
 });

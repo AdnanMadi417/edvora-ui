@@ -25,6 +25,12 @@ export interface OverviewItem {
   status?: string;
   /** Display text for `status` when it differs from the raw value (e.g. the Unibexs voice for Advisors). */
   statusLabel?: string;
+  /** Leads the row with this person's or student's avatar. */
+  avatar?: { name: string; src?: string | null };
+  /** Days it has waited (lists sort oldest first). */
+  waitingDays?: number;
+  /** The row's one verb + object button, e.g. "Review eVAL". */
+  actionLabel?: string;
 }
 export interface OverviewData {
   universityCommission?: import("./dashboardData").UniversityCommission[];

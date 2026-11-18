@@ -3,9 +3,10 @@ import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
 import { isAdvisorAction } from "features/applications/stages";
 import { unibexsVoice } from "lib/unibexsVoice";
-import { relabelText, stageLabel, statusLabel } from "config/statusLabels";
+import { relabelText, stageLabel, statusLabel, nextActionLabel } from "config/statusLabels";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
+import { byOldest, daysSince } from "../model/dashboardData";
 import { getSenderName } from "features/notifications/utils/notificationIcons";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
 import { programApi } from "features/programs/services/programApi";
@@ -133,12 +134,14 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
                     canViewCommission ||
                     normalize(item.status) !== "commission_ready"))
             )
-            .slice(0, 6)
             .map(
               (item): OverviewItem => ({
                 id: item.id,
                 title: item.student_name || "Student",
                 description: item.university_name || "",
+                avatar: { name: item.student_name || "Student", src: item.student_photo_file_url },
+                waitingDays: daysSince(item.updated_at),
+                actionLabel: status === "hold" ? "Open application" : nextActionLabel(item.status),
                 href: idPath(`${base}/applications`, item.id),
                 // A held application says it's on hold (the reason isn't in the list response),
                 // not the workflow status it was paused at.
@@ -150,7 +153,9 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
                     ? say(statusLabel(item.status))
                     : undefined,
               })
-            );
+            )
+            .sort(byOldest)
+            .slice(0, 6);
           return { total: data.total, items };
         },
       });
@@ -260,7 +265,12 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
               .join(" · "),
             href: idPath(`${base}/advisors`, item.id),
             at: item.created_at,
-          })),
+            avatar: { name: item.name },
+            status: "unverified",
+            statusLabel: "Awaiting review",
+            waitingDays: daysSince(item.created_at),
+            actionLabel: "Review profile",
+          })).sort(byOldest),
         };
       },
     });
@@ -307,6 +317,9 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             ),
             href: `${base}/advisors?tab=pending-otps`,
             at: item.created_at,
+            avatar: { name: item.full_name || item.company_name || item.email },
+            waitingDays: daysSince(item.created_at),
+            actionLabel: "Follow up",
           })),
         };
       },
@@ -366,6 +379,10 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
               .filter(Boolean)
               .join(" · "),
             href: idPath(`${base}/advisors`, item.id),
+            avatar: { name: item.name },
+            status: item.is_active === false ? "suspended" : "active",
+            statusLabel: item.is_active === false ? "Suspended" : "Active",
+            actionLabel: "Open advisor",
           })),
         };
       },
@@ -418,6 +435,9 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
               role === "admin"
                 ? "/admin/finance-queue"
                 : "/partner/commission-tracker",
+            avatar: { name: item.student_name },
+            waitingDays: typeof item.days_waiting === "number" ? item.days_waiting : daysSince(item.since_date),
+            actionLabel: role === "admin" ? "Record payout" : "Open commission",
           })),
         };
       },
@@ -453,6 +473,7 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
                 .filter(Boolean)
                 .join(" · "),
               href: idPath(`${base}/knowledge-hub`, item.id),
+              actionLabel: hidden ? "Review program" : "Open program",
             })),
           };
         },
@@ -516,6 +537,8 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             href:
               item.application_id && ["admin", "account_manager", "partner"].includes(role)
                 ? idPath(`${base}/applications`, item.application_id)
+                : item.type === "partner_signed_up" && item.data?.partner_id && (role === "admin" || role === "reviewer")
+                ? idPath(`${base}/advisors`, String(item.data.partner_id))
                 : `${base}/notifications`,
           }))
           .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()),

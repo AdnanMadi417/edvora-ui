@@ -7,7 +7,9 @@ import { languageCentersApi } from "features/universities/language-centers/api";
 import { commissionsApi } from "features/applications/payouts/services/commissionsApi";
 import { statementApi } from "features/partners/statement/services/statementApi";
 import {
+  byOldest,
   completeCollection,
+  daysSince,
   groupUniversityCommission,
 } from "../model/dashboardData";
 import type {
@@ -15,7 +17,7 @@ import type {
   OverviewItem,
   ResourcePlan,
 } from "../model/types";
-import { statusLabel } from "config/statusLabels";
+import { nextActionLabel, statusLabel } from "config/statusLabels";
 const staffActions = new Set([
   "new_application",
   "payment_submitted",
@@ -90,7 +92,8 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
         return {
           total: actionable.length,
           byUniversity: [...perUniversity].map(([label, value]) => ({ key: label, label, value })),
-          items: actionable.slice(0, 6).map(
+          items: actionable
+            .map(
             (item): OverviewItem => ({
               id: item.id,
               // The student, not a sentence: the status tag names the task and the row's button opens it.
@@ -100,8 +103,13 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
               status: item.status,
               // The same status label as every other screen.
               statusLabel: statusLabel(item.status),
+              avatar: { name: item.student_name || "Student", src: item.student_photo_file_url },
+              waitingDays: daysSince(item.updated_at),
+              actionLabel: nextActionLabel(item.status),
             })
-          ),
+          )
+            // Every item: the home list expands in place (the API has no "needs action" filter).
+            .sort(byOldest),
         };
       },
     });
@@ -196,11 +204,13 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
           .filter((row) => row.missing.length);
         return {
           total: checks.length,
-          items: checks.slice(0, 6).map(({ item, missing }) => ({
+          items: checks.map(({ item, missing }) => ({
             id: item.id,
             title: item.name || "Unnamed program",
-            description: `Complete: ${missing.join(", ")}`,
+            // What's missing, as a short list, not a sentence.
+            description: `Missing ${missing.join(", ")}`,
             href: `${base}/knowledge-hub/${encodeURIComponent(item.id)}/edit`,
+            actionLabel: "Complete record",
           })),
         };
       },
@@ -220,6 +230,7 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
             title: item.name,
             description: item.location,
             href: `${base}/language-centers/${encodeURIComponent(item.id)}`,
+            actionLabel: "Open center",
           })),
         };
       },

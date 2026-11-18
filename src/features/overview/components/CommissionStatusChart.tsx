@@ -105,7 +105,7 @@ export default function CommissionStatusChart({
             </Tag>
           )}
         </p>
-        <div className="grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-6">
+        <div className="grid items-center gap-5">
           {/* Each ring is a stage's share of the total; the total sits in the hole. */}
           {anyUnknown ? (
             <p className="grid aspect-square w-44 place-items-center rounded-ub-full border border-dashed border-ub-border text-center text-ub-body-sm text-ub-text-secondary">
@@ -113,7 +113,7 @@ export default function CommissionStatusChart({
             </p>
           ) : (
             <RadialRingsChart
-              className="w-44 sm:w-48"
+              className="w-44"
               rings={stages.map((s) => ({ key: s.key, label: s.label, value: s.amount, color: RING[s.color] }))}
               total={total}
               centerValue={<span className="text-ub-heading-sm">{money(total)}</span>}

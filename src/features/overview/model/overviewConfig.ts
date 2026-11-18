@@ -39,7 +39,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
         // Active and payouts live in the pipeline and commission cards; KPIs carry only numbers shown nowhere else.
-        metrics: ["actionRequired", "reviews", "hold"],
+        metrics: ["actionRequired", "reviews", "hold", "commission"],
         panels: ["actionRequired", "reviews", "commission"],
         actions: [
           action(
@@ -49,7 +49,7 @@ export function overviewConfig(context: OverviewContext) {
           ),
           action("Review advisors", "/advisors", "Verify advisor profiles"),
           action(
-            "Finance queue",
+            "Record payouts",
             "/finance-queue",
             "Review outstanding payouts"
           ),
@@ -65,7 +65,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your work overview",
         subtitle:
           "Follow up on applications and support your assigned advisors.",
-        metrics: ["actionRequired", "advisors", "hold"],
+        metrics: ["actionRequired", "hold", "advisors"],
         panels: ["actionRequired", "hold", "advisors"],
         actions: [
           action(
@@ -74,7 +74,7 @@ export function overviewConfig(context: OverviewContext) {
             "Move your applications forward"
           ),
           action(
-            "Your advisors",
+            "View your advisors",
             "/advisors",
             "Support assigned and shared advisors"
           ),
@@ -90,7 +90,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Review overview",
         subtitle: "Review advisor profiles and monitor registration progress.",
         // The reviewer's work: profiles to verify and registrations to follow.
-        metrics: ["reviews", "registrations"],
+        metrics: ["reviews", "registrations", "suspended"],
         panels: ["reviews", "registrations"],
         actions: [
           action(
@@ -99,12 +99,12 @@ export function overviewConfig(context: OverviewContext) {
             "Check profiles and verification"
           ),
           action(
-            "Pending registrations",
+            "Follow up registrations",
             "/advisors?tab=pending-otps",
             "Follow registration progress"
           ),
           action(
-            "Account managers",
+            "View account managers",
             "/account-managers",
             "View the manager directory"
           ),
@@ -129,7 +129,7 @@ export function overviewConfig(context: OverviewContext) {
             "Register a university"
           ),
           action(
-            "Language centers",
+            "Manage language centers",
             "/language-centers",
             "Maintain center information"
           ),
@@ -139,7 +139,7 @@ export function overviewConfig(context: OverviewContext) {
             "Review and update catalogue entries"
           ),
           action(
-            "University configuration",
+            "Configure universities",
             "/university-configuration",
             "Maintain types and required fields"
           ),
@@ -150,20 +150,20 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your advisor overview",
         subtitle: "Stay on top of your students, applications and next steps.",
         // Active, offer and payout figures are in the pipeline and commission cards.
-        metrics: ["actionRequired", "hold"],
+        metrics: ["actionRequired", "hold", ...(context.canViewCommission ? ["commission"] : [])],
         panels: ["actionRequired", "hold"],
         actions: [
           ...(context.canCreateApplication
             ? [
                 action(
-                  "New application",
+                  "Start application",
                   "/applications/apply-now",
                   "Apply for a student"
                 ),
               ]
             : []),
           action(
-            "Application tracker",
+            "Track applications",
             "/applications",
             "Review progress and next steps"
           ),
@@ -205,6 +205,7 @@ export const metricIcons = {
   managers: Users,
   programs: BookOpen,
   hiddenPrograms: BookOpen,
+  suspended: Users,
   institutions: Building2,
   unread: Bell,
 };
@@ -217,7 +218,8 @@ export const metricLabels: Record<string, string> = {
   active: "Active applications",
   hold: "On hold",
   reviews: "Advisors awaiting review",
-  commission: "Awaiting payout",
+  commission: "Payouts to record",
+  suspended: "Suspended advisors",
   advisors: "Active advisors",
   registrations: "Pending registrations",
   managers: "Account managers",
@@ -238,6 +240,7 @@ export const metricCaptions: Record<string, string> = {
   hold: "Paused, to follow up",
   reviews: "Profiles to verify",
   commission: "Ready for payout",
+  suspended: "Accounts to follow up",
   advisors: "In your directory",
   registrations: "Still in progress",
   managers: "In the directory",

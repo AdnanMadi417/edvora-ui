@@ -79,5 +79,5 @@ it("does not treat optional fees or hidden state as incomplete programme informa
     .find((plan) => plan.id === "catalogueQuality")!
     .load();
   expect(data.total).toBe(1);
-  expect(data.items[0].description).toBe("Complete: field of study");
+  expect(data.items[0].description).toBe("Missing field of study");
 });
