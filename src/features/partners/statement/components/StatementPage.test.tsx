@@ -163,8 +163,8 @@ it("stops pagination at the last full page", async () => {
 it("summarises commissions by status and filters from a tile", async () => {
   const user = userEvent.setup();
   render(<StatementPage />);
-  const due = screen.getByRole("button", { name: /Due to you\s*38/ });
-  expect(screen.getByRole("button", { name: /Paid\s*1/ })).toBeInTheDocument();
+  const due = screen.getByRole("button", { name: /Due to you:?\s*38/ });
+  expect(screen.getByRole("button", { name: /Paid:?\s*1/ })).toBeInTheDocument();
   await user.click(due);
   expect(mockUseStatement).toHaveBeenLastCalledWith(expect.objectContaining({ waiting_on: "us", page: 1 }));
 });
@@ -176,14 +176,14 @@ it("totals expected commission per currency, never mixed", () => {
   expect(within(summary).getByText("USD 3,000")).toBeInTheDocument();
   expect(within(summary).queryByText("RM7,500")).not.toBeInTheDocument();
   expect(within(summary).getByText(/Adding up 3 of 5 applications/)).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /Expected\s*5/ })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Expected:?\s*5/ })).toBeInTheDocument();
 });
 
 it("lists expected rows from the Expected tile", async () => {
   const user = userEvent.setup();
   render(<StatementPage />);
   expect(screen.queryByText("Expected Student 1")).not.toBeInTheDocument();
-  await user.click(screen.getByRole("button", { name: /Expected\s*5/ }));
+  await user.click(screen.getByRole("button", { name: /Expected:?\s*5/ }));
   const table = screen.getByRole("table", { name: "Expected commission" });
   expect(within(table).getAllByText("Expected Student 1").length).toBeGreaterThan(0);
   expect(within(table).getAllByText("RM3,000").length).toBeGreaterThan(0);

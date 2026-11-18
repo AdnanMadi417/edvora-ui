@@ -39,6 +39,8 @@ export interface StatTileProps {
   pressed?: boolean;
   /** With onClick: the button's accessible name; defaults to the label. */
   ariaLabel?: string;
+  /** With onClick: not pressable (e.g. a filter with no results). */
+  disabled?: boolean;
   className?: string;
 }
 
@@ -65,6 +67,7 @@ export default function StatTile({
   onClick,
   pressed = false,
   ariaLabel,
+  disabled = false,
   className,
 }: StatTileProps) {
   const button = Boolean(onClick);
@@ -86,7 +89,8 @@ export default function StatTile({
     pressed ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface-subtle",
     button && [
       "w-full transition-colors duration-ub-base motion-reduce:transition-none",
-      !pressed && "hover:border-ub-border-hover",
+      !pressed && !disabled && "hover:border-ub-border-hover",
+      disabled && "cursor-not-allowed opacity-60",
       focusRing,
     ],
     className
@@ -133,7 +137,7 @@ export default function StatTile({
   );
 
   return button ? (
-    <button type="button" data-ub-stat-tile aria-pressed={pressed} aria-label={ariaLabel ?? label} onClick={onClick} className={tray}>
+    <button type="button" data-ub-stat-tile aria-pressed={pressed} aria-label={ariaLabel ?? label} onClick={onClick} disabled={disabled} className={tray}>
       {content}
     </button>
   ) : (

@@ -55,18 +55,11 @@ export default function AdvisorDirectoryToolbar({
             />
           ) : undefined
         }
+        // The count is in the table footer; the toolbar doesn't repeat it.
         actions={
-          <div className="flex items-center gap-3">
-            {(search.trim() || count > 0) && (
-              <Button variant="tertiary" text="Clear" onClick={onClear} />
-            )}
-            <p
-              role="status"
-              className="whitespace-nowrap text-ub-label-sm text-ub-text-secondary"
-            >
-              {loading ? "Updating…" : `${total} advisors`}
-            </p>
-          </div>
+          search.trim() || count > 0 ? (
+            <Button variant="tertiary" text="Clear" onClick={onClear} />
+          ) : undefined
         }
       />
       <Drawer

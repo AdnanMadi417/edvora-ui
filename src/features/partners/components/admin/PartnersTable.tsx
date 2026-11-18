@@ -186,12 +186,18 @@ export default function PartnersTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
+  // Every advisor is active or suspended, and individual or company, so each
+  // card's share is of the same whole.
+  const advisorTotal = (stats?.active ?? 0) + (stats?.inactive ?? 0);
+  const shareOf = (n: number | undefined) => (advisorTotal > 0 ? ((n ?? 0) / advisorTotal) * 100 : undefined);
   const statsCards = useMemo<FilterCardItem[]>(
     () => [
       {
         id: "active",
         label: "Active",
         count: stats?.active ?? 0,
+        progress: shareOf(stats?.active),
+        shareOf: "of advisors",
         icon: CheckCircle,
         colorScheme: "emerald",
       },
@@ -199,6 +205,8 @@ export default function PartnersTable() {
         id: "inactive",
         label: "Suspended",
         count: stats?.inactive ?? 0,
+        progress: shareOf(stats?.inactive),
+        shareOf: "of advisors",
         icon: XCircle,
         colorScheme: "rose",
       },
@@ -206,6 +214,8 @@ export default function PartnersTable() {
         id: "individual",
         label: "Individual",
         count: stats?.individual ?? 0,
+        progress: shareOf(stats?.individual),
+        shareOf: "of advisors",
         icon: User,
         colorScheme: "violet",
       },
@@ -213,10 +223,13 @@ export default function PartnersTable() {
         id: "agency",
         label: "Company",
         count: stats?.agency ?? 0,
+        progress: shareOf(stats?.agency),
+        shareOf: "of advisors",
         icon: Building2,
         colorScheme: "cyan",
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [stats]
   );
 
