@@ -227,7 +227,9 @@ export default function ReviewerPartnersTable() {
   // ?status= from a link (the home advisor rings) opens the list on that group.
   useEffect(() => {
     // "suspended" is the word people see; "inactive" is the older link.
-    const raw = new URLSearchParams(window.location.search).get("status");
+    // Company/Individual come as ?type= (older links used ?status=).
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("type") || params.get("status");
     const status = raw === "suspended" ? "inactive" : raw === "company" ? "agency" : raw;
     if (status && ["active", "inactive", "individual", "agency", "unverified"].includes(status))
       setSelectedStatus(status as StatusFilter);
