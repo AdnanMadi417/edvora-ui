@@ -40,8 +40,8 @@ it("shows one currency at a time without aggregating unlike currencies", async (
   );
   expect(
     screen.getByRole("list", { name: "Commission amounts in MYR" })
-  ).toHaveTextContent("100");
-  expect(screen.queryByText("900")).not.toBeInTheDocument();
+  ).toHaveTextContent("MYR 100");
+  expect(screen.queryByText(/900/)).not.toBeInTheDocument();
   await selectOption(
     user,
     screen.getByRole("combobox", { name: "Chart currency" }),
@@ -49,7 +49,7 @@ it("shows one currency at a time without aggregating unlike currencies", async (
   );
   expect(
     screen.getByRole("list", { name: "Commission amounts in USD" })
-  ).toHaveTextContent("900");
+  ).toHaveTextContent("USD 900");
 });
 it("shows missing amounts as unavailable rather than charting partial totals", () => {
   render(
@@ -68,12 +68,12 @@ it("shows missing amounts as unavailable rather than charting partial totals", (
       }}
     />
   );
-  expect(screen.getByText("Not available")).toBeInTheDocument();
-  expect(
-    screen.queryByRole("list", { name: /Commission amounts/ })
-  ).not.toBeInTheDocument();
+  // The stage and the total both say so; nothing is summed or drawn from a partial figure.
+  expect(screen.getAllByText("Not available").length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByRole("listitem", { name: /^Ready for payout: Not available/ })).toBeInTheDocument();
+  expect(document.querySelector("[data-stage]")).toBeNull();
 });
-it("does not draw positive bars for zero-valued stages", () => {
+it("draws only stages that have an amount, and names each row's count", () => {
   render(
     <CommissionStatusChart
       onRetry={jest.fn()}
@@ -87,6 +87,8 @@ it("does not draw positive bars for zero-valued stages", () => {
       }}
     />
   );
-  const expected = screen.getByRole("listitem", { name: "Expected: 0 MYR" });
-  expect(expected.querySelector("span[style]")).toHaveStyle({ height: "0%" });
+  expect(screen.getByRole("listitem", { name: "Expected: MYR 0, 0 commissions" })).toBeInTheDocument();
+  expect(screen.getByRole("listitem", { name: "Ready for payout: MYR 100, 1 commission" })).toBeInTheDocument();
+  // Only the Ready segment has a width; empty stages draw nothing.
+  expect([...document.querySelectorAll("[data-stage]")].map((el) => el.getAttribute("data-stage"))).toEqual(["ready"]);
 });
