@@ -1,5 +1,4 @@
 "use client";
-import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -8,16 +7,8 @@ import { useState } from "react";
 import { CreditCard, Pencil, Plus, Trash2 } from "lucide-react";
 import { useAllPaymentMethods, useDeletePaymentMethod } from "../../hooks";
 import type { PaymentMethod } from "../../types";
-import DataTable, {
-  sortRows,
-  type DataTableColumn,
-  type DataTableSort,
-} from "components/ub/data/tables/DataTable";
-import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
-import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import EntityCell from "components/ub/data/display/EntityCell";
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
+import ItemList from "components/ub/data/display/ItemList";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import CreatePayment from "../admin/popups/CreatePayment";
@@ -30,6 +21,10 @@ export const descriptionText = (html?: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+/**
+ * A handful of options, so a plain list: the name opens the method, actions on
+ * the right. The description lives on the method's page, not in the list.
+ */
 export default function PaymentMethodsDirectory({
   basePath = "/admin/config-universities/payment-methods",
   allowDelete = true,
@@ -40,58 +35,8 @@ export default function PaymentMethodsDirectory({
   const { paymentMethods, loading, error, refetch } = useAllPaymentMethods();
   const { deletePayment, isDeleting } = useDeletePaymentMethod();
   const { showToast } = useToast();
-  const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
   const [target, setTarget] = useState<PaymentMethod | null>(null);
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<DataTableSort | null>(null);
-  const matching = paymentMethods.filter((method) => {
-    const description = descriptionText(method.description);
-    return `${method.name} ${description}`
-      .toLowerCase()
-      .includes(search.trim().toLowerCase());
-  });
-  const currentPage = Math.min(
-    page,
-    Math.max(1, Math.ceil(matching.length / 10))
-  );
-  const columns: DataTableColumn<PaymentMethod>[] = [
-    {
-      key: "name",
-      header: "Payment method",
-      sortable: true,
-      cell: (method) => (
-        <EntityCell name={method.name} noAvatar />
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      cell: (method) => (
-        <TableActions>
-          <TableAction
-            label={`Edit ${method.name}`}
-            icon={<Pencil className="h-4 w-4" />}
-            href={`${basePath}/${method.id}/edit`}
-            primary
-          />
-          {allowDelete && (
-            <TableAction
-              label={`Delete ${method.name}`}
-              icon={<Trash2 className="h-4 w-4" />}
-              onSelect={() => setTarget(method)}
-              danger
-            />
-          )}
-        </TableActions>
-      ),
-    },
-  ];
-  const rows = sortRows(matching, columns, sort).slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
-  );
   const remove = async () => {
     if (!target) return;
     try {
@@ -123,54 +68,39 @@ export default function PaymentMethodsDirectory({
           className="shrink-0"
         />
       </header>
-      <div className="border-b border-ub-border p-4 sm:p-6">
-        <DataTableToolbar
-          className="!mb-0"
-          search={{
-            value: search,
-            onChange: (value) => {
-              setSearch(value);
-              setPage(1);
-            },
-            placeholder: "Search payment methods...",
-          }}
-          resultLabel={`${matching.length} payment methods`}
-        />
-      </div>
-      <div className={`min-w-0 ${tableSectionPadding}`}>
-        <DataTable
-          columns={columns}
-          rows={rows}
-          getRowId={(method) => method.id}
-          getRowHref={(method) => `${basePath}/${method.id}`}
-          caption="University payment methods"
-          loading={loading}
-          error={error}
-          onRetry={refetch}
-          sort={sort}
-          onSortChange={(value) => {
-            setSort(value);
-            setPage(1);
-          }}
-          manualSort
-          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
-          empty={{
-            title: "No payment methods found",
-            description: "Try another name or description.",
-          }}
-          footer={
-            <TablePagination
-              currentPage={currentPage}
-              onPageChange={setPage}
-              itemsPerPage={10}
-              itemCount={rows.length}
-              totalCount={matching.length}
-              itemLabel="payment methods"
-              loading={loading}
+      <ItemList
+        label="University payment methods"
+        items={paymentMethods}
+        getId={(method) => method.id}
+        getName={(method) => method.name}
+        getHref={(method) => `${basePath}/${method.id}`}
+        loading={loading}
+        error={error}
+        onRetry={refetch}
+        empty={{
+          title: "No payment methods yet",
+          description: "Create the first payment method universities can use.",
+          icon: CreditCard,
+        }}
+        renderActions={(method) => (
+          <TableActions label={method.name}>
+            <TableAction
+              label={`Edit ${method.name}`}
+              icon={<Pencil className="h-4 w-4" />}
+              href={`${basePath}/${method.id}/edit`}
+              primary
             />
-          }
-        />
-      </div>
+            {allowDelete && (
+              <TableAction
+                label={`Delete ${method.name}`}
+                icon={<Trash2 className="h-4 w-4" />}
+                onSelect={() => setTarget(method)}
+                danger
+              />
+            )}
+          </TableActions>
+        )}
+      />
       <CreatePayment
         isOpen={creating}
         onClose={() => setCreating(false)}

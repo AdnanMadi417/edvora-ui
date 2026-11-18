@@ -909,6 +909,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Every directory table and its phone card"],
     avoid: "Descriptions or long text: those go on the detail page or drawer.",
   },
+  ItemList: {
+    category: "data",
+    imports: [imp("ItemList", "data/display/ItemList")],
+    useFor: "Plain list for short lookup records (a handful to a few dozen): status circle and name, an optional small tag (a code), actions on the right. Same row on phone and desktop.",
+    usedIn: ["Payment methods", "Fields of study"],
+    avoid: "Records people sort, compare across columns or page through: use DataTable.",
+  },
   StatusBadge: {
     category: "data",
     imports: [imp("StatusBadge", "data/badges/StatusBadge")],

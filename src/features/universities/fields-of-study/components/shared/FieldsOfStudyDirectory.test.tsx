@@ -57,6 +57,13 @@ it("applies status filters only after confirmation", async () => {
     rowAction("View Computer Science")
   ).toBeInTheDocument();
 });
+it("lists fields with a status circle and the code as a tag, no table", () => {
+  const { container } = render(<FieldsOfStudyDirectory />);
+  expect(container.querySelector("table")).toBeNull();
+  expect(screen.getByRole("list", { name: "Fields of study" })).toBeInTheDocument();
+  expect(screen.getByText("ART")).toBeInTheDocument();
+  expect(container.querySelectorAll("[data-entity-status]")[0]).toHaveAttribute("title", "Inactive");
+});
 it("requires confirmation before deletion", async () => {
   const user = userEvent.setup();
   render(<FieldsOfStudyDirectory />);

@@ -85,6 +85,16 @@ it("requires explicit delete confirmation", async () => {
   expect(mockDelete).toHaveBeenCalledWith("card");
   await waitFor(() => expect(mockRefetch).toHaveBeenCalled());
 });
+it("is a plain list of names, without a table or descriptions", () => {
+  const { container } = render(<PaymentMethodsDirectory />);
+  expect(container.querySelector("table")).toBeNull();
+  expect(
+    screen.getByRole("list", { name: "University payment methods" })
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByText("Transfer to the university bank account.")
+  ).not.toBeInTheDocument();
+});
 it("uses data-entry details and edit routes without deletion", () => {
   render(
     <PaymentMethodsDirectory

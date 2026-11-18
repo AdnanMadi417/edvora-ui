@@ -19,6 +19,8 @@ import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import FilterChip from "components/ub/data/badges/FilterChip";
 import EntityStatusBadge from "components/ub/data/badges/EntityStatusBadge";
 import EntityCell from "components/ub/data/display/EntityCell";
+import ItemList from "components/ub/data/display/ItemList";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { Demo, ShowcaseSection, StateSwitch, ThemePreviews, Variant } from "../Showcase";
 
@@ -202,6 +204,33 @@ export function Badges() {
         <EntityCell name="Global Pathways Education International Sdn Bhd" subtitle="Agency · Nigeria" status={{ status: "unverified", label: "Pending verification" }} />
         <EntityCell name="Farah Aziz" subtitle="farah@unibexs.com" status={{ status: false, label: "Inactive" }} />
         <EntityCell name="Computer Science and IT" noAvatar status={{ status: false }} />
+      </Demo>
+
+      <Demo
+        name="ItemList"
+        path="components/ub/data/display/ItemList.tsx"
+        description="A plain list for short lookup records that don't need a table (payment methods, fields of study): status circle and name, an optional small tag such as a code, actions on the right. The same row on phones and desktops; no columns, no descriptions, no pagination."
+        className="max-w-xl overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface"
+      >
+        <ItemList
+          label="Fields of study (demo)"
+          items={[
+            { id: "cs", name: "Computer Science and IT", code: "CS", active: true },
+            { id: "bus", name: "Business and Management", code: "BUS", active: true },
+            { id: "art", name: "Arts and Design", code: "ART", active: false },
+          ]}
+          getId={(f) => f.id}
+          getName={(f) => f.name}
+          getStatus={(f) => ({ status: f.active })}
+          getTag={(f) => f.code}
+          onOpen={() => undefined}
+          renderActions={(f) => (
+            <TableActions label={f.name}>
+              <TableAction label={`Edit ${f.name}`} icon={<Pencil className="h-4 w-4" />} onSelect={() => undefined} primary />
+              <TableAction label={`Delete ${f.name}`} icon={<Trash2 className="h-4 w-4" />} onSelect={() => undefined} danger />
+            </TableActions>
+          )}
+        />
       </Demo>
 
       <Demo name="StatusBadge" path="components/ub/data/badges/StatusBadge.tsx" className="flex flex-wrap gap-3">

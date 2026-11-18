@@ -1,29 +1,14 @@
 "use client";
-import { focusRing, tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import {
-  BookOpen,
-  Eye,
-  Pencil,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from "lucide-react";
+import { BookOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { useAllFields, useDeleteField, type FieldOfStudy } from "../../hooks";
-import DataTable, {
-  sortRows,
-  type DataTableColumn,
-  type DataTableSort,
-} from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
-import TablePagination from "components/ub/data/tables/TablePagination";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
-import EntityCell from "components/ub/data/display/EntityCell";
+import ItemList from "components/ub/data/display/ItemList";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import SelectInput from "components/ub/forms/selection/SelectInput";
@@ -49,81 +34,16 @@ export default function FieldsOfStudyDirectory({
   const [editing, setEditing] = useState<FieldOfStudy | null>(null);
   const [viewing, setViewing] = useState<FieldOfStudy | null>(null);
   const [deleting, setDeleting] = useState<FieldOfStudy | null>(null);
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<DataTableSort | null>(null);
-  const matching = fields.filter(
-    (field) =>
-      `${field.name} ${field.code || ""}`
-        .toLowerCase()
-        .includes(search.trim().toLowerCase()) &&
-      (status === "all" ||
-        (status === "active" ? field.is_active : !field.is_active))
-  );
-  const currentPage = Math.min(
-    page,
-    Math.max(1, Math.ceil(matching.length / 10))
-  );
-  const columns: DataTableColumn<FieldOfStudy>[] = [
-    {
-      key: "name",
-      header: "Field of study",
-      sortable: true,
-      cell: (field) => (
-        <button
-          type="button"
-          onClick={() => setViewing(field)}
-          className={`block w-full min-w-0 max-w-sm rounded-ub-xs text-start ${focusRing}`}
-          aria-label={`View ${field.name}`}
-        >
-          <EntityCell
-            name={field.name}
-            noAvatar
-            status={{ status: field.is_active }}
-          />
-        </button>
-      ),
-    },
-    {
-      key: "code",
-      header: "Code",
-      sortable: true,
-      cell: (field) => (
-        <span className="break-words">{field.code || "Not assigned"}</span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      cell: (field) => (
-        <TableActions>
-          <TableAction
-            label={`View ${field.name}`}
-            icon={<Eye className="h-4 w-4" />}
-            onSelect={() => setViewing(field)}
-          />
-          <TableAction
-            label={`Edit ${field.name}`}
-            icon={<Pencil className="h-4 w-4" />}
-            onSelect={() => setEditing(field)}
-            primary
-          />
-          {allowDelete && (
-            <TableAction
-              label={`Delete ${field.name}`}
-              icon={<Trash2 className="h-4 w-4" />}
-              onSelect={() => setDeleting(field)}
-              danger
-            />
-          )}
-        </TableActions>
-      ),
-    },
-  ];
-  const rows = sortRows(matching, columns, sort).slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
-  );
+  const matching = fields
+    .filter(
+      (field) =>
+        `${field.name} ${field.code || ""}`
+          .toLowerCase()
+          .includes(search.trim().toLowerCase()) &&
+        (status === "all" ||
+          (status === "active" ? field.is_active : !field.is_active))
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
   async function confirmDelete() {
     if (!deleting) return;
     try {
@@ -163,7 +83,6 @@ export default function FieldsOfStudyDirectory({
             value: search,
             onChange: (value) => {
               setSearch(value);
-              setPage(1);
             },
             placeholder: "Search by field name or code...",
           }}
@@ -179,39 +98,41 @@ export default function FieldsOfStudyDirectory({
           resultLabel={`${matching.length} fields`}
         />
       </div>
-      <div className={`min-w-0 ${tableSectionPadding}`}>
-        <DataTable
-          columns={columns}
-          rows={rows}
-          getRowId={(field) => field.id}
-          caption="Fields of study"
-          loading={fieldsLoading}
-          error={fieldsError}
-          onRetry={refetch}
-          sort={sort}
-          onSortChange={(value) => {
-            setSort(value);
-            setPage(1);
-          }}
-          manualSort
-          scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
-          empty={{
-            title: "No fields found",
-            description: "Try another search or clear your filters.",
-          }}
-          footer={
-            <TablePagination
-              currentPage={currentPage}
-              onPageChange={setPage}
-              itemsPerPage={10}
-              itemCount={rows.length}
-              totalCount={matching.length}
-              itemLabel="fields"
-              loading={fieldsLoading}
+      <ItemList
+        label="Fields of study"
+        items={matching}
+        getId={(field) => field.id}
+        getName={(field) => field.name}
+        getStatus={(field) => ({ status: field.is_active })}
+        getTag={(field) => field.code}
+        onOpen={(field) => setViewing(field)}
+        loading={fieldsLoading}
+        error={fieldsError}
+        onRetry={refetch}
+        empty={{
+          title: "No fields found",
+          description: "Try another search or clear your filters.",
+          icon: BookOpen,
+        }}
+        renderActions={(field) => (
+          <TableActions label={field.name}>
+            <TableAction
+              label={`Edit ${field.name}`}
+              icon={<Pencil className="h-4 w-4" />}
+              onSelect={() => setEditing(field)}
+              primary
             />
-          }
-        />
-      </div>
+            {allowDelete && (
+              <TableAction
+                label={`Delete ${field.name}`}
+                icon={<Trash2 className="h-4 w-4" />}
+                onSelect={() => setDeleting(field)}
+                danger
+              />
+            )}
+          </TableActions>
+        )}
+      />
       <Drawer
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
@@ -225,7 +146,6 @@ export default function FieldsOfStudyDirectory({
               onClick={() => {
                 setDraft("all");
                 setStatus("all");
-                setPage(1);
                 setFiltersOpen(false);
               }}
             />
@@ -234,7 +154,6 @@ export default function FieldsOfStudyDirectory({
               text="Apply filters"
               onClick={() => {
                 setStatus(draft);
-                setPage(1);
                 setFiltersOpen(false);
               }}
             />
