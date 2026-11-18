@@ -1,13 +1,13 @@
 "use client";
 
-import Applications from 'features/applications/account-manager/components/table/ManagerApplications';
+import { Suspense } from "react";
+import Applications from "features/applications/account-manager/components/table/ManagerApplications";
 
-const ProfileOverview = () => {
+export default function AccountManagerApplicationsPage() {
   return (
-    <div>
-      <Applications/>
-    </div>
+    // The list reads ?stage= from the URL (Commission menu item).
+    <Suspense fallback={null}>
+      <Applications />
+    </Suspense>
   );
-};
-
-export default ProfileOverview;
+}

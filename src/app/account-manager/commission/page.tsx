@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
-// The account manager Commission page isn't built yet (its menu item is
-// hidden in accountManagerRoutes). Send old links Home instead of showing
-// placeholder figures.
+// Commission for an account manager's advisors: the Applications list on the
+// Commission stage, where each application's status says where its commission
+// stands and its Commission tab shows the amounts.
 export default function AccountManagerCommissionPage() {
-  redirect("/account-manager/home");
+  redirect("/account-manager/applications?stage=commission");
 }

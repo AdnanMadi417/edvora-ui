@@ -1,6 +1,6 @@
 import { Home } from "lucide-react";
 import { IRoute } from "../types/navigation";
-import { ClipboardList, Handshake, BookOpen, Truck, Bell } from "lucide-react";
+import { ClipboardList, Handshake, BookOpen, Truck, Bell, Wallet } from "lucide-react";
 
 const accountManagerRoutes: IRoute[] = [
   { name: "Home", layout: "/account-manager", path: "/home", icon: Home },
@@ -34,12 +34,12 @@ const accountManagerRoutes: IRoute[] = [
         path: "/advisors",
         icon: Handshake,
     },
-    // {
-    //     name: "Commission",
-    //     layout: "/account-manager",
-    //     path: "/commission",
-    //     icon: MdPayments,
-    // },
+    {
+        name: "Commission",
+        layout: "/account-manager",
+        path: "/commission",
+        icon: Wallet,
+    },
 ];
 
 

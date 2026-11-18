@@ -2,7 +2,9 @@
 import { tableSectionPadding } from "components/ub/recipes";
 
 import Card from "components/ub/data/cards/Card";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { stageCodeOf } from "features/applications/stages";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
 import api from "lib/useApi";
@@ -47,6 +49,10 @@ const ModernApplicationsTable = () => {
 
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedStages, setSelectedStages] = useState<string | null>(null);
+  // ?stage=commission (the Commission menu item and Home's Commission step) opens the
+  // list on the Commission stage: where each application's commission stands.
+  const searchParams = useSearchParams();
+  const appliedStageParam = useRef(false);
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
@@ -213,6 +219,16 @@ const ModernApplicationsTable = () => {
     setSortConfig({ key: null, direction: "asc" });
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (appliedStageParam.current || searchParams?.get("stage") !== "commission" || !stages.length) return;
+    const commission = stages.find((s: any) => stageCodeOf(s) === "PARTNER_COMMISSION_INVOICING" || /commission/i.test(s.name));
+    if (commission) {
+      appliedStageParam.current = true;
+      setSelectedStages(commission.id);
+      setCurrentPage(1);
+    }
+  }, [searchParams, stages]);
 
   return (
     <Card extra="mt-6 ">
