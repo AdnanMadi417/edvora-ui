@@ -32,7 +32,10 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import AppDate from "components/ub/data/formatting/AppDate";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
+import EntityCell from "components/ub/data/display/EntityCell";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import ResendRegistrationOtpConfirmation from "./ResendRegistrationOtpConfirmation";
 import FilterButton from "components/ub/core/buttons/FilterButton";
@@ -198,120 +201,65 @@ export default function PendingRegistrationOtpsTable() {
 
   const columns: DataTableColumn<PendingRegistrationOtp>[] = [
     {
-      key: "Registrant",
+      key: "registrant",
       header: "Registrant",
+      cell: (row) => (
+        <EntityCell
+          name={row.company_name || row.full_name || row.email}
+          subtitle={
+            row.company_name && row.full_name
+              ? `${row.full_name} · ${row.email}`
+              : row.email
+          }
+        />
+      ),
+    },
+    {
+      // A registration's verification progress is a workflow step, not
+      // whether an account is live, so it keeps its own column.
+      key: "progress",
+      header: "Progress",
       cell: (row) => {
         const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
-        const isResending = resendingEmail === row.email;
-        const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
-        const canResend = config.canResend && resendsLeft > 0;
         return (
-          <>
-            {" "}
-            <div className="truncate text-sm font-medium text-ub-text-primary">
-              {row.full_name || "—"}
-            </div>
-            <div className="truncate text-xs text-ub-text-secondary">{row.email}</div>
-            {row.company_name && (
-              <div className="truncate text-xs text-ub-text-secondary">
-                {row.company_name}
-              </div>
-            )}
-          </>
+          <StatusBadge variant={config.variant} icon={config.icon}>
+            {config.label}
+          </StatusBadge>
         );
       },
     },
     {
-      key: "Type",
-      mobileSecondary: true,
-      header: "Type",
-      cell: (row) => {
-        const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
-        const isResending = resendingEmail === row.email;
-        const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
-        const canResend = config.canResend && resendsLeft > 0;
-        return (
-          <>
-            {" "}
-            <span className="text-sm capitalize text-ub-text-secondary">
-              {row.partner_type || "—"}
-            </span>
-          </>
-        );
-      },
-    },
-    {
-      key: "Status",
-      header: "Status",
-      cell: (row) => {
-        const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
-        const isResending = resendingEmail === row.email;
-        const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
-        const canResend = config.canResend && resendsLeft > 0;
-        return (
-          <>
-            {" "}
-            <StatusBadge variant={config.variant} icon={config.icon}>
-              {config.label}
-            </StatusBadge>
-          </>
-        );
-      },
-    },
-    {
-      key: "Requested",
-      mobileSecondary: true,
+      key: "requested",
       header: "Requested",
-      cell: (row) => {
-        const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
-        const isResending = resendingEmail === row.email;
-        const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
-        const canResend = config.canResend && resendsLeft > 0;
-        return (
-          <>
-            {" "}
-            <AppDate value={row.created_at} format="datetime" fallback="—" />
-          </>
-        );
-      },
+      cell: (row) => (
+        <AppDate value={row.created_at} format="short" fallback="—" />
+      ),
     },
     {
-      key: "Expires",
+      key: "expires",
       header: "Expires",
-      cell: (row) => {
-        const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
-        const isResending = resendingEmail === row.email;
-        const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
-        const canResend = config.canResend && resendsLeft > 0;
-        return (
-          <>
-            {" "}
-            {row.progress === "completed" ? (
-              <span className="text-sm text-ub-text-tertiary">—</span>
-            ) : (
-              <AppDate value={row.expires_at} format="datetime" fallback="—" />
-            )}
-          </>
-        );
-      },
+      cell: (row) =>
+        row.progress === "completed" ? (
+          <span className="text-ub-text-tertiary">—</span>
+        ) : (
+          <AppDate value={row.expires_at} format="datetime" fallback="—" />
+        ),
     },
     {
-      key: "Actions",
+      key: "actions",
       header: "Actions",
+      align: "end",
       cell: (row) => {
         const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
         const isResending = resendingEmail === row.email;
         const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
         const canResend = config.canResend && resendsLeft > 0;
         return (
-          <>
-            {" "}
-            <IconButton
-              onClick={() => setConfirmTarget(row)}
-              disabled={!canResend || isResending}
-              title={
+          <TableActions label={row.full_name || row.email}>
+            <TableAction
+              label={
                 isResending
-                  ? "Sending..."
+                  ? "Sending verification code"
                   : canResend
                   ? `Resend verification code (${resendsLeft} left)`
                   : "Resend limit reached"
@@ -321,14 +269,11 @@ export default function PendingRegistrationOtpsTable() {
                   className={`h-4 w-4 ${isResending ? "animate-pulse" : ""}`}
                 />
               }
-              bgColor="bg-transparent"
-              textColor="text-ub-text-tertiary"
-              borderColor="border-transparent"
-              hoverTextColor="hover:text-ub-text-link"
-              hoverBorderColor="hover:border-transparent"
-              className="hover:bg-ub-tone-brand-bg"
+              disabled={!canResend || isResending}
+              onSelect={() => setConfirmTarget(row)}
+              primary
             />
-          </>
+          </TableActions>
         );
       },
     },

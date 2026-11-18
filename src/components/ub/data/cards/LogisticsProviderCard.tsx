@@ -3,18 +3,18 @@
 import { useId, type ReactNode } from "react";
 import Link from "next/link";
 import {
-  ArrowUpRight,
+  Eye,
   GraduationCap,
   Languages,
   Lock,
   MapPin,
   MessageCircle,
-  Truck,
 } from "lucide-react";
-import PresignedImage from "components/ub/data/media/PresignedImage";
+import EntityCell from "components/ub/data/display/EntityCell";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
+import ProviderAvatar from "features/logistical-service/components/shared/ProviderAvatar";
 import Tag from "components/ub/data/badges/Tag";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import { focusRing } from "components/ub/recipes";
 import type { ServiceProvider } from "features/logistical-service/types";
 
@@ -78,61 +78,54 @@ export default function LogisticsProviderCard({
           className={`absolute inset-0 z-10 rounded-ub-xl ${focusRing}`}
         />
       )}
-      <div className="flex items-start justify-between gap-3 p-4 pb-0 sm:p-5 sm:pb-0">
-        <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-ub-lg sm:h-14 sm:w-14 border border-ub-border bg-ub-tone-brand-bg text-ub-tone-brand-text">
-          <PresignedImage
-            fileKey={locked ? undefined : provider.picture_file_key}
-            alt=""
-            className="h-full w-full object-cover"
-            fallback={
-              locked ? (
-                <Lock className="h-6 w-6" />
-              ) : (
-                <Truck className="h-6 w-6" />
-              )
-            }
-          />
-        </span>
-        <Tag
-          hue={locked ? "grey" : provider.is_active ? "teal" : "grey"}
-          size="sm"
-        >
-          {locked
-            ? "Stage required"
-            : provider.is_active
-            ? "Active"
-            : "Inactive"}
-        </Tag>
-      </div>
-      <div className="flex flex-1 flex-col gap-3 p-4 sm:gap-4 sm:p-5">
-        <div className="space-y-2">
-          <h3 id={titleId} className="text-ub-heading-md text-ub-text-primary">
-            {locked ? (
-              "Logistics provider"
-            ) : (
-              <CardTextTooltip href={href} content={provider.name}>
-                <span className="line-clamp-2 break-words">
-                  {provider.name}
+      <div className="flex items-start justify-between gap-2 p-4 pb-0 sm:p-5 sm:pb-0">
+        <h3 id={titleId} className="min-w-0 flex-1">
+          {locked ? (
+            <EntityCell
+              name="Logistics provider"
+              avatar={
+                <span className="grid h-10 w-10 place-items-center rounded-ub-full bg-ub-surface-subtle text-ub-text-tertiary">
+                  <Lock className="h-4 w-4" aria-hidden="true" />
                 </span>
-              </CardTextTooltip>
-            )}
-          </h3>
-          <p className="flex min-w-0 items-start gap-1.5 text-ub-body-sm text-ub-text-secondary">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-            {locked ? (
-              <span>Provider details unlock with access</span>
-            ) : (
-              <CardTextTooltip
-                href={href}
-                content={provider.main_location || "Location not provided"}
-              >
-                <span className="line-clamp-1 break-words">
+              }
+              subtitle="Unlocks at Visa Processing"
+            />
+          ) : (
+            <EntityCell
+              name={provider.name}
+              avatar={<ProviderAvatar provider={provider} />}
+              status={{ status: provider.is_active }}
+              subtitle={
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   {provider.main_location || "Location not provided"}
                 </span>
-              </CardTextTooltip>
-            )}
-          </p>
-        </div>
+              }
+            />
+          )}
+        </h3>
+        {!locked && (
+          <div className="relative z-20 -me-2 -mt-1 shrink-0">
+            <TableActions label={provider.name}>
+              <TableAction
+                label={`View ${provider.name}`}
+                icon={<Eye className="h-4 w-4" />}
+                href={href}
+                primary
+              />
+              {whatsapp && (
+                <TableAction
+                  label={`WhatsApp ${provider.name}`}
+                  icon={<MessageCircle className="h-4 w-4" />}
+                  href={`https://wa.me/${whatsapp}`}
+                  target="_blank"
+                />
+              )}
+            </TableActions>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:gap-4 sm:p-5">
         <dl className="grid grid-cols-2 gap-3 rounded-ub-lg border border-ub-border bg-ub-surface-subtle p-3.5">
           {[
             { label: "Single service", range: provider.services_price_range },
@@ -234,41 +227,14 @@ export default function LogisticsProviderCard({
           </p>
         </div>
       </div>
-      <footer className="border-t border-ub-border p-4 pt-3.5">
-        {locked ? (
+      {locked && (
+        <footer className="border-t border-ub-border p-4 pt-3.5">
           <p className="flex min-h-[40px] items-center justify-center gap-2 rounded-ub-full bg-ub-surface-subtle text-ub-label-sm text-ub-text-secondary">
             <Lock className="h-4 w-4" />
             Contact locked
           </p>
-        ) : (
-          <div className="relative z-20 grid grid-cols-2 gap-2">
-            <LinkBtn
-              href={href}
-              label="Details"
-              variant="secondary"
-              icon={<ArrowUpRight className="h-4 w-4" />}
-              size="sm"
-              className="min-h-[44px] w-full !px-2"
-            />
-            {whatsapp ? (
-              <LinkBtn
-                href={`https://wa.me/${whatsapp}`}
-                label="WhatsApp"
-                variant="primary"
-                target="_blank"
-                rel="noopener noreferrer"
-                icon={<MessageCircle className="h-4 w-4" />}
-                size="sm"
-                className="min-h-[44px] w-full !px-2"
-              />
-            ) : (
-              <span className="flex items-center justify-center text-ub-caption text-ub-text-tertiary">
-                No WhatsApp listed
-              </span>
-            )}
-          </div>
-        )}
-      </footer>
+        </footer>
+      )}
     </article>
   );
 }

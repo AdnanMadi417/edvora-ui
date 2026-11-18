@@ -10,17 +10,20 @@ import PresignedImage from "components/ub/data/media/PresignedImage";
 export default function UniversityLogo({
   name,
   fileKey,
+  src,
 }: {
   name: string;
   fileKey?: string | null;
+  /** A saved URL to use when there is no file key or it can't be signed. */
+  src?: string | null;
 }) {
-  const fallback = <Avatar name={name} size={40} alt="" />;
+  const fallback = <Avatar name={name} src={src || undefined} size={40} alt="" />;
   return (
     <PresignedImage
       fileKey={fileKey || undefined}
       alt=""
       fallback={fallback}
-      renderImage={(src) => <Avatar name={name} src={src} size={40} alt="" />}
+      renderImage={(url) => <Avatar name={name} src={url} size={40} alt="" />}
     />
   );
 }

@@ -2,18 +2,14 @@
 import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
-import { ChevronRight, RefreshCw, Wallet } from "lucide-react";
+import { Eye, RefreshCw, Wallet } from "lucide-react";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import Button from "components/ub/core/buttons/Button";
-import TableWrapper from "components/ub/data/tables/TableWrapper";
-import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
-import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
+import EntityCell from "components/ub/data/display/EntityCell";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import { useBanks } from "features/partners/banks/hooks";
 import { usePartnerBankAccountsList } from "../../hooks";
@@ -30,8 +26,9 @@ const CURRENCY_OPTIONS = [
 // aggregates it client-side; see that hook for the N+1 caveat. Rows link
 // back to the owning partner's details page, where the account is actually
 // managed — this table is read-only.
+type BankAccountRow = ReturnType<typeof usePartnerBankAccountsList>["rows"][number];
+
 export default function PartnerBankAccountsTable() {
-  const router = useRouter();
   const { rows, loading, error, refetch } = usePartnerBankAccountsList();
   const { banks: allBanks } = useBanks({ include_inactive: true });
 
@@ -78,6 +75,44 @@ export default function PartnerBankAccountsTable() {
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
+
+  const columns: DataTableColumn<BankAccountRow>[] = [
+    {
+      key: "advisor",
+      header: "Advisor",
+      cell: (row) => <EntityCell name={row.partner_name} />,
+    },
+    {
+      key: "bank",
+      header: "Bank",
+      cell: (row) => (row.bank_id ? bankLookup.get(row.bank_id)?.name ?? "Curated bank" : row.intl_bank_name) || "—",
+    },
+    {
+      key: "holder",
+      header: "Account holder",
+      cell: (row) => row.account_holder_name,
+    },
+    {
+      key: "account",
+      header: "Account number",
+      cell: (row) => (
+        <span className="ub-tabular">
+          {row.account_number}
+          <span className="text-ub-text-tertiary"> · {row.currency}</span>
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "end",
+      cell: (row) => (
+        <TableActions label={row.partner_name}>
+          <TableAction label={`View ${row.partner_name}`} icon={<Eye className="h-4 w-4" />} href={`/admin/advisors/${row.partner_id}`} primary />
+        </TableActions>
+      ),
+    },
+  ];
 
   return (
     <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-ub-border bg-ub-surface">
@@ -127,8 +162,21 @@ export default function PartnerBankAccountsTable() {
 
       {/* Table */}
       <div className={tableSectionPadding}>
-        <TableWrapper
-          scrollLabel="Scroll to see all columns and rows"
+        <DataTable
+          columns={columns}
+          rows={currentRows}
+          getRowId={(row) => row.id}
+          getRowHref={(row) => `/admin/advisors/${row.partner_id}`}
+          caption="Advisor bank accounts"
+          loading={status === "loading"}
+          skeletonRows={5}
+          error={status === "error" ? error ?? "Couldn't load bank accounts." : null}
+          onRetry={refetch}
+          empty={{
+            title: "No bank accounts found",
+            description: activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisor has added a payout account yet.",
+            icon: <Wallet className="h-8 w-8 text-ub-text-tertiary" />,
+          }}
           footer={
             <TablePagination
               currentPage={currentPage}
@@ -140,60 +188,7 @@ export default function PartnerBankAccountsTable() {
               loading={status === "loading"}
             />
           }
-        >
-            <table className="ub-legacy-table w-full min-w-[800px]">
-              <thead>
-                <tr className="border-b border-ub-border bg-ub-surface-subtle">
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Advisor</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Bank</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account holder</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account number</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Currency</th>
-                  <th className="w-8" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ub-border bg-ub-surface">
-                {status === "loading" && <TableSkeletonRows columns={6} rows={5} />}
-
-                {status === "error" && <TableErrorRow colSpan={6} message={error ?? undefined} onRetry={refetch} />}
-
-                {status === "empty" && (
-                  <TableEmptyRow
-                    colSpan={6}
-                    title="No bank accounts found"
-                    subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisor has added a payout account yet."}
-                    icon={<Wallet className="h-8 w-8 text-ub-text-tertiary" />}
-                  />
-                )}
-
-                <AnimatePresence>
-                {status === "success" &&
-                  currentRows.map((row) => {
-                    const bankName = row.bank_id ? bankLookup.get(row.bank_id)?.name ?? "Curated bank" : row.intl_bank_name;
-                    return (
-                      <AnimatedTableRow
-                        key={row.id}
-                        className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
-                        onClick={() => router.push(`/admin/advisors/${row.partner_id}`)}
-                      >
-                        <td data-label="Advisor" data-primary className="px-6 py-4 text-sm font-medium text-ub-text-primary">
-                          <p>{row.partner_name}</p>
-                          <p className="text-xs text-ub-text-secondary">{row.partner_email}</p>
-                        </td>
-                        <td data-label="Bank" className="px-6 py-4 text-sm text-ub-text-secondary">{bankName}</td>
-                        <td data-label="Account holder" className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_holder_name}</td>
-                        <td data-label="Account number" className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_number}</td>
-                        <td data-label="Currency" className="px-6 py-4 text-sm text-ub-text-secondary">{row.currency}</td>
-                        <td data-label="" className="w-8 pr-4 py-4">
-                          <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
-                        </td>
-                      </AnimatedTableRow>
-                    );
-                  })}
-                </AnimatePresence>
-              </tbody>
-            </table>
-        </TableWrapper>
+        />
       </div>
     </div>
   );

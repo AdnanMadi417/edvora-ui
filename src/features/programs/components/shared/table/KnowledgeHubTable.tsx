@@ -5,12 +5,8 @@ import TableActions, {
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
-import Link from "next/link";
-import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
 import type { ReactNode } from "react";
 import {
-  Landmark,
-  Languages,
   CopyPlus,
   Eye,
   EyeOff,
@@ -23,15 +19,22 @@ import DataTable, {
   type DataTableColumn,
 } from "components/ub/data/tables/DataTable";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import IconButton from "components/ub/core/buttons/IconButton";
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
-import Tag from "components/ub/data/badges/Tag";
-import Tooltip from "components/ub/feedback/dialogs/Tooltip";
+import EntityCell from "components/ub/data/display/EntityCell";
+import UniversityLogo from "features/universities/components/shared/UniversityLogo";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import IntakeMonthsChips from "../IntakeMonthsChips";
-import { courseTypeLabel } from "features/programs/utils/courseType";
-import { getIeltsLabel } from "constants/lists";
 import type { Program } from "features/programs/types";
+
+/** Visible to Advisors, or hidden from the catalogue: the circle on the program's logo. */
+export const programStatus = (program: { is_hidden?: boolean }) =>
+  program.is_hidden
+    ? { status: "inactive", label: "Hidden" }
+    : { status: "active", label: "Visible" };
+
+/** The one short line under a program's name: its university and branch. */
+export const programSubtitle = (program: Pick<Program, "university" | "branch">) =>
+  [program.university?.name, program.branch?.name].filter(Boolean).join(" · ") ||
+  "University unavailable";
 
 interface KnowledgeHubTableProps {
   basePath?: "/admin" | "/data-entry";
@@ -96,103 +99,27 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       header: "Program",
       width: "320px",
       cell: (program) => (
-        <div className="ub-program-summary min-w-0 max-w-[320px] space-y-1 py-1 text-start md:min-w-[240px]">
-          <Tooltip content={program.name} className="w-full min-w-0">
-            <span className="line-clamp-2 break-words text-ub-label-md leading-snug text-ub-text-primary">
-              {program.name}
-            </span>
-          </Tooltip>
-          <p
-            className="line-clamp-1 text-ub-body-sm text-ub-text-secondary"
-            title={program.university?.name}
-          >
-            {program.university?.name}
-          </p>
-          <p
-            className="line-clamp-1 text-ub-label-sm text-ub-text-tertiary"
-            title={[program.branch?.name, program.branch?.state]
-              .filter(Boolean)
-              .join(" · ")}
-          >
-            {[program.branch?.name, program.branch?.state]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            <Tag hue="indigo" size="sm">
-              {program.qualification_level}
-            </Tag>
-            {program.is_hidden && (
-              <Tag hue="amber" size="sm">
-                Hidden
-              </Tag>
-            )}
-          </div>
-          {program.course_type && (
-            <p className="text-ub-body-sm text-ub-text-secondary">
-              {courseTypeLabel(program.course_type)}
-            </p>
-          )}
-        </div>
+        <EntityCell
+          name={program.name}
+          avatar={
+            <UniversityLogo
+              name={program.university?.name || program.name}
+              fileKey={program.university?.logo_file_key}
+              src={program.university?.logo_file_url}
+            />
+          }
+          status={programStatus(program)}
+          subtitle={programSubtitle(program)}
+        />
       ),
     },
     {
-      key: "related",
-      header: "Quick links",
-      width: "190px",
-      cell: (program) =>
-        program.university?.id ? (
-          <div className="flex flex-wrap items-center gap-1">
-            <Link
-              href={`${
-                props.basePath ?? "/admin"
-              }/universities/${encodeURIComponent(program.university.id)}`}
-              aria-label={`University: ${program.university.name}`}
-              className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.tertiary} !px-2`}
-            >
-              <Landmark className="h-4 w-4 shrink-0" aria-hidden="true" />
-              University
-            </Link>
-            <Link
-              href={`${
-                props.basePath ?? "/admin"
-              }/language-centers?university_id=${encodeURIComponent(
-                program.university.id
-              )}`}
-              aria-label={`Language centers for ${program.university.name}`}
-              className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.tertiary} !px-2`}
-            >
-              <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Language centers
-            </Link>
-          </div>
-        ) : (
-          <span className="text-ub-body-sm text-ub-text-tertiary">
-            University unavailable
-          </span>
-        ),
-    },
-    {
-      key: "financials",
-      header: "Financials",
-      mobileLabel: "Commission",
-      width: "240px",
+      key: "commission",
+      header: "Commission",
+      align: "end",
       cell: (program) => (
-        <span className="ub-tabular block space-y-1">
-          <span className="block">
-            <span className="hidden text-ub-caption text-ub-text-secondary md:inline">
-              Commission:{" "}
-            </span>
-            <span className="text-ub-label-md text-ub-tone-success-text">
-              {money(program.commission_amount, program.commission_currency)}
-            </span>
-          </span>
-          <span className="hidden text-ub-caption text-ub-text-secondary md:block">
-            First-year tuition:{" "}
-            <span className="text-ub-text-primary">
-              {money(program.first_year_tuition, program.yearly_fee_currency)}
-            </span>
-          </span>
+        <span className="text-ub-label-md text-ub-tone-success-text">
+          {money(program.commission_amount, program.commission_currency)}
         </span>
       ),
     },
@@ -212,27 +139,9 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
         ),
     },
     {
-      key: "requirements",
-      mobileSecondary: true,
-      header: "Requirements",
-      cell: (program) => (
-        <div className="space-y-2">
-          <p className="text-ub-body-sm">
-            {program.english_required_score
-              ? `IELTS ${getIeltsLabel(program.english_required_score)}`
-              : "English score not provided"}
-          </p>
-          <Tag hue={program.has_scholarship ? "amber" : "grey"} size="sm">
-            {program.has_scholarship
-              ? "Scholarship available"
-              : "No scholarship"}
-          </Tag>
-        </div>
-      ),
-    },
-    {
       key: "actions",
       header: "Actions",
+      align: "end",
       cell: (program) => {
         const copy = props.copyEligibility?.(program);
         return (

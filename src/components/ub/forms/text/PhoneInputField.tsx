@@ -49,7 +49,7 @@ export default function PhoneInputField({
       {/* Phone numbers always read left to right, dial code first. */}
       <div dir="ltr" className={`${group} ${error ? fieldControlError : ""}`}>
         <span className="relative flex shrink-0">
-          <Combobox compact ariaLabel="Country dialling code" value={dialCode} options={DIAL_CODES.map(d => ({ value: d.code, label: d.label }))} onChange={value => updateFormData(dialCodeField, value ?? "+60")} triggerClassName="!h-full !w-28 !rounded-none !rounded-s-[33px] !bg-transparent !outline-none" className="h-full" />
+          <Combobox compact ariaLabel="Country dialling code" value={dialCode} options={DIAL_CODES.map(d => ({ value: d.code, label: d.label }))} onChange={value => updateFormData(dialCodeField, value ?? "+60")} triggerClassName="!h-full !w-28 !rounded-none !rounded-s-[33px] !bg-transparent !outline-none" className="h-full [&>div]:h-full" />
         </span>
         <span aria-hidden="true" className="my-3 w-px shrink-0 bg-[var(--ub-field-ring)]" />
         <input
