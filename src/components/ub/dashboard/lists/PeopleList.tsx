@@ -1,3 +1,4 @@
+import type { TagTone } from "components/ub/recipes";
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import ListRow, { RowAvatar } from "./ListRow";
@@ -12,6 +13,7 @@ export interface PeopleListItemProps {
   /** Status for the tag next to the name. */
   status?: string;
   statusLabel?: string;
+  statusTone?: TagTone;
   /** Days it has waited (e.g. a profile awaiting review). */
   waitingDays?: number | null;
   /** End-side action: one verb + object TextButton. */
@@ -24,13 +26,14 @@ export interface PeopleListItemProps {
 }
 
 /** A person, in the shared row: avatar · name + status tag · one line · days tag · action. */
-export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, waitingDays, action, href, hrefLabel, className }: PeopleListItemProps) {
+export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, statusTone, waitingDays, action, href, hrefLabel, className }: PeopleListItemProps) {
   return (
     <ListRow
       leading={<RowAvatar name={name} src={avatarSrc} />}
       title={name}
       status={status}
       statusLabel={statusLabel}
+      statusTone={statusTone}
       meta={work}
       waitingDays={waitingDays}
       action={action}

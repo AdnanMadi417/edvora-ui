@@ -5,6 +5,7 @@ import { CalendarClock, ChevronRight, Clock } from "lucide-react";
 import { focusRing } from "components/ub/recipes";
 import Avatar from "components/ub/data/media/Avatar";
 import { getDaysLabel, getDaysLevel, type DaysLevel } from "components/ub/data/badges/DaysTag";
+import type { TagTone } from "components/ub/recipes";
 import StatusTag from "../shared/StatusTag";
 
 export interface ListRowProps {
@@ -14,6 +15,8 @@ export interface ListRowProps {
   /** Status tag next to the name (one line, ellipsis and tooltip). Leave it out when every row in the list shares it. */
   status?: string;
   statusLabel?: string;
+  /** Tag tone from config/statusTone.ts: amber = waiting on the viewer, red = a problem. */
+  statusTone?: TagTone;
   /** One short secondary line: never a sentence. */
   meta?: ReactNode;
   /** Days it has waited (lists sort oldest first). */
@@ -65,7 +68,7 @@ function Days({ waitingDays, dueInDays }: { waitingDays?: number | null; dueInDa
  * optional action sits on the end. On phones the days drop under the text.
  * TaskListItem and PeopleListItem are this row on every role home.
  */
-export default function ListRow({ leading, title, status, statusLabel, meta, waitingDays, dueInDays, action, href, hrefLabel, className }: ListRowProps) {
+export default function ListRow({ leading, title, status, statusLabel, statusTone, meta, waitingDays, dueInDays, action, href, hrefLabel, className }: ListRowProps) {
   const hasDays = typeof waitingDays === "number" || typeof dueInDays === "number";
   const content = (
     <>
@@ -78,13 +81,17 @@ export default function ListRow({ leading, title, status, statusLabel, meta, wai
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="min-w-0 max-w-full truncate text-ub-label-md text-ub-text-primary">
+            <p className="min-w-0 max-w-full truncate text-ub-label-md text-ub-text-primary" title={typeof title === "string" ? title : undefined}>
               {hrefLabel && <span className="sr-only">{hrefLabel}: </span>}
               {title}
             </p>
-            {status && <StatusTag status={status} label={statusLabel} size="sm" />}
+            {status && <StatusTag status={status} label={statusLabel} tone={statusTone} size="sm" />}
           </div>
-          {meta && <p className="mt-0.5 truncate text-ub-caption text-ub-text-tertiary">{meta}</p>}
+          {meta && (
+            <p className="mt-0.5 truncate text-ub-caption text-ub-text-tertiary" title={typeof meta === "string" ? meta : undefined}>
+              {meta}
+            </p>
+          )}
         </div>
         {(hasDays || action) && (
           <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">

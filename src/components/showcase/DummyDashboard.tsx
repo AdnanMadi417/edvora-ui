@@ -49,6 +49,8 @@ import {
   PipelineFlow,
   ProgressCard,
   QuickActions,
+  ListFooter,
+  ActivityFeed,
   ReminderCard,
   Sparkline,
   StatCard,
@@ -81,7 +83,7 @@ export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[
   { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "RadialStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
   { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "RadialRingsChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
-  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "AvatarStrip"] },
+  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
   { group: "Data kit", path: "components/ub/data/cards", names: ["StatCard (data kit)"] },
 ];
@@ -398,6 +400,31 @@ export default function DummyDashboard() {
                   { icon: Search, label: "Explore programs", href: "#qa-programs", description: "Find the right course" },
                   { icon: BookOpen, label: "Application Tracker", href: "#qa-tracker", description: "Review progress" },
                   { icon: Users, label: "Manage team", href: "#qa-team", description: "Agency Advisors only" },
+                ]}
+              />
+            </DashboardCard>
+          </Block>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Block show={labels} names={["TaskList", "ListFooter"]}>
+            <DashboardCard
+              title="Stuck applications"
+              footer={<ListFooter shown={2} total={15} label="Stuck applications" viewAllHref="#lf-all" />}
+            >
+              <TaskList label="Stuck applications" count={2}>
+                <TaskListItem title="Laila Mahmoud" meta="Asia Pacific University" status="Enrollment verified" waitingDays={29} href="#lf-1" hrefLabel="Open application" />
+                <TaskListItem title="Tariq Adeyemi" meta="Limkokwing University" status="Student travelling" waitingDays={28} href="#lf-2" hrefLabel="Open application" />
+              </TaskList>
+            </DashboardCard>
+          </Block>
+          <Block show={labels} names={["ActivityFeed"]}>
+            <DashboardCard title="Recent activity">
+              <ActivityFeed
+                label="Recent activity"
+                items={[
+                  { id: "a1", title: "Fatima Yusuf submitted a new application for Ruqayyah Zhang", nextStep: "Review the documents and assign it for checking.", at: new Date().toISOString(), href: "#af-1" },
+                  { id: "a2", title: "Li Wei signed up as an individual Advisor from China", nextStep: "Review the profile and verify their documents.", at: new Date(Date.now() - 3 * 86_400_000).toISOString(), href: "#af-2" },
                 ]}
               />
             </DashboardCard>

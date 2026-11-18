@@ -1,3 +1,4 @@
+import type { TagTone } from "components/ub/recipes";
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import ListRow, { RowAvatar } from "./ListRow";
@@ -16,6 +17,7 @@ export interface TaskListItemProps {
   /** Status tag next to the title. */
   status?: string;
   statusLabel?: string;
+  statusTone?: TagTone;
   /** Days until due (negative = overdue) → Days tag. */
   dueInDays?: number | null;
   /** Days it has waited → "Waiting N days". */
@@ -30,13 +32,14 @@ export interface TaskListItemProps {
 }
 
 /** One task, in the shared row: avatar or icon tile · title + status tag · meta · days tag · action. */
-export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", status, statusLabel, dueInDays, waitingDays, action, href, hrefLabel, className }: TaskListItemProps) {
+export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", status, statusLabel, statusTone, dueInDays, waitingDays, action, href, hrefLabel, className }: TaskListItemProps) {
   return (
     <ListRow
       leading={avatar ? <RowAvatar name={avatar.name} src={avatar.src} /> : icon ? <IconTile icon={icon} tone={iconTone} size="sm" /> : undefined}
       title={title}
       status={status}
       statusLabel={statusLabel}
+      statusTone={statusTone}
       meta={meta}
       dueInDays={dueInDays}
       waitingDays={waitingDays}

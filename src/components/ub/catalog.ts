@@ -294,6 +294,18 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Keyboard-accessible links to common tasks, with labels and descriptions.",
     usedIn: ["Role home pages"],
   },
+  ListFooter: {
+    category: "data",
+    imports: ['import { ListFooter } from "components/ub/dashboard";'],
+    useFor: "The one footer under a dashboard list: \"Showing 3 of N\" and a single View all or Show all control.",
+    usedIn: ["Role home pages"],
+  },
+  ActivityFeed: {
+    category: "data",
+    imports: ['import { ActivityFeed } from "components/ub/dashboard";'],
+    useFor: "Recent activity as list rows: who did what, the reader's next step on one line, the time on the end.",
+    usedIn: ["Role home pages"],
+  },
   "DashboardHeader and PeriodSelect": {
     category: "data",
     imports: ['import { DashboardHeader, PeriodSelect } from "components/ub/dashboard";'],
