@@ -24,7 +24,11 @@ it("disables navigation while results are updating", () => {
 it("handles an empty result and the last partial page", () => {
   const { rerender } = render(<TablePagination {...props} totalCount={0} itemCount={0} />);
   expect(screen.getByRole("status")).toHaveTextContent("0 applications");
-  expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+  // One page (or none): only the count, no arrows and no lone "1".
+  expect(screen.queryByRole("navigation", { name: "Pagination" })).toBeNull();
+  rerender(<TablePagination {...props} totalCount={5} itemCount={5} />);
+  expect(screen.getByRole("status")).toHaveTextContent("5 applications");
+  expect(screen.queryByRole("button", { name: "Next page" })).toBeNull();
   rerender(<TablePagination {...props} currentPage={11} itemCount={1} />);
   expect(screen.getByRole("status")).toHaveTextContent("201 applications");
   expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();

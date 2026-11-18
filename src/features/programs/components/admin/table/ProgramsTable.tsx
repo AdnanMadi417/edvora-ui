@@ -345,7 +345,6 @@ const ProgramsTable = () => {
           showHiddenFilter
           sortBy={sortBy}
           onSortChange={(value) => { setSortBy(value); setCurrentPage(1); }}
-          resultsCount={total}
         >
           {/* Bulk operations */}
       </ProgramFilterPanel>

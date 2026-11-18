@@ -191,7 +191,6 @@ export default function ProviderDirectory({
               }}
             />
           }
-          resultLabel={`${matching.length} providers`}
         />
       </div>
       <div className={`min-w-0 ${tableSectionPadding}`}>

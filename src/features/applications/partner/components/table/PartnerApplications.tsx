@@ -353,7 +353,6 @@ const PartnerApplications = () => {
             setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all");
             setCurrentPage(1);
           }}
-          resultsCount={displayTotal}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={handleClearFilters}
           showFilters={showMobileFilters}

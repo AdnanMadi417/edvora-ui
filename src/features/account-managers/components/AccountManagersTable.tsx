@@ -279,7 +279,6 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
             onChange: setSearchTerm,
             placeholder: "Search by name or email...",
           }}
-          resultLabel={`${total} account managers`}
           filters={
             <FilterButton
               count={activeFiltersCount}

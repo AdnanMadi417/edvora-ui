@@ -124,7 +124,6 @@ export default function DocumentTypesDirectory() {
             },
             placeholder: "Search document types...",
           }}
-          resultLabel={`${matching.length} document types`}
         />
       </div>
       <div className={`min-w-0 ${tableSectionPadding}`}>

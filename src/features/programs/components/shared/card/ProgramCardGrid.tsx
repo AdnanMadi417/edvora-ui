@@ -177,7 +177,6 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
             onClearAll={clearAllFilters}
             sortBy={sortBy}
             onSortChange={(value) => { setSortBy(value); setCurrentPage(1); }}
-            resultsCount={total}
           />
 
           </div>

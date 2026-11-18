@@ -169,7 +169,6 @@ export default function UniversityDirectory({
             setFilters(initial);
             setPage(1);
           }}
-          resultsCount={filtered.length}
           showVisibility={canManage}
         />
       </div>

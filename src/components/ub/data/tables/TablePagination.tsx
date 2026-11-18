@@ -29,7 +29,8 @@ export default function TablePagination({
 
   return (
     <div className="ub-table-pagination flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-4 py-3 text-ub-body-sm text-ub-text-secondary max-md:border-t-0 max-md:bg-transparent max-md:px-1 md:px-6">
-      <span className="ub-tabular hidden shrink-0 md:inline" role="status">
+      {/* The one place a table states its count (the toolbar above doesn't repeat it). */}
+      <span className="ub-tabular shrink-0" role="status">
         {loading ? "Updating results…" : (
           <>
             <span className="font-medium text-ub-text-primary">{totalCount.toLocaleString()}</span> {itemLabel}
@@ -37,7 +38,9 @@ export default function TablePagination({
         )}
       </span>
 
-      <nav aria-label="Pagination" aria-busy={loading || undefined} className="ub-tabular flex w-full items-center justify-between gap-2 md:w-auto md:justify-end">
+      {/* One page: just the count, no arrows and no lone "1". */}
+      {totalPages > 1 && (
+      <nav aria-label="Pagination" aria-busy={loading || undefined} className="ub-tabular flex items-center justify-end gap-2">
         <button
           type="button"
           className={navButton}
@@ -80,6 +83,7 @@ export default function TablePagination({
           <ChevronRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
         </button>
       </nav>
+      )}
     </div>
   );
 }

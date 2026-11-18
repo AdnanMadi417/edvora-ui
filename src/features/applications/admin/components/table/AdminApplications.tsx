@@ -310,7 +310,6 @@ const ModernApplicationsTable = () => {
             setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all");
             setCurrentPage(1);
           }}
-          resultsCount={total}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={handleClearFilters}
           showFilters={showMobileFilters}

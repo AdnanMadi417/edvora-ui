@@ -222,7 +222,6 @@ export default function StaffUsersTable() {
             onChange: setSearchTerm,
             placeholder: "Search by name or email...",
           }}
-          resultLabel={`${total} staff users`}
           filters={
             <FilterButton
               count={activeFiltersCount}
