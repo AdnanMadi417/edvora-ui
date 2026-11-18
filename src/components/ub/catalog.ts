@@ -360,6 +360,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Admin and reviewer Advisors: active, suspended, company, individual"],
     avoid: "Parts that add up to the whole and nothing else (use DonutStatsCard), or more than five measures.",
   },
+  SegmentedBars: {
+    category: "data",
+    imports: ['import { SegmentedBars } from "components/ub/dashboard";'],
+    useFor: "One whole split several ways, one row per dimension (e.g. advisors by verification, account status, type): a bar that adds up to the whole, then each part's count and share as a link.",
+    usedIn: ["Admin and reviewer home: Advisors card"],
+    avoid: "Two dimensions in one chart (they double-count), or colouring status with categorical hues: status rows use success / warning / danger.",
+  },
   GroupedBarChart: {
     category: "data",
     imports: ['import { GroupedBarChart } from "components/ub/dashboard";'],

@@ -436,7 +436,8 @@ export const SearchableSelectButton = forwardRef<
             }
           }}
           className={`${fieldControl} ${
-            compact ? "h-10" : fieldControlHeight
+            // 44px on touch screens, so a finger can hit it.
+            compact ? "h-10 [@media(pointer:coarse)]:h-11" : fieldControlHeight
           } flex items-center gap-2 text-start ${
             clearable && selectedValues.length ? "pe-20" : "pe-10"
           } ${error ? fieldControlError : ""} ${triggerClassName}`}

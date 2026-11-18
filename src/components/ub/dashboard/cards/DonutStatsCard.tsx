@@ -25,6 +25,8 @@ export interface DonutStatsView {
   /** Small text in the donut's hole, above the total. */
   centerLabel: string;
   items: DonutStatsItem[];
+  /** Keep the given order (e.g. workflow stages) instead of largest first. */
+  keepOrder?: boolean;
 }
 
 export interface DonutStatsCardProps {
@@ -49,8 +51,8 @@ export interface DonutStatsCardProps {
 const num = (value: number) => value.toLocaleString();
 
 /** Largest first, capped at `max`, the rest folded into one "Other" slice. */
-export function foldSlices(items: DonutStatsItem[], max = 5): (DonutStatsItem & { color: string })[] {
-  const sorted = [...items].filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
+export function foldSlices(items: DonutStatsItem[], max = 5, keepOrder = false): (DonutStatsItem & { color: string })[] {
+  const sorted = keepOrder ? items.filter((i) => i.value > 0) : [...items].filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
   const cap = Math.min(max, DONUT_COLORS.length);
   const head = sorted.length > cap ? sorted.slice(0, cap - 1) : sorted;
   const rest = sorted.slice(head.length);
@@ -84,7 +86,7 @@ export default function DonutStatsCard({
   const [activeId, setActiveId] = useState(views[0]?.id ?? "");
   const view = views.find((v) => v.id === activeId) ?? views[0];
   const total = (v: DonutStatsView) => v.items.reduce((sum, i) => sum + Math.max(0, i.value), 0);
-  const slices = view ? foldSlices(view.items, maxSlices) : [];
+  const slices = view ? foldSlices(view.items, maxSlices, view.keepOrder) : [];
   const viewTotal = view ? total(view) : 0;
   const cardState: WidgetState = state === "ready" && viewTotal === 0 ? "empty" : state;
 

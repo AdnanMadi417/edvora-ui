@@ -84,7 +84,11 @@ export default function AvatarStrip({ people, label, className }: AvatarStripPro
               <span title={p.name} className="mt-2 line-clamp-2 w-full break-words text-ub-label-md text-ub-text-primary">
                 {p.name}
               </span>
-              {p.subtitle && <span className="w-full truncate text-ub-caption text-ub-text-tertiary">{p.subtitle}</span>}
+              {p.subtitle && (
+                <span title={p.subtitle} className="w-full truncate text-ub-caption text-ub-text-tertiary">
+                  {p.subtitle}
+                </span>
+              )}
             </>
           );
           const cell = "flex w-28 shrink-0 flex-col items-center rounded-ub-md px-2 py-2 text-center";

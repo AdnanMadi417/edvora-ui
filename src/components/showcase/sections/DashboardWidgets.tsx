@@ -39,6 +39,7 @@ import {
   AreaLineChart,
   AvatarStrip,
   RadialStatsCard,
+  SegmentedBars,
   TaskList,
   TaskListItem,
   type DashboardPeriod,
@@ -270,6 +271,28 @@ export default function DashboardWidgets() {
         ]}
       >
         <RadialStatsDemo />
+      </Demo>
+
+      <Demo
+        name="SegmentedBars"
+        path="components/ub/dashboard/lists/SegmentedBars.tsx"
+        description="One whole split several ways, one row per dimension, so nothing is counted twice. Each bar adds up to the whole; each part shows its count and share and can link to the filtered list. Status rows use the status palette (success, warning, danger); identity rows use categorical slots."
+        code={`<SegmentedBars unit="advisors" rows={[{ label: "Account", parts: [{ id: "active", label: "Active", value: 15, tone: "success" }, { id: "suspended", label: "Suspended", value: 6, tone: "danger" }] }]} />`}
+        props={[
+          { name: "rows", type: "{ label, parts: { id, label, value, tone, href? }[] }[]", description: "One dimension per row; parts add up to the whole." },
+          { name: "unit", type: "string", description: "Noun for counts in link names." },
+        ]}
+      >
+        <div className="max-w-xl">
+          <SegmentedBars
+            unit="advisors"
+            rows={[
+              { label: "Verification", parts: [{ id: "v", label: "Verified", value: 16, tone: "success" }, { id: "u", label: "Awaiting review", value: 5, tone: "warning", href: "#c-segmentedbars" }] },
+              { label: "Account", parts: [{ id: "a", label: "Active", value: 15, tone: "success", href: "#c-segmentedbars" }, { id: "s", label: "Suspended", value: 6, tone: "danger", href: "#c-segmentedbars" }] },
+              { label: "Type", parts: [{ id: "c", label: "Company", value: 6, tone: "cat-1" }, { id: "i", label: "Individual", value: 15, tone: "cat-2" }] },
+            ]}
+          />
+        </div>
       </Demo>
 
       <Demo

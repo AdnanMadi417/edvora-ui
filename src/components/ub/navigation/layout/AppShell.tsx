@@ -23,10 +23,18 @@ export interface AppShellProps {
 }
 
 /** Notifications live in the header bell. Use the first three other routes below (groups link to their first child). */
+// The bottom bar has ~90px per item; long page names get their short form there
+// (the full name stays in the sidebar and the page title).
+const SHORT_LABELS: Record<string, string> = {
+  "Logistics Marketplace": "Logistics",
+  "Commission Tracker": "Commission",
+  "Account managers": "Managers",
+};
+
 function defaultBottomItems(routes: IRoute[]): NavbarBottomItem[] {
   return routes.filter((route) => route.path !== "/notifications").slice(0, 3).map((route) => {
     const target = route.children?.length ? route.children[0] : route;
-    return { href: (target.layout ?? "") + target.path, label: route.name, icon: route.icon ?? Circle };
+    return { href: (target.layout ?? "") + target.path, label: SHORT_LABELS[route.name] ?? route.name, icon: route.icon ?? Circle };
   });
 }
 

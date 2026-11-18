@@ -82,11 +82,12 @@ export default function StatTile({
       {href && <ArrowRight aria-hidden="true" className="h-5 w-5 shrink-0 text-ub-icon transition-transform duration-ub-fast group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 motion-reduce:transition-none" />}
     </>
   );
-  const footerClass = "flex min-h-11 items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4";
+  const footerClass = "flex min-h-11 items-center gap-2 border-t border-ub-border px-3 py-2 sm:gap-3 sm:px-4";
 
   const tray = clsx(
-    "flex min-w-0 flex-col rounded-ub-lg border p-1.5 text-start",
-    pressed ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface-subtle",
+    // One card: content, then a footer under a hairline (no card inside a card).
+    "flex min-w-0 flex-col overflow-hidden rounded-ub-lg border text-start",
+    pressed ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface",
     button && [
       "w-full transition-colors duration-ub-base motion-reduce:transition-none",
       !pressed && !disabled && "hover:border-ub-border-hover",
@@ -97,7 +98,7 @@ export default function StatTile({
   );
   const content = (
     <>
-      <span className="flex min-w-0 flex-1 items-start justify-between gap-3 rounded-ub-md border border-ub-border bg-ub-surface p-3 sm:p-4">
+      <span className="flex min-w-0 flex-1 items-start justify-between gap-3 p-3 sm:p-4">
         <span className="block min-w-0 flex-1">
           <Label className={clsx("line-clamp-2 block break-words text-ub-label-md text-ub-text-secondary", labelLines === 1 && "sm:line-clamp-1")} title={label}>
             {label}
@@ -127,7 +128,7 @@ export default function StatTile({
 
       {(footer || href) &&
         (href && !button ? (
-          <Link href={href} aria-label={linkLabel ?? `Open ${label}`} className={clsx("group rounded-ub-md hover:text-ub-text-primary", footerClass, focusRing)}>
+          <Link href={href} aria-label={linkLabel ?? `Open ${label}`} className={clsx("group hover:bg-ub-surface-subtle hover:text-ub-text-primary", footerClass, focusRing)}>
             {footerBody}
           </Link>
         ) : (
