@@ -102,3 +102,29 @@ describe("FileUpload", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("on every device", () => {
+  it("offers MIME types with the extensions, so phones show the camera and photo library", () => {
+    const { container } = render(<FileUpload label="Passport" accept={[".pdf", ".jpg", ".png"]} files={[]} onSelect={jest.fn()} />);
+    expect(container.querySelector("input[type=file]")).toHaveAttribute("accept", ".pdf,application/pdf,.jpg,image/jpeg,.png,image/png");
+  });
+
+  it("has words for touch screens, where nothing can be dragged", () => {
+    render(<FileUpload label="Passport" files={[]} onSelect={jest.fn()} />);
+    expect(screen.getByText("Choose a file")).toHaveClass("hidden");
+    expect(screen.getByText(/Drag a file here or/).className).toMatch(/pointer:coarse\)\]:hidden/);
+  });
+
+  it("stops a file dropped beside the zone from opening in the browser", () => {
+    const { unmount } = render(<FileUpload label="Passport" files={[]} onSelect={jest.fn()} />);
+    const drop = new Event("drop", { cancelable: true }) as DragEvent;
+    Object.defineProperty(drop, "dataTransfer", { value: { types: ["Files"] } });
+    window.dispatchEvent(drop);
+    expect(drop.defaultPrevented).toBe(true);
+    unmount();
+    const later = new Event("drop", { cancelable: true }) as DragEvent;
+    Object.defineProperty(later, "dataTransfer", { value: { types: ["Files"] } });
+    window.dispatchEvent(later);
+    expect(later.defaultPrevented).toBe(false);
+  });
+});

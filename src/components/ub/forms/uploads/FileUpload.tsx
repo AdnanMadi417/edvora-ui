@@ -109,6 +109,32 @@ export function acceptLabel(accept: string[]): string {
   return `${labels.slice(0, -1).join(", ")} or ${labels[labels.length - 1]}`;
 }
 
+const MIME_FOR: Record<string, string> = {
+  ".pdf": "application/pdf",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".heic": "image/heic",
+  ".doc": "application/msword",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+};
+
+/**
+ * The input's accept attribute: every extension plus its MIME type. With
+ * extensions alone, phones tend to open a file browser instead of offering the
+ * camera and photo library.
+ */
+export function acceptAttribute(accept: string[]): string | undefined {
+  const out = new Set<string>();
+  for (const a of accept) {
+    out.add(a);
+    const mime = MIME_FOR[a.toLowerCase()];
+    if (mime) out.add(mime);
+  }
+  return out.size ? Array.from(out).join(",") : undefined;
+}
+
 const isAccepted = (file: File, accept: string[]) => {
   if (!accept.length) return true;
   const name = file.name.toLowerCase();
@@ -276,7 +302,7 @@ function FileRow({
             download={item.downloadOnly ? item.name : undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className={`mt-2 inline-flex min-h-8 items-center text-ub-label-sm text-ub-text-link underline ${focusRing}`}
+            className={`mt-2 inline-flex min-h-8 items-center text-ub-label-sm text-ub-text-link underline [@media(pointer:coarse)]:min-h-11 ${focusRing}`}
           >
             {item.downloadOnly ? "Download file" : "Preview file"}
             <span className="sr-only">: {item.name} (opens in a new tab)</span>
@@ -286,7 +312,7 @@ function FileRow({
           <TextButton
             size="sm"
             leadingIcon="upload"
-            className="mt-2"
+            className="mt-2 [@media(pointer:coarse)]:min-h-11"
             disabled={disabled}
             aria-describedby={item.reason ? reasonId : undefined}
             onClick={() => onPickReplacement(item.id)}
@@ -397,7 +423,7 @@ export function FileUpload({
         className="sr-only"
         tabIndex={-1}
         aria-hidden="true"
-        accept={accept.join(",") || undefined}
+        accept={acceptAttribute(accept)}
         multiple={multiple}
         disabled={disabled}
         onChange={(e) => {
@@ -444,11 +470,15 @@ export function FileUpload({
               "Drop to upload"
             ) : (
               <>
-                Drag {multiple ? "files" : "a file"} here or{" "}
-                <span
-                  className={disabled ? "" : "font-medium text-ub-text-link"}
-                >
-                  choose {multiple ? "files" : "one"}
+                {/* Mouse: drag or choose. Touch (phones, tablets): there is nothing to drag, so just choose. */}
+                <span className="[@media(pointer:coarse)]:hidden">
+                  Drag {multiple ? "files" : "a file"} here or{" "}
+                  <span className={disabled ? "" : "font-medium text-ub-text-link"}>
+                    choose {multiple ? "files" : "one"}
+                  </span>
+                </span>
+                <span className={`hidden [@media(pointer:coarse)]:inline ${disabled ? "" : "font-medium text-ub-text-link"}`}>
+                  Choose {multiple ? "files" : "a file"}
                 </span>
               </>
             )}

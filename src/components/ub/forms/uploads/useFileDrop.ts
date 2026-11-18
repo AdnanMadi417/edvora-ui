@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface UseFileDropOptions {
   /** Called with the dropped files (never empty). */
@@ -17,6 +17,21 @@ interface UseFileDropOptions {
 export function useFileDrop({ onFiles, disabled = false }: UseFileDropOptions) {
   const dragCounter = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  // While an uploader is on the page, a file dropped anywhere else is ignored
+  // instead of the browser opening it (which leaves the page and loses the form).
+  useEffect(() => {
+    const hasFiles = (e: DragEvent) => Array.from(e.dataTransfer?.types ?? []).includes("Files");
+    const block = (e: DragEvent) => {
+      if (hasFiles(e)) e.preventDefault();
+    };
+    window.addEventListener("dragover", block);
+    window.addEventListener("drop", block);
+    return () => {
+      window.removeEventListener("dragover", block);
+      window.removeEventListener("drop", block);
+    };
+  }, []);
 
   const onDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
