@@ -44,25 +44,10 @@ const COLS: Record<number, string> = {
   6: "grid-cols-3 xl:grid-cols-6",
 };
 
-/** The step number in a neutral ring (dashed when the stage is empty). */
-function StageMarker({ index, empty }: { index: number; empty: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={clsx(
-        "ub-tabular grid h-7 w-7 shrink-0 place-items-center rounded-ub-full border-2 border-ub-border bg-ub-surface-subtle text-ub-label-sm",
-        empty ? "border-dashed text-ub-text-tertiary" : "text-ub-text-secondary"
-      )}
-    >
-      {index + 1}
-    </span>
-  );
-}
-
 /**
  * Applications by stage, in workflow order. From 1024px each stage is a
- * StatTile (the same card as the home KPIs): stage name, count, the step
- * number, and a footer with its share. On tablets, phones and narrow cards: a
+ * StatTile (the same card as the home KPIs): stage name, count and a footer
+ * with its share. On tablets, phones and narrow cards: a
  * vertical list with a share bar and the count on the end; never a squeezed
  * strip. No per-stage colours and no badges: the name and the count carry it.
  * With onSelect each stage toggles a filter; with getHref it opens a link.
@@ -81,11 +66,10 @@ export default function PipelineFlow({
   const tiles = layout === "auto" && wide;
   const total = stages.reduce((sum, s) => sum + s.count, 0);
 
-  const rows = stages.map((s, i) => {
+  const rows = stages.map((s) => {
     const share = total > 0 ? Math.round((s.count / total) * 100) : 0;
     return {
       s,
-      i,
       share,
       selected: selectedId === s.id,
       empty: s.count === 0,
@@ -96,14 +80,13 @@ export default function PipelineFlow({
   if (tiles)
     return (
       <ol aria-label={label} data-layout="tiles" className={clsx("grid gap-3", COLS[stages.length] ?? "grid-cols-4", className)}>
-        {rows.map(({ s, i, share, selected, empty, name }) => (
+        {rows.map(({ s, share, selected, empty, name }) => (
           <li key={s.id} className="min-w-0">
             <StatTile
               className="h-full"
               label={s.label}
               labelLines={2}
               value={<span className={empty ? "text-ub-text-tertiary" : undefined}>{s.count.toLocaleString()}</span>}
-              media={<StageMarker index={i} empty={empty} />}
               footer={{ value: `${share}%`, text: `of ${unit}` }}
               href={getHref?.(s)}
               linkLabel={name}
@@ -118,11 +101,10 @@ export default function PipelineFlow({
 
   return (
     <ol aria-label={label} data-layout="list" className={clsx("grid gap-2", className)}>
-      {rows.map(({ s, i, share, selected, empty, name }) => {
+      {rows.map(({ s, share, selected, empty, name }) => {
         const interactive = Boolean(onSelect || getHref);
         const body: ReactNode = (
           <>
-            <StageMarker index={i} empty={empty} />
             <span className="min-w-0 flex-1">
               <span title={s.label} className="block truncate text-ub-label-md text-ub-text-primary">
                 {s.label}

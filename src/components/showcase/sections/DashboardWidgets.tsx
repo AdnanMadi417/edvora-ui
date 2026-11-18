@@ -34,6 +34,10 @@ import {
   StatCard,
   StatTile,
   StatusTag,
+  DonutStatsCard,
+  GroupedBarChart,
+  AreaLineChart,
+  AvatarStrip,
   TaskList,
   TaskListItem,
   type DashboardPeriod,
@@ -213,6 +217,108 @@ export default function DashboardWidgets() {
           <StatTile state={statState} onRetry={() => setStatState("ready")} label="Active applications" value="126" icon={GraduationCap} delta={{ value: 10.7, comparedTo: "vs last 7 days (sample)" }} footer={{ value: "+12", text: "vs last 7 days (sample)" }} href="#c-stattile" />
           <StatTile state={statState} onRetry={() => setStatState("ready")} label="Arriving in 30 days" value="3" icon={Plane} delta={{ value: -5.1, comparedTo: "vs last month (sample)" }} footer={{ value: "−1", text: "vs last month (sample)" }} href="#c-stattile" />
           <StatTile state={statState} onRetry={() => setStatState("ready")} label="Expected commission" value={<Amount value={7950} />} icon={Wallet} iconTone="success" footer={{ text: "In the commission stage, not yet paid" }} href="#c-stattile" />
+        </div>
+      </Demo>
+
+      <Demo
+        name="DonutStatsCard and DonutChart"
+        path="components/ub/dashboard/cards/DonutStatsCard.tsx"
+        description="A total split into parts. Tabs for each split show their total; the donut has the total in the hole and 2px surface gaps; the legend gives each part's swatch, name, share and value, and links to the list behind it. Colours are five fixed, checked categorical slots (never cycled); past five parts the rest fold into Other."
+        code={`<DonutStatsCard title="Application pipeline" views={[{ id: "stage", label: "By stage", centerLabel: "Active applications", items: [{ key: "visa", label: "Visa", value: 2, href: "/partner/applications?stage=visa" }] }]} />`}
+        props={[
+          { name: "views", type: "{ id, label, centerLabel, items: { key, label, value, href? }[] }[]", description: "Two or more show as tabs." },
+          { name: "maxSlices", type: "number", default: "5", description: "The rest fold into Other." },
+          { name: "state / emptyMessage / errorMessage / onRetry", type: "WidgetState / …", description: "Card states." },
+        ]}
+      >
+        <div className="max-w-xl">
+          <DonutStatsCard
+            title="Application pipeline"
+            subtitle="All active applications."
+            views={[
+              { id: "stage", label: "By stage", centerLabel: "Active applications", items: [
+                { key: "review", label: "Unibexs review", value: 1, href: "#c-donutstatscard-and-donutchart" },
+                { key: "offer", label: "University and offer", value: 2, href: "#c-donutstatscard-and-donutchart" },
+                { key: "visa", label: "Visa", value: 2, href: "#c-donutstatscard-and-donutchart" },
+                { key: "arrival", label: "Arrival and enrollment", value: 2, href: "#c-donutstatscard-and-donutchart" },
+                { key: "commission", label: "Commission", value: 3, href: "#c-donutstatscard-and-donutchart" },
+              ] },
+              { id: "university", label: "By university", centerLabel: "Active applications", items: [
+                { key: "apu", label: "Asia Pacific University", value: 4 },
+                { key: "taylors", label: "Taylor's University", value: 3 },
+                { key: "ucsi", label: "UCSI University", value: 1 },
+                { key: "inti", label: "INTI International University", value: 1 },
+                { key: "sunway", label: "Sunway University", value: 1 },
+                { key: "mmu", label: "Multimedia University", value: 0 },
+              ] },
+            ]}
+          />
+        </div>
+      </Demo>
+
+      <Demo
+        name="GroupedBarChart"
+        path="components/ub/dashboard/charts/GroupedBarChart.tsx"
+        description="Up to three series per group on one baseline: thin bars with rounded ends, 2px gaps, recessive gridlines, one axis, legend above. Hover or Tab to a bar for its value; a hidden table carries the numbers."
+        code={`<GroupedBarChart label="Commission per university in RM" series={[{ key: "expected", label: "Expected", color: "cat-1" }, { key: "paid", label: "Paid", color: "cat-3" }]} groups={[{ key: "apu", label: "APU", values: [4200, 3000] }]} />`}
+        props={[
+          { name: "series", type: '{ key, label, color: "cat-1" | "cat-2" | "cat-3" }[]', description: "Fixed order; max three." },
+          { name: "groups", type: "{ key, label, values: number[] }[]", description: "One value per series." },
+          { name: "label / formatValue / heightClass", type: "string / (n) => string / string", description: "Naming and formatting." },
+        ]}
+      >
+        <GroupedBarChart
+          label="Commission per university in RM"
+          series={[{ key: "expected", label: "Expected", color: "cat-1" }, { key: "ready", label: "Ready for payout", color: "cat-2" }, { key: "paid", label: "Paid", color: "cat-3" }]}
+          groups={[
+            { key: "apu", label: "Asia Pacific University", values: [4200, 2450, 3000] },
+            { key: "taylors", label: "Taylor's University", values: [3750, 0, 5250] },
+            { key: "ucsi", label: "UCSI University", values: [1800, 1200, 2600] },
+            { key: "sunway", label: "Sunway University", values: [2900, 600, 1400] },
+          ]}
+          formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
+        />
+      </Demo>
+
+      <Demo
+        name="AreaLineChart"
+        path="components/ub/dashboard/charts/AreaLineChart.tsx"
+        description="One series over time: a 2px line with a soft area, recessive gridlines, one axis. Hover, or focus and use the arrow keys, for a crosshair and the value. Only chart dated records the API returns."
+        code={`<AreaLineChart label="Commission paid per month in RM" points={[{ key: "2026-06", label: "Jun", value: 3000 }]} />`}
+        props={[
+          { name: "points", type: "{ key, label, value }[]", description: "In time order." },
+          { name: "label / formatValue / heightClass", type: "string / (n) => string / string", description: "Naming and formatting." },
+        ]}
+      >
+        <AreaLineChart
+          label="Commission paid per month in RM"
+          formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
+          points={[["2026-04", "Apr", 1200], ["2026-05", "May", 3400], ["2026-06", "Jun", 2600], ["2026-07", "Jul", 5200], ["2026-08", "Aug", 2100], ["2026-09", "Sep", 4300], ["2026-10", "Oct", 3800], ["2026-11", "Nov", 6100]].map(([key, label, value]) => ({ key: String(key), label: String(label), value: Number(value) }))}
+        />
+      </Demo>
+
+      <Demo
+        name="AvatarStrip"
+        path="components/ub/dashboard/lists/AvatarStrip.tsx"
+        description="People in a scrollable row: 64px avatar with the status circle, name and one line, each opening the profile. Previous / next buttons on the end page through and hide at the ends; mirrored in RTL."
+        code={`<AvatarStrip label="Advisors awaiting review" people={[{ id: "p1", name: "Global Pathways", subtitle: "Agency · Nigeria", status: "unverified", href: "/admin/advisors/p1" }]} />`}
+        props={[
+          { name: "people", type: "{ id, name, subtitle?, avatarSrc?, status?, statusLabel?, href?, ariaLabel? }[]", description: "status is a backend value shown as the circle." },
+          { name: "label", type: "string", description: "Accessible name of the row." },
+        ]}
+      >
+        <div className="max-w-lg">
+          <AvatarStrip
+            label="Advisors awaiting review"
+            people={["Global Pathways Education", "Bright Futures Consultancy", "Nur Aisyah Binti Kamal", "Chinedu Okafor", "Tanvir Hossain", "Sara Mahmoud", "Lim Wei Jie"].map((name, i) => ({
+              id: `p${i}`,
+              name,
+              subtitle: i < 2 ? "Agency" : "Individual",
+              status: i % 3 === 0 ? "active" : "unverified",
+              statusLabel: i % 3 === 0 ? "Verified" : "Awaiting review",
+              href: "#c-avatarstrip",
+            }))}
+          />
         </div>
       </Demo>
 

@@ -54,6 +54,10 @@ import {
   StatCard,
   StatTile,
   StatusTag,
+  DonutStatsCard,
+  GroupedBarChart,
+  AreaLineChart,
+  AvatarStrip,
   TaskList,
   TaskListItem,
   WidgetStatus,
@@ -73,10 +77,10 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
-  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
-  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions"] },
+  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
   { group: "Data kit", path: "components/ub/data/cards", names: ["StatCard (data kit)"] },
 ];
@@ -295,6 +299,52 @@ export default function DummyDashboard() {
             <DashboardCard title="Document uploads" subtitle="When Advisors upload">
               <ActivityHeatmap rows={DAYS} columns={HOURS} values={UPLOADS} unit="uploads" label="Document uploads by day and hour" />
               <ChartLegend className="mt-4" marker="square" items={[{ label: "Uploads", color: "cat-1" }, { label: "Quiet hours", color: "muted" }]} />
+            </DashboardCard>
+          </Block>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Block show={labels} names={["DonutStatsCard", "DonutChart"]}>
+            <DonutStatsCard
+              title="Application pipeline"
+              views={[
+                { id: "stage", label: "By stage", centerLabel: "Active applications", items: FLOW.map((f) => ({ key: f.id, label: f.label, value: f.count, href: "#c-overview" })) },
+                { id: "university", label: "By university", centerLabel: "Active applications", items: [
+                  { key: "apu", label: "Asia Pacific University", value: 4 },
+                  { key: "taylors", label: "Taylor's University", value: 3 },
+                  { key: "ucsi", label: "UCSI University", value: 2 },
+                  { key: "inti", label: "INTI International University", value: 1 },
+                ] },
+              ]}
+            />
+          </Block>
+          <Block show={labels} names={["DashboardCard", "GroupedBarChart"]}>
+            <DashboardCard title="Commission by university" subtitle="RM only.">
+              <GroupedBarChart
+                label="Commission per university in RM"
+                series={[{ key: "expected", label: "Expected", color: "cat-1" }, { key: "ready", label: "Ready for payout", color: "cat-2" }, { key: "paid", label: "Paid", color: "cat-3" }]}
+                groups={COMMISSION_ROWS.map((r) => ({ key: r.key, label: r.name, values: [r.expected.amount, r.ready.amount, r.paid.amount] }))}
+                formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
+              />
+            </DashboardCard>
+          </Block>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Block show={labels} names={["DashboardCard", "AreaLineChart"]}>
+            <DashboardCard title="Commission paid by month" subtitle="RM only.">
+              <AreaLineChart
+                label="Commission paid per month in RM"
+                formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
+                points={[["2026-06", "Jun", 3000], ["2026-07", "Jul", 0], ["2026-08", "Aug", 5250], ["2026-09", "Sep", 2100], ["2026-10", "Oct", 4300], ["2026-11", "Nov", 3800]].map(([key, label, value]) => ({ key: String(key), label: String(label), value: Number(value) }))}
+              />
+            </DashboardCard>
+          </Block>
+          <Block show={labels} names={["DashboardCard", "AvatarStrip"]}>
+            <DashboardCard title="Advisors awaiting review">
+              <AvatarStrip
+                label="Advisors awaiting review"
+                people={["Global Pathways Education", "Bright Futures Consultancy", "Nur Aisyah Binti Kamal", "Chinedu Okafor", "Tanvir Hossain", "Sara Mahmoud"].map((name, i) => ({ id: `a${i}`, name, subtitle: i < 2 ? "Agency" : "Individual", status: "unverified", statusLabel: "Awaiting review", href: "#c-overview" }))}
+              />
             </DashboardCard>
           </Block>
         </div>
