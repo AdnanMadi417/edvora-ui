@@ -8,3 +8,5 @@ export { useSuspendMember } from "./useSuspendMember";
 export { useReactivateMember } from "./useReactivateMember";
 export { useResendMemberWelcomeEmail } from "./useResendMemberWelcomeEmail";
 export { useResendAgencyInvitationOtp } from "./useResendAgencyInvitationOtp";
+export { useVerifyAgencyInvitationOtp } from "./useVerifyAgencyInvitationOtp";
+export { useSubmitAgencyMemberProfile } from "./useSubmitAgencyMemberProfile";

@@ -38,8 +38,9 @@ import type { HeaderAction, OverflowAction } from "features/applications/compone
 import { usePageTitle } from "components/ub/navigation/layout/pageTitle";
 
 
-/** Unibexs' official Respond.io support line, the same for every role. */
-export const SUPPORT_WHATSAPP_URL = "https://wa.me/601172591101";
+import { SUPPORT_WHATSAPP_URL } from "constants/support";
+
+export { SUPPORT_WHATSAPP_URL };
 
 /** wa.me link for a phone number, or null when it has no digits. */
 export const whatsappLink = (phone: string | null) => {
