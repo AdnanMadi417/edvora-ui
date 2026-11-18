@@ -356,7 +356,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
   "PipelineFlow": {
     category: "data",
     imports: ['import { PipelineFlow } from "components/ub/dashboard";'],
-    useFor: "The one application pipeline: stages in workflow order with count, share and an Action needed badge. Columns from 1024px, a list below (or layout=\"list\" in narrow cards). Filter with onSelect or link with getHref.",
+    useFor: "The one application pipeline: stages in workflow order with count and share, as StatTiles from 1024px and a list below (or layout=\"list\" in narrow cards). No per-stage colours or badges. Filter with onSelect or link with getHref.",
     usedIn: ["Applications pages (admin, account manager, Advisor) via PipelineCard", "Role home pipeline (OverviewVisual)"],
     avoid: "A one-line stage summary inside another card: use PipelineBar.",
   },

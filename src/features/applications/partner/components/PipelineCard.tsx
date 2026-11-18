@@ -2,7 +2,6 @@
 
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import PipelineFlow from "components/ub/dashboard/pipeline/PipelineFlow";
-import { getApiStageTagId } from "config/applicationStages";
 import { stageLabel } from "config/statusLabels";
 
 export interface PipelineStage {
@@ -34,7 +33,6 @@ export const isCommissionStage = (stage: PipelineStage) =>
 export default function PipelineCard({
   stages,
   stageCounts,
-  stageActionRequired,
   selectedId,
   onSelect,
   loading,
@@ -57,8 +55,6 @@ export default function PipelineCard({
               id: stage.id,
               label: stageLabel(stage.code ?? stage.name),
               count: stageCounts[stage.id] || 0,
-              stageId: getApiStageTagId(stage),
-              attention: Boolean(stageActionRequired[stage.id]),
             }))}
             selectedId={selectedId}
             onSelect={onSelect}

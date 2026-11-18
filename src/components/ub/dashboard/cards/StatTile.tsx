@@ -27,8 +27,18 @@ export interface StatTileProps {
   state?: "ready" | "loading" | "error";
   errorMessage?: string;
   onRetry?: () => void;
-  /** Heading level of the label. */
+  /** Heading level of the label (ignored when the tile is a button). */
   as?: "h2" | "h3" | "h4";
+  /** Lines the label may take on wider screens (phones always allow 2). */
+  labelLines?: 1 | 2;
+  /** Replaces the icon slot, e.g. a pipeline stage's numbered ring. */
+  media?: ReactNode;
+  /** Makes the whole tile a toggle button (e.g. filter a table by this stage); no footer link then. */
+  onClick?: () => void;
+  /** With onClick: whether the toggle is on (selected styling, aria-pressed). */
+  pressed?: boolean;
+  /** With onClick: the button's accessible name; defaults to the label. */
+  ariaLabel?: string;
   className?: string;
 }
 
@@ -50,8 +60,16 @@ export default function StatTile({
   errorMessage = "Couldn't load this number.",
   onRetry,
   as: Heading = "h3",
+  labelLines = 1,
+  media,
+  onClick,
+  pressed = false,
+  ariaLabel,
   className,
 }: StatTileProps) {
+  const button = Boolean(onClick);
+  // A heading or block element isn't allowed inside a button, so a button tile uses spans.
+  const Label = button ? "span" : Heading;
   const footerBody = (
     <>
       <span className="line-clamp-2 min-w-0 flex-1 break-words text-ub-body-sm text-ub-text-secondary sm:line-clamp-1">
@@ -63,47 +81,64 @@ export default function StatTile({
   );
   const footerClass = "flex min-h-11 items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4";
 
-  return (
-    <section
-      aria-busy={state === "loading" || undefined}
-      data-ub-stat-tile
-      className={clsx("flex min-w-0 flex-col rounded-ub-lg border border-ub-border bg-ub-surface-subtle p-1.5", className)}
-    >
-      <div className="flex min-w-0 items-start justify-between gap-3 rounded-ub-md border border-ub-border bg-ub-surface p-3 sm:p-4">
-        <div className="min-w-0 flex-1">
-          <Heading className="line-clamp-2 break-words text-ub-label-md text-ub-text-secondary sm:line-clamp-1" title={label}>
+  const tray = clsx(
+    "flex min-w-0 flex-col rounded-ub-lg border p-1.5 text-start",
+    pressed ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface-subtle",
+    button && [
+      "w-full transition-colors duration-ub-base motion-reduce:transition-none",
+      !pressed && "hover:border-ub-border-hover",
+      focusRing,
+    ],
+    className
+  );
+  const content = (
+    <>
+      <span className="flex min-w-0 flex-1 items-start justify-between gap-3 rounded-ub-md border border-ub-border bg-ub-surface p-3 sm:p-4">
+        <span className="block min-w-0 flex-1">
+          <Label className={clsx("line-clamp-2 block break-words text-ub-label-md text-ub-text-secondary", labelLines === 1 && "sm:line-clamp-1")} title={label}>
             {label}
-          </Heading>
+          </Label>
           {state === "loading" ? (
             <Skeleton className="mt-2 h-8 w-24" />
           ) : state === "error" ? (
-            <p role="alert" className="mt-2 text-ub-body-sm text-ub-tone-danger-text">
+            <span role="alert" className="mt-2 block text-ub-body-sm text-ub-tone-danger-text">
               {errorMessage}{" "}
               {onRetry && (
                 <button type="button" onClick={onRetry} className={`min-h-11 rounded-ub-xs text-ub-label-sm text-ub-text-link underline ${focusRing}`}>
                   Try again
                 </button>
               )}
-            </p>
+            </span>
           ) : (
-            <p className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
               <span className="ub-tabular text-ub-data-lg text-ub-text-primary">{value}</span>
               {delta && <DeltaPill {...delta} />}
-            </p>
+            </span>
           )}
-        </div>
-        {/* Phones in a 2×2 grid need the room for the label and value. */}
-        {icon && <IconTile icon={icon} tone={iconTone} size="md" className="hidden sm:grid" />}
-      </div>
+        </span>
+        {media ??
+          /* Phones in a 2×2 grid need the room for the label and value. */
+          (icon && <IconTile icon={icon} tone={iconTone} size="md" className="hidden sm:grid" />)}
+      </span>
 
       {(footer || href) &&
-        (href ? (
+        (href && !button ? (
           <Link href={href} aria-label={linkLabel ?? `Open ${label}`} className={clsx("group rounded-ub-md hover:text-ub-text-primary", footerClass, focusRing)}>
             {footerBody}
           </Link>
         ) : (
-          <div className={footerClass}>{footerBody}</div>
+          <span className={footerClass}>{footerBody}</span>
         ))}
+    </>
+  );
+
+  return button ? (
+    <button type="button" data-ub-stat-tile aria-pressed={pressed} aria-label={ariaLabel ?? label} onClick={onClick} className={tray}>
+      {content}
+    </button>
+  ) : (
+    <section aria-busy={state === "loading" || undefined} data-ub-stat-tile className={tray}>
+      {content}
     </section>
   );
 }

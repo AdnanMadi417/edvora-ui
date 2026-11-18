@@ -55,7 +55,6 @@ export default function OverviewVisual({
             id: stage.key,
             label: stage.label,
             count: stage.value,
-            stageId: stage.stageId,
           }))}
           // Each stage opens the Application Tracker filtered to it.
           getHref={(stage) => `${pipeline.href}?stage=${encodeURIComponent(stage.id)}`}

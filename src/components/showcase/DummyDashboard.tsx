@@ -106,11 +106,11 @@ const HOURS = ["9am", "10", "11", "12pm", "1", "2", "3", "4", "5"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const UPLOADS = DAYS.map((_, d) => HOURS.map((_, h) => (d > 4 ? Math.max(0, ((h * 3 + d) % 4) - 1) : ((d + 1) * (h + 2) * 7) % 13)));
 const FLOW = [
-  { id: "review", label: "Unibexs review", count: 1, stageId: "documents-pending", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "review", label: "Unibexs review", count: 1, stageId: "documents-pending" },
   { id: "offer", label: "University and offer", count: 2, stageId: "offer-received" },
-  { id: "visa", label: "Visa", count: 2, stageId: "visa-in-progress", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "visa", label: "Visa", count: 2, stageId: "visa-in-progress" },
   { id: "arrival", label: "Arrival and enrollment", count: 2, stageId: "arrival-logistics" },
-  { id: "commission", label: "Commission", count: 3, stageId: "commission-paid", badge: { label: "Payout", tone: "success" as const } },
+  { id: "commission", label: "Commission", count: 3, stageId: "commission-paid" },
 ];
 const COUNTS = { "documents-pending": 1, "offer-received": 2, "visa-in-progress": 2, "arrival-logistics": 2, "commission-paid": 3 };
 
