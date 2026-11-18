@@ -1,35 +1,44 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import DaysTag from "components/ub/data/badges/DaysTag";
+import ListRow, { RowAvatar } from "./ListRow";
 import IconTile, { type IconTileTone } from "../shared/IconTile";
 import WidgetStatus, { resolveWidgetState } from "../shared/WidgetStatus";
 import type { IconComponent, WidgetStateProps } from "../types";
 
 export interface TaskListItemProps {
   title: ReactNode;
-  /** Second line: student, reference or Institution. */
+  /** Second line: student, reference or Institution. Never a sentence. */
   meta?: ReactNode;
+  /** A person or student: their avatar leads the row (wins over `icon`). */
+  avatar?: { name: string; src?: string | null };
   icon?: IconComponent;
   iconTone?: IconTileTone;
+  /** Status tag next to the title. */
+  status?: string;
+  statusLabel?: string;
   /** Days until due (negative = overdue) → Days tag. */
   dueInDays?: number | null;
-  /** End-side action: a small secondary Button or TextButton. */
+  /** Days it has waited → "Waiting N days". */
+  waitingDays?: number | null;
+  /** End-side action: one verb + object TextButton. */
   action?: ReactNode;
   className?: string;
 }
 
-/** One task: icon tile, title, meta, due Days tag and an optional action. */
-export function TaskListItem({ title, meta, icon, iconTone = "brand", dueInDays, action, className }: TaskListItemProps) {
+/** One task, in the shared row: avatar or icon tile · title + status tag · meta · days tag · action. */
+export function TaskListItem({ title, meta, avatar, icon, iconTone = "brand", status, statusLabel, dueInDays, waitingDays, action, className }: TaskListItemProps) {
   return (
-    <li className={clsx("flex items-center gap-3 py-3 first:pt-0 last:pb-0", className)}>
-      {icon && <IconTile icon={icon} tone={iconTone} size="sm" />}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-ub-label-md text-ub-text-primary">{title}</p>
-        {meta && <p className="truncate text-ub-caption text-ub-text-tertiary">{meta}</p>}
-      </div>
-      {typeof dueInDays === "number" && <DaysTag mode="deadline" days={dueInDays} size="sm" />}
-      {action && <div className="shrink-0">{action}</div>}
-    </li>
+    <ListRow
+      leading={avatar ? <RowAvatar name={avatar.name} src={avatar.src} /> : icon ? <IconTile icon={icon} tone={iconTone} size="sm" /> : undefined}
+      title={title}
+      status={status}
+      statusLabel={statusLabel}
+      meta={meta}
+      dueInDays={dueInDays}
+      waitingDays={waitingDays}
+      action={action}
+      className={className}
+    />
   );
 }
 

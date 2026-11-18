@@ -123,6 +123,55 @@ export function statusLabel(codeOrName: string | null | undefined): string {
   return (code && STATUS_LABELS[code]) || codeOrName;
 }
 
+/**
+ * The one button on a work-list row: verb + object for the status that's
+ * waiting on someone ("Review eVAL", "Upload e-Visa"). Same status, same words,
+ * on every role. Statuses with nothing to do fall back to "Open application".
+ */
+export const NEXT_ACTION_LABELS: Record<string, string> = {
+  // Advisor
+  CORRECTION_REQUESTED: "Fix documents",
+  UNI_REQ_CORRECTIONS: "Fix documents",
+  PROGRAM_CHANGE_SUGGESTED: "Review program change",
+  WAITING_FOR_PAYMENT: "Upload payment",
+  PAYMENT_REJECTED: "Re-upload payment",
+  APPLICATION_FORM_REJECTED: "Re-upload form",
+  APPLICATION_FORM_2_REJECTED: "Re-upload form",
+  HEALTH_DECLARATION_REJECTED: "Re-upload form",
+  SIGNED_OFFER_LETTER_REJECTED: "Re-upload offer letter",
+  ENGLISH_FORM_REJECTED: "Re-upload form",
+  VISA_DOCUMENTS_REUPLOAD_REQUIRED: "Re-upload visa documents",
+  IMMIGRATION_REQUESTED_DOCUMENTS: "Upload documents",
+  EVAL_READY: "Upload eVAL",
+  EVAL_PARTNER_UPLOAD: "Upload eVAL",
+  EVAL_REUPLOAD_REQUIRED: "Re-upload eVAL",
+  WAITING_PARTNER_CONFIRM_ARRIVAL_DATE: "Confirm arrival date",
+  E_VISA_REQUIRED: "Upload e-Visa",
+  E_VISA_PARTNER_UPLOAD: "Upload e-Visa",
+  E_VISA_REUPLOAD_REQUIRED: "Re-upload e-Visa",
+  ARRIVAL_EXTRA_DOCS_REQUIRED: "Upload arrival documents",
+  ARRIVAL_EXTRA_DOCS_UPLOAD: "Upload arrival documents",
+  ARRIVAL_EXTRA_DOCS_REUPLOAD: "Re-upload arrival documents",
+  COMMISSION_PAID: "Confirm receipt",
+  DISPUTE_RESPONSE_RECEIVED: "Review response",
+  // Unibexs staff
+  NEW: "Review application",
+  UNDER_REVIEW: "Review application",
+  PAYMENT_SUBMITTED: "Review payment",
+  VISA_DOCUMENTS_UNDER_REVIEW: "Review visa documents",
+  EVAL_UNDER_REVIEW: "Review eVAL",
+  E_VISA_UNDER_REVIEW: "Review e-Visa",
+  ARRIVAL_CONFIRMED: "Verify enrollment",
+  ARRIVAL_EXTRA_DOCS_UNDER_REVIEW: "Review arrival documents",
+  DISPUTE_ISSUE_RECEIVED: "Review dispute",
+};
+
+export function nextActionLabel(codeOrName: string | null | undefined): string {
+  if (!codeOrName) return "Open application";
+  const code = STATUS_BY_KEY.get(key(codeOrName));
+  return (code && NEXT_ACTION_LABELS[code]) || "Open application";
+}
+
 // Backend names inside sentences ("moved the application to Correction Requested by
 // Account Manager"), longest first so a shorter name never matches inside a longer one.
 const NAME_SWAPS: [RegExp, string][] = (() => {

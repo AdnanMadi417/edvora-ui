@@ -490,6 +490,7 @@ export default function DashboardWidgets() {
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <DashboardCard title="Due this week" actions={<CardLinkButton href="#" label="Open all tasks" />}>
             <TaskList label="Due this week" count={4} state={pick(listState)} onRetry={() => setListState("ready")}>
+              <TaskListItem avatar={{ name: "Nadia Rahman" }} title="Nadia Rahman" status="Upload EMGS eval" statusLabel="eVAL to upload" meta="INTI International University" waitingDays={6} action={<TextButton size="sm">Upload eVAL</TextButton>} />
               <TaskListItem icon={FileUp} title="Upload signed offer letter" meta="Nur Aisyah Binti Kamal · UBX-2026-0412" dueInDays={2} action={<TextButton size="sm">Open</TextButton>} />
               <TaskListItem icon={Wallet} iconTone="warning" title="Pay visa fee" meta="Chinedu Okafor · RM2,450" dueInDays={0} action={<TextButton size="sm">Pay</TextButton>} />
               <TaskListItem icon={Plane} iconTone="neutral" title="Confirm arrival date" meta="Tanvir Hossain · Taylor's University" dueInDays={9} />

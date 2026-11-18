@@ -360,6 +360,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Admin and reviewer Advisors: active, suspended, company, individual"],
     avoid: "Parts that add up to the whole and nothing else (use DonutStatsCard), or more than five measures.",
   },
+  ListRow: {
+    category: "data",
+    imports: ['import ListRow from "components/ub/dashboard/lists/ListRow";'],
+    useFor: "The one dashboard list row behind TaskListItem and PeopleListItem: avatar · name + status tag · one short line · days tag · one verb + object action on the end (wraps under the text on phones).",
+    usedIn: ["Every role home list (tasks, advisors, registrations, payouts, catalogue)"],
+    avoid: "Description sentences in rows, or more than one action: open the item for more.",
+  },
   SegmentedBars: {
     category: "data",
     imports: ['import { SegmentedBars } from "components/ub/dashboard";'],

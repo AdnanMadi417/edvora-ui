@@ -2,7 +2,8 @@ import React from "react";
 import { CalendarClock, Clock } from "lucide-react";
 import Tag, { type TagHue, type TagSize } from "components/ub/data/badges/Tag";
 
-export type DaysTagMode = "inStage" | "deadline";
+export type DaysTagMode = "inStage" | "waiting" | "deadline";
+/** "waiting": days something has waited on someone (same thresholds as inStage). */
 export type DaysLevel = "grey" | "amber" | "orange" | "red";
 
 /**
@@ -24,7 +25,7 @@ export type DaysTagThresholds = {
 
 /** Pure: urgency level for a day count. `days` for deadlines is days remaining (negative = overdue). */
 export function getDaysLevel(mode: DaysTagMode, days: number, thresholds: DaysTagThresholds = DAYS_TAG_THRESHOLDS): DaysLevel {
-  if (mode === "inStage") {
+  if (mode === "inStage" || mode === "waiting") {
     const t = thresholds.inStage;
     if (days >= t.redFrom) return "red";
     if (days >= t.orangeFrom) return "orange";
@@ -43,6 +44,7 @@ const plural = (n: number) => `${n} ${n === 1 ? "day" : "days"}`;
 /** Pure: "5 days in stage", "Due in 3 days", "Due today", "Overdue by 2 days". */
 export function getDaysLabel(mode: DaysTagMode, days: number): string {
   if (mode === "inStage") return `${plural(Math.max(0, days))} in stage`;
+  if (mode === "waiting") return `Waiting ${plural(Math.max(0, days))}`;
   if (days === 0) return "Due today";
   if (days > 0) return `Due in ${plural(days)}`;
   return `Overdue by ${plural(Math.abs(days))}`;
@@ -63,7 +65,7 @@ export interface DaysTagProps {
 export default function DaysTag({ mode, days, size, thresholds, className }: DaysTagProps) {
   const whole = Math.trunc(days);
   const level = getDaysLevel(mode, whole, thresholds);
-  const Icon = mode === "inStage" ? Clock : CalendarClock;
+  const Icon = mode === "deadline" ? CalendarClock : Clock;
   return (
     <Tag hue={LEVEL_HUE[level]} size={size} icon={<Icon />} data-level={level} className={`ub-tabular ${className ?? ""}`}>
       {getDaysLabel(mode, whole)}

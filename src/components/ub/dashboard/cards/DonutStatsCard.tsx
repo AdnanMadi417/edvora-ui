@@ -117,9 +117,9 @@ export default function DonutStatsCard({
       bodyProps={views.length > 1 && view ? tabPanelProps(prefix, view.id) : undefined}
     >
       {view && (
-        <div className="grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-6">
+        <div className="grid items-center gap-5">
           <DonutChart
-            className="sm:w-44"
+            className="w-44"
             segments={slices.map((s): DonutSegment => ({ key: s.key, label: s.label, value: s.value, color: s.color }))}
             centerLabel={view.centerLabel}
             centerValue={formatValue(viewTotal)}

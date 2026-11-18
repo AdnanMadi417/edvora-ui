@@ -1,35 +1,37 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import Avatar from "components/ub/data/media/Avatar";
-import StatusTag from "../shared/StatusTag";
+import ListRow, { RowAvatar } from "./ListRow";
 import WidgetStatus, { resolveWidgetState } from "../shared/WidgetStatus";
 import type { WidgetStateProps } from "../types";
 
 export interface PeopleListItemProps {
   name: string;
   avatarSrc?: string | null;
-  /** What they're working on, e.g. "Reviewing 4 applications". */
+  /** One short line: type, country, current work. Never a sentence. */
   work?: ReactNode;
-  /** Stage id or status for the tag. */
+  /** Status for the tag next to the name. */
   status?: string;
   statusLabel?: string;
-  /** End-side action, e.g. a CardLinkButton. */
+  /** Days it has waited (e.g. a profile awaiting review). */
+  waitingDays?: number | null;
+  /** End-side action: one verb + object TextButton. */
   action?: ReactNode;
   className?: string;
 }
 
-/** Avatar, name, current work and a status tag. */
-export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, action, className }: PeopleListItemProps) {
+/** A person, in the shared row: avatar · name + status tag · one line · days tag · action. */
+export function PeopleListItem({ name, avatarSrc, work, status, statusLabel, waitingDays, action, className }: PeopleListItemProps) {
   return (
-    <li className={clsx("flex items-center gap-3 py-3 first:pt-0 last:pb-0", className)}>
-      <Avatar name={name} src={avatarSrc} size={40} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-ub-label-md text-ub-text-primary">{name}</p>
-        {work && <p className="truncate text-ub-caption text-ub-text-tertiary">{work}</p>}
-      </div>
-      {status && <StatusTag status={status} label={statusLabel} />}
-      {action && <div className="shrink-0">{action}</div>}
-    </li>
+    <ListRow
+      leading={<RowAvatar name={name} src={avatarSrc} />}
+      title={name}
+      status={status}
+      statusLabel={statusLabel}
+      meta={work}
+      waitingDays={waitingDays}
+      action={action}
+      className={className}
+    />
   );
 }
 
