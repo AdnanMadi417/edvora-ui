@@ -4,6 +4,7 @@ import PeopleList, {
   PeopleListItem,
 } from "components/ub/dashboard/lists/PeopleList";
 import TaskList, { TaskListItem } from "components/ub/dashboard/lists/TaskList";
+import AvatarStrip from "components/ub/dashboard/lists/AvatarStrip";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import Timeline from "components/ub/data/display/Timeline";
 import AppDate from "components/ub/data/formatting/AppDate";
@@ -20,7 +21,24 @@ export default function OverviewItems({
   title: string;
   items: OverviewItem[];
 }) {
-  if (["reviews", "advisors", "registrations"].includes(resourceId)) {
+  // Advisors as a row of avatars with their status circle, each opening the profile.
+  if (resourceId === "reviews" || resourceId === "advisors") {
+    return (
+      <AvatarStrip
+        label={title}
+        people={items.map((item) => ({
+          id: item.id,
+          name: item.title,
+          subtitle: item.description,
+          status: resourceId === "reviews" ? "unverified" : item.status,
+          statusLabel: resourceId === "reviews" ? "Awaiting review" : item.statusLabel,
+          href: item.href,
+          ariaLabel: `Open advisor: ${item.title}`,
+        }))}
+      />
+    );
+  }
+  if (resourceId === "registrations") {
     return (
       <PeopleList count={items.length} label={title}>
         {items.map((item) => (

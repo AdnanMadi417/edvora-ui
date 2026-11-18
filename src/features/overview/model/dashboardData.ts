@@ -86,6 +86,52 @@ export function groupUniversityCommission(
       a.currency.localeCompare(b.currency)
   );
 }
+export interface PaidMonth {
+  /** yyyy-mm */
+  month: string;
+  currency: string;
+  amount: number;
+}
+/**
+ * Paid commission per month and currency, from the settled records' last fact
+ * date (the payout). Months between the first and last are filled with 0 so
+ * the line is continuous; at most the last 12 months. Currencies stay apart.
+ */
+export function groupPaidByMonth(items: (CommissionQueueItem | PartnerStatementItem)[], admin: boolean): PaidMonth[] {
+  const sums = new Map<string, number>();
+  const months = new Map<string, Set<string>>();
+  for (const item of items) {
+    if (item.waiting_on !== "nobody") continue;
+    const actual = admin && "paid_amount" in item;
+    const amount = actual ? (item as CommissionQueueItem).paid_amount : item.commission_amount;
+    if (typeof amount !== "number" || !Number.isFinite(amount)) continue;
+    const currency = ((actual ? (item as CommissionQueueItem).paid_currency : item.commission_currency) ?? "").trim().toUpperCase() || "Unspecified";
+    const date = ("since_date" in item && item.since_date) || ("last_fact_date" in item && item.last_fact_date) || ("created_at" in item && item.created_at);
+    const month = typeof date === "string" ? date.slice(0, 7) : "";
+    if (!/^\d{4}-\d{2}$/.test(month)) continue;
+    sums.set(`${currency}|${month}`, (sums.get(`${currency}|${month}`) ?? 0) + amount);
+    if (!months.has(currency)) months.set(currency, new Set());
+    months.get(currency)!.add(month);
+  }
+  const out: PaidMonth[] = [];
+  for (const [currency, set] of months) {
+    const sorted = [...set].sort();
+    let [y, m] = sorted[0].split("-").map(Number);
+    const [ly, lm] = sorted[sorted.length - 1].split("-").map(Number);
+    const series: PaidMonth[] = [];
+    while (y < ly || (y === ly && m <= lm)) {
+      const month = `${y}-${String(m).padStart(2, "0")}`;
+      series.push({ month, currency, amount: sums.get(`${currency}|${month}`) ?? 0 });
+      m += 1;
+      if (m > 12) {
+        m = 1;
+        y += 1;
+      }
+    }
+    out.push(...series.slice(-12));
+  }
+  return out;
+}
 /** Fetch all pages before calculating totals. A failed or inconsistent page cannot become a partial total. */
 export async function completeCollection(
   load: (page: number) => Promise<{ data: any }>

@@ -9,6 +9,7 @@ import { commissionsApi } from "features/applications/payouts/services/commissio
 import { statementApi } from "features/partners/statement/services/statementApi";
 import {
   completeCollection,
+  groupPaidByMonth,
   groupUniversityCommission,
 } from "../model/dashboardData";
 import type {
@@ -82,8 +83,15 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
                 normalize(item.status) !== "commission_ready")
             : staffActions.has(normalize(item.status))
         );
+        // Every active application per university, for the home split (same scope as the pipeline).
+        const perUniversity = new Map<string, number>();
+        for (const row of rows) {
+          const name = row.university_name?.trim() || "University unavailable";
+          perUniversity.set(name, (perUniversity.get(name) ?? 0) + 1);
+        }
         return {
           total: actionable.length,
+          byUniversity: [...perUniversity].map(([label, value]) => ({ key: label, label, value })),
           items: actionable.slice(0, 6).map(
             (item): OverviewItem => ({
               id: item.id,
@@ -143,6 +151,7 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
           total: rows.length,
           items: [],
           universityCommission: groupUniversityCommission(rows, admin),
+          paidByMonth: groupPaidByMonth(rows, admin),
           universities: universities.map((item) => ({
             id: item.id,
             name: item.name,

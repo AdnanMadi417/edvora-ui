@@ -1,18 +1,21 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import StatTile from "components/ub/dashboard/cards/StatTile";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
-import { focusRing } from "components/ub/recipes";
 import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
 import CommissionStatusChart from "./CommissionStatusChart";
 import { useRoleOverview } from "../hooks/useRoleOverview";
-import { metricCaptions, metricIcons, metricLabels, overviewConfig } from "../model/overviewConfig";
+import {
+  metricCaptions,
+  metricIcons,
+  metricLabels,
+  overviewConfig,
+} from "../model/overviewConfig";
 import type { OverviewResource, OverviewRole } from "../model/types";
 const HIDE_WHEN_ZERO = new Set(["hold", "hiddenPrograms", "unread"]);
 const GRID_COLS = [
@@ -97,28 +100,27 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           <CardLinkButton href={plan.href} label={`View all: ${plan.title}`} />
         }
         footer={
-          state === "ready" && items.length ? (
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-ub-caption text-ub-text-tertiary">
-                Showing {displayedItems.length} of{" "}
-                {resource?.data?.total.toLocaleString()}
-              </p>
-              {items.length > 3 && (
-                <button
-                  type="button"
-                  className="min-h-11 text-ub-label-sm text-ub-text-link hover:underline"
-                  onClick={() =>
-                    setExpandedPanels((previous) => ({
-                      ...previous,
-                      [id]: !previous[id],
-                    }))
+          state === "ready" && items.length
+            ? // No "Showing x of y": the count is the KPI above.
+              items.length > 3 && (
+                <div className="flex justify-end">
+                  {
+                    <button
+                      type="button"
+                      className="min-h-11 text-ub-label-sm text-ub-text-link hover:underline"
+                      onClick={() =>
+                        setExpandedPanels((previous) => ({
+                          ...previous,
+                          [id]: !previous[id],
+                        }))
+                      }
+                    >
+                      {expandedPanels[id] ? "Show fewer" : "Show more"}
+                    </button>
                   }
-                >
-                  {expandedPanels[id] ? "Show fewer" : "Show more"}
-                </button>
-              )}
-            </div>
-          ) : undefined
+                </div>
+              )
+            : undefined
         }
       >
         <OverviewItems
@@ -130,13 +132,6 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
     );
   };
   const secondary = config.panels.slice(1).filter(visible);
-  const shortcuts = config.actions.slice(1);
-  if (context.agencyAdmin)
-    shortcuts.sort(
-      (a, b) =>
-        Number(b.href.endsWith("/team-members")) -
-        Number(a.href.endsWith("/team-members"))
-    );
 
   const canSeeUniversityCommission =
     role === "admin" || (role === "partner" && context.canViewCommission);
@@ -246,38 +241,9 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           )}
         </section>
         <aside
-          aria-label="Dashboard activity and shortcuts"
-          className="grid min-w-0 items-start gap-4 lg:grid-cols-2 min-[1600px]:grid-cols-1"
+          aria-label="Recent activity"
+          className="grid min-w-0 items-start gap-4"
         >
-          <DashboardCard title="Shortcuts" as="h2">
-            <nav
-              aria-label="Dashboard shortcuts"
-              className="flex flex-col divide-y divide-ub-border"
-            >
-              {shortcuts.slice(0, 3).map((action) => (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className={`flex min-w-0 items-start gap-3 rounded-ub-sm py-3 first:pt-0 last:pb-0 hover:text-ub-text-link ${focusRing}`}
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg">
-                    <action.icon
-                      aria-hidden="true"
-                      className="h-4 w-4 text-ub-tone-brand-text"
-                    />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-ub-label-md text-ub-text-primary">
-                      {action.label}
-                    </span>
-                    <span className="mt-1 block text-ub-caption text-ub-text-secondary">
-                      {action.description}
-                    </span>
-                  </span>
-                </Link>
-              ))}
-            </nav>
-          </DashboardCard>
           {panel("updates")}
         </aside>
       </div>

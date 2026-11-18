@@ -4,7 +4,7 @@ import { RefreshCw } from "lucide-react";
 import GaugeCard from "components/ub/dashboard/cards/GaugeCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
-import PipelineFlow from "components/ub/dashboard/pipeline/PipelineFlow";
+import DonutStatsCard from "components/ub/dashboard/cards/DonutStatsCard";
 import type {
   OverviewResource,
   OverviewRole,
@@ -26,40 +26,39 @@ export default function OverviewVisual({
   if (pipeline) {
     const resource = resources.pipeline;
     const distribution = resource?.data?.distribution ?? [];
-    const state =
-      resource?.state === "ready" && !resource.data?.total
-        ? "empty"
-        : resource?.state ?? "loading";
+    const universities = resources.actionRequired?.state === "ready" ? resources.actionRequired.data?.byUniversity : undefined;
+    const stageTotal = distribution.reduce((sum, stage) => sum + stage.value, 0);
+    const universityTotal = universities?.reduce((sum, u) => sum + u.value, 0);
+    // Dev-only: every count on the home must agree (pipeline total = list total).
+    if (process.env.NODE_ENV !== "production" && resource?.state === "ready" && universityTotal != null && universityTotal !== stageTotal)
+      console.warn(`[overview] Applications by stage (${stageTotal}) and by university (${universityTotal}) disagree.`);
     return (
-      <DashboardCard
-        className="h-full"
+      <DonutStatsCard
         title={pipeline.title}
         subtitle={pipeline.subtitle}
-        as="h2"
-        skeleton="list"
-        state={state}
+        state={resource?.state ?? "loading"}
         emptyMessage={pipeline.emptyMessage}
         errorMessage={resource?.error}
         onRetry={onRetry}
-        actions={
-          <CardLinkButton
-            href={pipeline.href}
-            label="Open application tracker"
-          />
-        }
-      >
-        <PipelineFlow
-          layout="list"
-          label="Applications by stage"
-          stages={distribution.map((stage) => ({
-            id: stage.key,
-            label: stage.label,
-            count: stage.value,
-          }))}
-          // Each stage opens the Application Tracker filtered to it.
-          getHref={(stage) => `${pipeline.href}?stage=${encodeURIComponent(stage.id)}`}
-        />
-      </DashboardCard>
+        actions={<CardLinkButton href={pipeline.href} label="Open application tracker" />}
+        views={[
+          {
+            id: "stage",
+            label: "By stage",
+            centerLabel: "Active applications",
+            // Each stage opens the Application Tracker filtered to it.
+            items: distribution.map((stage) => ({
+              key: stage.key,
+              label: stage.label,
+              value: stage.value,
+              href: `${pipeline.href}?stage=${encodeURIComponent(stage.key)}`,
+            })),
+          },
+          ...(universities?.length
+            ? [{ id: "university", label: "By university", centerLabel: "Active applications", items: universities }]
+            : []),
+        ]}
+      />
     );
   }
   if (role === "data_entry") {

@@ -26,9 +26,13 @@ export interface OverviewItem {
 }
 export interface OverviewData {
   universityCommission?: import("./dashboardData").UniversityCommission[];
+  /** Paid commission per month and currency (settled records). */
+  paidByMonth?: import("./dashboardData").PaidMonth[];
   universities?: { id: string; name: string; logo_file_key?: string }[];
   total: number;
   items: OverviewItem[];
+  /** Active applications per university (same rows as the stage totals). */
+  byUniversity?: { key: string; label: string; value: number }[];
   distribution?: {
     key: string;
     label: string;

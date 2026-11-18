@@ -48,7 +48,7 @@ it("hides university commission and team shortcuts from restricted advisor membe
   ).toBeInTheDocument();
 });
 
-it("gives agency owners a team shortcut alongside their financial overview", () => {
+it("shows agency owners their financial overview, with no shortcuts that repeat the sidebar", () => {
   mockContext = {
     role: "partner",
     partnerId: "p1",
@@ -57,9 +57,9 @@ it("gives agency owners a team shortcut alongside their financial overview", () 
     canCreateApplication: true,
   };
   render(<RoleOverview role="partner" />);
-  expect(
-    screen.getByRole("link", { name: /manage your team/i })
-  ).toHaveAttribute("href", "/partner/team-members");
+  // Team, Applications and the Knowledge Hub are in the sidebar; Home doesn't repeat them.
+  expect(screen.queryByRole("heading", { name: "Shortcuts" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: /manage your team/i })).not.toBeInTheDocument();
   expect(
     screen.getByRole("heading", { name: "Commission overview" })
   ).toBeInTheDocument();

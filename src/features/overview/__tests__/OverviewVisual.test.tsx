@@ -108,9 +108,11 @@ test("pipeline displays API counts and stage names", () => {
   // One view only: the pipeline, with no Bars/Pipeline switch.
   expect(screen.queryByRole("tab")).not.toBeInTheDocument();
   expect(
-    screen.getByRole("list", { name: "Applications by stage" })
+    screen.getByRole("list", { name: "By stage, 50 in total" })
   ).toHaveTextContent("50");
   expect(screen.getByText("Institution Review")).toBeInTheDocument();
+  // Each stage opens the tracker filtered to it.
+  expect(screen.getByRole("link", { name: /^Institution Review: 50, 100%$/ })).toHaveAttribute("href", "/admin/applications?stage=stage");
   expect(
     screen.getByRole("link", { name: "Open application tracker" })
   ).toHaveAttribute("href", "/admin/applications");

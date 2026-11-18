@@ -6,6 +6,7 @@ import { unibexsVoice } from "lib/unibexsVoice";
 import { relabelText, stageLabel, statusLabel } from "config/statusLabels";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
+import { getSenderName } from "features/notifications/utils/notificationIcons";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
 import { programApi } from "features/programs/services/programApi";
 import { universityApi } from "features/universities/services/universityApi";
@@ -474,7 +475,8 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
         items: data.items
           .map((item) => ({
             id: item.id,
-            title: say(item.title),
+            // Every item names who did it ("Unibexs moved…"), the same sender as the Notifications page.
+            title: say(`${getSenderName(item, { forAdvisor: role === "partner" })} ${item.title}`),
             description: say(item.body),
             at: item.created_at,
             href: `${base}/notifications`,

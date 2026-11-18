@@ -38,7 +38,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
-        metrics: ["actionRequired", "active", "reviews", "commission"],
+        // Active and payouts live in the pipeline and commission cards; KPIs carry only numbers shown nowhere else.
+        metrics: ["actionRequired", "reviews", "hold", "unread"],
         panels: ["actionRequired", "reviews", "commission"],
         actions: [
           action(
@@ -64,7 +65,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your work overview",
         subtitle:
           "Follow up on applications and support your assigned advisors.",
-        metrics: ["actionRequired", "active", "hold", "advisors"],
+        metrics: ["actionRequired", "advisors", "hold", "unread"],
         panels: ["actionRequired", "hold", "advisors"],
         actions: [
           action(
@@ -88,7 +89,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Review overview",
         subtitle: "Review advisor profiles and monitor registration progress.",
-        metrics: ["reviews", "registrations", "verified", "managers"],
+        // Verified and awaiting review are in the verification gauge.
+        metrics: ["registrations", "managers", "unread"],
         panels: ["reviews", "registrations"],
         actions: [
           action(
@@ -112,12 +114,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Catalogue overview",
         subtitle: "Maintain accurate program and university information.",
-        metrics: [
-          "catalogueQuality",
-          "programs",
-          "institutions",
-          "languageCenters",
-        ],
+        // Records to complete is in the catalogue completeness gauge.
+        metrics: ["programs", "institutions", "languageCenters"],
         panels: ["catalogueQuality", "hiddenPrograms", "languageCenters"],
         actions: [
           action(
@@ -151,12 +149,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Your advisor overview",
         subtitle: "Stay on top of your students, applications and next steps.",
-        metrics: [
-          "actionRequired",
-          "active",
-          "offers",
-          ...(context.canViewCommission ? ["commission"] : []),
-        ],
+        // Active, offer and payout figures are in the pipeline and commission cards.
+        metrics: ["actionRequired", "hold", "unread"],
         panels: ["actionRequired", "hold"],
         actions: [
           ...(context.canCreateApplication
@@ -221,7 +215,7 @@ export const metricLabels: Record<string, string> = {
   languageCenters: "Language centers",
   verified: "Verified advisors",
   active: "Active applications",
-  hold: "Applications on hold",
+  hold: "On hold",
   reviews: "Advisors awaiting review",
   commission: "Awaiting payout",
   advisors: "Active advisors",
