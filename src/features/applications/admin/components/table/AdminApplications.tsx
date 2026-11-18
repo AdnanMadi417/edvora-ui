@@ -1,7 +1,7 @@
 import { tableSectionPadding } from "components/ub/recipes";
 import Card from "components/ub/data/cards/Card";
 import React, { useState, useMemo, useEffect } from "react";
-import { useStageParam } from "features/applications/hooks/useStageParam";
+import { useLifecycleParam, useStageParam } from "features/applications/hooks/useStageParam";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
@@ -67,6 +67,11 @@ const ModernApplicationsTable = () => {
   const [selectedLifecycle, setSelectedLifecycle] = useState<
     "active" | "hold" | "cancel" | "all"
   >("active");
+  // ?lifecycle=hold from a link (the home's On hold tile) opens the list on that lifecycle.
+  useLifecycleParam((value) => {
+    setSelectedLifecycle(value);
+    setCurrentPage(1);
+  });
 
   useEffect(() => {
     const t = setTimeout(() => {

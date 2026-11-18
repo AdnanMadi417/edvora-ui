@@ -7,8 +7,8 @@ const ready = (total: number): OverviewResource => ({
   data: { total, items: [] },
 });
 const retry = jest.fn();
-test("verification chart uses exact totals from both disjoint groups", () => {
-  render(
+test("reviewer home has no second verification chart (the Advisors card shows it)", () => {
+  const { container } = render(
     <OverviewVisual
       role="reviewer"
       resources={{ verified: ready(75), reviews: ready(25) }}
@@ -16,40 +16,7 @@ test("verification chart uses exact totals from both disjoint groups", () => {
       onRetry={retry}
     />
   );
-  expect(
-    screen.getByRole("img", {
-      name: "Advisor verification status: Verified 75%, Awaiting review 25%",
-    })
-  ).toBeInTheDocument();
-  expect(screen.getByText("75")).toBeInTheDocument();
-  expect(screen.getByText("25")).toBeInTheDocument();
-});
-test("missing totals keep the chart loading rather than reporting zero", () => {
-  render(
-    <OverviewVisual
-      role="reviewer"
-      resources={{ verified: ready(75), reviews: { state: "loading" } }}
-      plans={[]}
-      onRetry={retry}
-    />
-  );
-  expect(screen.queryByRole("img")).not.toBeInTheDocument();
-  expect(screen.getByRole("status")).toBeInTheDocument();
-});
-test("failed chart source exposes retry instead of a misleading percentage", () => {
-  render(
-    <OverviewVisual
-      role="reviewer"
-      resources={{
-        verified: ready(75),
-        reviews: { state: "error", error: "Could not load reviews" },
-      }}
-      plans={[]}
-      onRetry={retry}
-    />
-  );
-  expect(screen.getByRole("alert")).toHaveTextContent("Could not load reviews");
-  expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  expect(container).toBeEmptyDOMElement();
 });
 test("data entry charts required-field completeness, independently of hidden state", () => {
   render(
@@ -69,8 +36,19 @@ test("data entry charts required-field completeness, independently of hidden sta
       name: "Required program information: Complete 75%, Needs attention 25%",
     })
   ).toBeInTheDocument();
-  expect(screen.getByText("21")).toBeInTheDocument();
-  expect(screen.getByText("7")).toBeInTheDocument();
+  // The counts live in the Records to complete tile, not repeated here.
+  expect(screen.queryByText("7")).not.toBeInTheDocument();
+});
+test("a complete catalogue shows no completeness card", () => {
+  const { container } = render(
+    <OverviewVisual
+      role="data_entry"
+      resources={{ programs: ready(26), hiddenPrograms: ready(2), catalogueQuality: ready(0) }}
+      plans={[]}
+      onRetry={retry}
+    />
+  );
+  expect(container).toBeEmptyDOMElement();
 });
 test("pipeline displays API counts and stage names", () => {
   const plan = {

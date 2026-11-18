@@ -1,7 +1,6 @@
 import Cookies from "js-cookie";
 import api from "lib/useApi";
 import { isAdvisorAction } from "features/applications/stages";
-import { unibexsVoice } from "lib/unibexsVoice";
 import { programApi } from "features/programs/services/programApi";
 import { universityApi } from "features/universities/services/universityApi";
 import { languageCentersApi } from "features/universities/language-centers/api";
@@ -16,7 +15,7 @@ import type {
   OverviewItem,
   ResourcePlan,
 } from "../model/types";
-import { relabelText, statusLabel } from "config/statusLabels";
+import { statusLabel } from "config/statusLabels";
 const staffActions = new Set([
   "new_application",
   "payment_submitted",
@@ -94,13 +93,9 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
           items: actionable.slice(0, 6).map(
             (item): OverviewItem => ({
               id: item.id,
-              title:
-                context.role === "partner"
-                  ? unibexsVoice(relabelText(item.next_action || "Review application"))
-                  : relabelText(item.next_action || "Review application"),
-              description: [item.student_name, item.university_name]
-                .filter(Boolean)
-                .join(" · "),
+              // The student, not a sentence: the status tag names the task and the row's button opens it.
+              title: item.student_name || "Student",
+              description: item.university_name || "",
               href: `${base}/applications/${encodeURIComponent(item.id)}`,
               status: item.status,
               // The same status label as every other screen.
@@ -224,7 +219,7 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
             id: item.id,
             title: item.name,
             description: item.location,
-            href: `${base}/language-centers`,
+            href: `${base}/language-centers/${encodeURIComponent(item.id)}`,
           })),
         };
       },

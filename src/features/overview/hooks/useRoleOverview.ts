@@ -41,6 +41,7 @@ export function useRoleOverview(role: OverviewRole) {
         role === "partner" && !!partner?.is_verified && !member,
       canCreateApplication:
         role === "partner" && !!partner?.is_verified && !!partner?.is_active,
+      awaitingVerification: role === "partner" && partner?.is_verified === false,
     }),
     [
       role,

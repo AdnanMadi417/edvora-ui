@@ -46,7 +46,7 @@ test("activity uses a dated timeline and retains notification links", () => {
     "2026-01-01T12:00:00.000Z"
   );
 });
-test("application tasks retain their actionable link and student context", () => {
+test("application tasks name the student and offer one verb + object button", () => {
   render(
     <OverviewItems
       resourceId="active"
@@ -54,15 +54,14 @@ test("application tasks retain their actionable link and student context", () =>
       items={[
         {
           ...item,
-          title: "Review documents",
-          description: "Student · University",
+          title: "Nadia Rahman",
+          description: "INTI International University",
           href: "/admin/applications/a",
         },
       ]}
     />
   );
-  expect(
-    screen.getByRole("link", { name: "Review documents" })
-  ).toHaveAttribute("href", "/admin/applications/a");
-  expect(screen.getByText("Student · University")).toBeInTheDocument();
+  expect(screen.getByText("Nadia Rahman")).toBeInTheDocument();
+  expect(screen.getByText("INTI International University")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Open application: Nadia Rahman" })).toHaveAttribute("href", "/admin/applications/a");
 });

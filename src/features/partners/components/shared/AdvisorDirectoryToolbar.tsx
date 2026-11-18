@@ -10,6 +10,7 @@ export type AdvisorStatusFilter =
   | "inactive"
   | "individual"
   | "agency"
+  | "unverified"
   | null;
 export default function AdvisorDirectoryToolbar({
   search,
@@ -122,6 +123,7 @@ export default function AdvisorDirectoryToolbar({
               { value: "inactive", label: "Suspended" },
               { value: "individual", label: "Individual" },
               { value: "agency", label: "Company" },
+              { value: "unverified", label: "Awaiting review" },
             ]}
           />
         </div>

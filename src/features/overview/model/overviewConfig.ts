@@ -39,7 +39,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
         // Active and payouts live in the pipeline and commission cards; KPIs carry only numbers shown nowhere else.
-        metrics: ["actionRequired", "reviews", "hold", "unread"],
+        metrics: ["actionRequired", "reviews", "hold"],
         panels: ["actionRequired", "reviews", "commission"],
         actions: [
           action(
@@ -65,11 +65,11 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your work overview",
         subtitle:
           "Follow up on applications and support your assigned advisors.",
-        metrics: ["actionRequired", "advisors", "hold", "unread"],
+        metrics: ["actionRequired", "advisors", "hold"],
         panels: ["actionRequired", "hold", "advisors"],
         actions: [
           action(
-            "Application tracker",
+            "Review follow-ups",
             "/applications",
             "Move your applications forward"
           ),
@@ -89,8 +89,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Review overview",
         subtitle: "Review advisor profiles and monitor registration progress.",
-        // Verified and awaiting review are in the verification gauge.
-        metrics: ["registrations", "managers", "unread"],
+        // The reviewer's work: profiles to verify and registrations to follow.
+        metrics: ["reviews", "registrations"],
         panels: ["reviews", "registrations"],
         actions: [
           action(
@@ -114,8 +114,8 @@ export function overviewConfig(context: OverviewContext) {
       return {
         title: "Catalogue overview",
         subtitle: "Maintain accurate program and university information.",
-        // Records to complete is in the catalogue completeness gauge.
-        metrics: ["programs", "institutions", "languageCenters"],
+        // What needs doing in the catalogue, not inventory counts.
+        metrics: ["catalogueQuality", "hiddenPrograms"],
         panels: ["catalogueQuality", "hiddenPrograms", "languageCenters"],
         actions: [
           action(
@@ -150,7 +150,7 @@ export function overviewConfig(context: OverviewContext) {
         title: "Your advisor overview",
         subtitle: "Stay on top of your students, applications and next steps.",
         // Active, offer and payout figures are in the pipeline and commission cards.
-        metrics: ["actionRequired", "hold", "unread"],
+        metrics: ["actionRequired", "hold"],
         panels: ["actionRequired", "hold"],
         actions: [
           ...(context.canCreateApplication

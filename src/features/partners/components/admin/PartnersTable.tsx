@@ -72,12 +72,14 @@ const TABS: TabItem<PartnersTab>[] = [
   { key: "pending-otps", label: "Pending registrations" },
 ];
 
-type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
+type StatusFilter = "active" | "inactive" | "individual" | "agency" | "unverified" | null;
 
 function statusToParams(status: StatusFilter): {
   is_active?: boolean;
+  is_verified?: boolean;
   type?: string;
 } {
+  if (status === "unverified") return { is_verified: false };
   if (status === "active") return { is_active: true };
   if (status === "inactive") return { is_active: false };
   if (status === "individual") return { type: "individual" };
@@ -267,8 +269,10 @@ export default function PartnersTable() {
 
   // ?status= from a link (the home advisor rings) opens the list on that group.
   useEffect(() => {
-    const status = new URLSearchParams(window.location.search).get("status");
-    if (status && ["active", "inactive", "individual", "agency"].includes(status))
+    // "suspended" is the word people see; "inactive" is the older link.
+    const raw = new URLSearchParams(window.location.search).get("status");
+    const status = raw === "suspended" ? "inactive" : raw === "company" ? "agency" : raw;
+    if (status && ["active", "inactive", "individual", "agency", "unverified"].includes(status))
       setSelectedStatus(status as StatusFilter);
   }, []);
 

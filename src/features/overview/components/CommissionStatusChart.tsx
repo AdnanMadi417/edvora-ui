@@ -3,6 +3,8 @@ import { useState } from "react";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import Combobox from "components/ub/forms/selection/Combobox";
 import Tag from "components/ub/data/badges/Tag";
+import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { CHART_BG } from "components/ub/dashboard/types";
 import RadialRingsChart from "components/ub/dashboard/charts/RadialRingsChart";
 import type { OverviewResource } from "../model/types";
@@ -13,9 +15,11 @@ const RING = {
   "cat-2": "var(--ub-chart-cat-2)",
   "cat-3": "var(--ub-chart-cat-3)",
 } as const;
+// Same words as the Commission Tracker: "Expected" there means applications
+// that haven't reached the commission stage, so it isn't used here.
 const STAGES = [
-  { key: "expected" as const, label: "Expected", color: "cat-1" as const },
-  { key: "ready" as const, label: "Ready for payout", color: "cat-2" as const },
+  { key: "expected" as const, label: "With university", color: "cat-1" as const },
+  { key: "ready" as const, label: "Ready for payout", advisorLabel: "Due to you", color: "cat-2" as const },
   { key: "paid" as const, label: "Paid", color: "cat-3" as const },
 ];
 
@@ -28,9 +32,15 @@ const STAGES = [
 export default function CommissionStatusChart({
   resource,
   onRetry,
+  audience = "staff",
+  href,
 }: {
   resource?: OverviewResource;
   onRetry: () => void;
+  /** Advisors read "Due to you" where staff read "Ready for payout". */
+  audience?: "advisor" | "staff";
+  /** The full list: the Commission Tracker (Advisors) or the Finance queue (admin). */
+  href?: string;
 }) {
   const [selection, setSelection] = useState("");
   const all = resource?.data?.universityCommission || [];
@@ -41,6 +51,7 @@ export default function CommissionStatusChart({
 
   const stages = STAGES.map((stage) => ({
     ...stage,
+    label: audience === "advisor" && "advisorLabel" in stage ? stage.advisorLabel : stage.label,
     amount: rows.reduce((sum, row) => sum + row[stage.key].amount, 0),
     count: rows.reduce((sum, row) => sum + row[stage.key].records.length, 0),
     unknown: rows.some((row) => row[stage.key].unknown > 0),
@@ -48,6 +59,16 @@ export default function CommissionStatusChart({
   const anyUnknown = stages.some((s) => s.unknown);
   const total = stages.reduce((sum, s) => sum + s.amount, 0);
   const disputed = rows.reduce((sum, row) => sum + row.disputed, 0);
+  const counted = stages.reduce((sum, s) => sum + s.count, 0);
+  // Money in other currencies is never added in; say it exists and let one press switch to it.
+  const others = currencies
+    .filter((c) => c !== currency)
+    .map((c) => {
+      const inC = all.filter((row) => row.currency === c);
+      const amount = inC.reduce((sum, row) => sum + row.expected.amount + row.ready.amount + row.paid.amount, 0);
+      const count = inC.reduce((sum, row) => sum + row.expected.records.length + row.ready.records.length + row.paid.records.length + row.disputed, 0);
+      return { currency: c, amount, count };
+    });
   const state = resource?.state === "ready" && !rows.length ? "empty" : resource?.state || "loading";
 
   return (
@@ -62,19 +83,28 @@ export default function CommissionStatusChart({
       onRetry={onRetry}
       emptyMessage="Commission amounts will appear when applications reach this stage."
       actions={
-        currencies.length > 1 ? (
-          <div className="w-28">
-            <Combobox compact ariaLabel="Chart currency" options={currencies.map((value) => ({ value, label: value }))} value={currency} onChange={(value) => setSelection(value || "")} />
-          </div>
-        ) : undefined
+        <>
+          {currencies.length > 1 && (
+            <div className="w-28">
+              <Combobox compact ariaLabel="Chart currency" options={currencies.map((value) => ({ value, label: value }))} value={currency} onChange={(value) => setSelection(value || "")} />
+            </div>
+          )}
+          {href && <CardLinkButton href={href} label={audience === "advisor" ? "Open Commission Tracker" : "Open finance queue"} />}
+        </>
       }
     >
       <div className="flex flex-col gap-4">
-        {disputed > 0 && (
-          <Tag tone="danger" size="sm" className="self-start">
-            {disputed} disputed, not included
-          </Tag>
-        )}
+        {/* Every commission in this currency is accounted for: the rows plus any disputed. */}
+        <p className="flex flex-wrap items-center gap-2 text-ub-body-sm text-ub-text-secondary">
+          <span className="ub-tabular">
+            {counted + disputed} {counted + disputed === 1 ? "commission" : "commissions"}
+          </span>
+          {disputed > 0 && (
+            <Tag tone="danger" size="sm">
+              {disputed} disputed, not in the total
+            </Tag>
+          )}
+        </p>
         <div className="grid items-center gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-6">
           {/* Each ring is a stage's share of the total; the total sits in the hole. */}
           {anyUnknown ? (
@@ -114,6 +144,11 @@ export default function CommissionStatusChart({
             })}
           </ul>
         </div>
+        {others.map((o) => (
+          <TextButton key={o.currency} size="sm" className="self-start [@media(pointer:coarse)]:min-h-11" onClick={() => setSelection(o.currency)}>
+            {`Also ${o.currency} ${o.amount.toLocaleString("en-MY", { maximumFractionDigits: 2 })} across ${o.count} ${o.count === 1 ? "commission" : "commissions"}`}
+          </TextButton>
+        ))}
       </div>
     </DashboardCard>
   );

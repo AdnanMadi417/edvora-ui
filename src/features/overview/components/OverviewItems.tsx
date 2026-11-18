@@ -11,6 +11,16 @@ import AppDate from "components/ub/data/formatting/AppDate";
 import { TextButton } from "components/ub/core/buttons/TextButton";
 import type { OverviewItem } from "../model/types";
 
+const ACTION_LABEL: Record<string, string> = {
+  actionRequired: "Open application",
+  active: "Open application",
+  hold: "Open application",
+  commission: "Open payout",
+  catalogueQuality: "Complete record",
+  hiddenPrograms: "Open program",
+  languageCenters: "Open center",
+};
+
 /** Match each resource to the existing design system's specialized list. */
 export default function OverviewItems({
   resourceId,
@@ -72,7 +82,7 @@ export default function OverviewItems({
         events={items.map((item) => ({
           id: item.id,
           title: (
-            <TextButton href={item.href} className="max-w-full text-start">
+            <TextButton href={item.href} className="max-w-full text-start [@media(pointer:coarse)]:min-h-11">
               <span className="whitespace-normal break-words">
                 {item.title}
               </span>
@@ -96,11 +106,16 @@ export default function OverviewItems({
               ? Wallet
               : FileText
           }
-          title={
-            <TextButton href={item.href} className="max-w-full text-start">
-              <span className="whitespace-normal break-words">
-                {item.title}
-              </span>
+          title={<span className="whitespace-normal break-words">{item.title}</span>}
+          // One verb + object button per row; the row has no sentence to read.
+          action={
+            <TextButton
+              href={item.href}
+              size="sm"
+              aria-label={`${ACTION_LABEL[resourceId] ?? "Open"}: ${item.title}`}
+              className="[@media(pointer:coarse)]:min-h-11"
+            >
+              {ACTION_LABEL[resourceId] ?? "Open"}
             </TextButton>
           }
           meta={

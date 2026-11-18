@@ -57,6 +57,12 @@ const auth = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+/** "OTP pending" / "otp expired" → "Verification code pending" / "Verification code expired"; anything else sentence case. */
+function sentenceCase(text: string): string {
+  const t = text.trim().replace(/\botp\b/gi, "verification code");
+  return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : t;
+}
+
 export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
   const { role, partnerId, agencyAdmin, canViewCommission } = context;
   // Advisors hear one voice: backend copy that names a staff role reads as Unibexs.
@@ -131,13 +137,18 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             .map(
               (item): OverviewItem => ({
                 id: item.id,
-                title: say(item.next_action || "Review application"),
-                description: [item.student_name, item.university_name]
-                  .filter(Boolean)
-                  .join(" · "),
+                title: item.student_name || "Student",
+                description: item.university_name || "",
                 href: idPath(`${base}/applications`, item.id),
-                status: item.status,
-                statusLabel: item.status ? say(statusLabel(item.status)) : undefined,
+                // A held application says it's on hold (the reason isn't in the list response),
+                // not the workflow status it was paused at.
+                status: status === "hold" ? "On hold" : item.status,
+                statusLabel:
+                  status === "hold"
+                    ? "On hold"
+                    : item.status
+                    ? say(statusLabel(item.status))
+                    : undefined,
               })
             );
           return { total: data.total, items };
@@ -228,13 +239,21 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
         return {
           total: data.total,
           advisorStats: stats
-            ? { active: stats.active ?? 0, inactive: stats.inactive ?? 0, agency: stats.agency ?? 0, individual: stats.individual ?? 0 }
+            ? {
+                active: stats.active ?? 0,
+                inactive: stats.inactive ?? 0,
+                agency: stats.agency ?? 0,
+                individual: stats.individual ?? 0,
+                verified: stats.verified ?? 0,
+                unverified: stats.unverified ?? 0,
+              }
             : undefined,
           items: data.items.map((item) => ({
             id: item.id,
             title: item.name,
             description: [
-              item.type === "agency" ? "Agency" : "Individual advisor",
+              // Same words as the Advisors list and its filters.
+              item.type === "agency" ? "Company" : "Individual",
               item.country,
             ]
               .filter(Boolean)
@@ -282,9 +301,10 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
           items: data.items.map((item) => ({
             id: item.email,
             title: item.full_name || item.company_name || item.email,
-            description: String(
-              item.progress || "Registration in progress"
-            ).replace(/_/g, " "),
+            // Sentence case, and "OTP" spelled out: "otp_pending" → "Verification code pending".
+            description: sentenceCase(
+              String(item.progress || "Registration in progress").replace(/_/g, " ")
+            ),
             href: `${base}/advisors?tab=pending-otps`,
             at: item.created_at,
           })),
@@ -384,7 +404,14 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
           items: data.items.map((item) => ({
             id: item.application_commission_id,
             title: item.student_name,
-            description: [item.reference, item.university_name]
+            // The amount, so the row agrees with the commission card in its own currency.
+            description: [
+              item.reference,
+              item.university_name,
+              typeof item.commission_amount === "number"
+                ? `${item.commission_currency ?? ""} ${item.commission_amount.toLocaleString("en-MY")}`.trim()
+                : null,
+            ]
               .filter(Boolean)
               .join(" · "),
             href:
@@ -404,7 +431,8 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
         subtitle: hidden
           ? "Review catalogue entries that are hidden from advisors."
           : "Programs currently available in the catalogue.",
-        href: `${base}/knowledge-hub`,
+        // "View all" opens the catalogue already filtered to hidden or visible programs.
+        href: `${base}/knowledge-hub?is_hidden=${hidden}`,
         emptyMessage: hidden
           ? "No programs are hidden from advisors."
           : "No visible programs yet.",
@@ -484,7 +512,11 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             title: say(`${getSenderName(item, { forAdvisor: role === "partner" })} ${item.title}`),
             description: say(item.body),
             at: item.created_at,
-            href: `${base}/notifications`,
+            // The application the update is about, where the role has application pages.
+            href:
+              item.application_id && ["admin", "account_manager", "partner"].includes(role)
+                ? idPath(`${base}/applications`, item.application_id)
+                : `${base}/notifications`,
           }))
           .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()),
       };

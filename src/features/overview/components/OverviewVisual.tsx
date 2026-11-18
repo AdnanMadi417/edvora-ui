@@ -46,6 +46,8 @@ export default function OverviewVisual({
             id: "stage",
             label: "By stage",
             centerLabel: "Active applications",
+            // Workflow order, so the pipeline reads review → commission.
+            keepOrder: true,
             // Each stage opens the Application Tracker filtered to it.
             items: distribution.map((stage) => ({
               key: stage.key,
@@ -86,6 +88,8 @@ export default function OverviewVisual({
         : "ready";
     const complete = Math.max(0, total - issues);
     const percent = total ? Math.round((complete / total) * 100) : 0;
+    // A complete catalogue needs no card: the Records to complete tile already says 0.
+    if (state === "ready" && issues === 0) return null;
     return (
       <GaugeCard
         title="Catalogue completeness"
@@ -99,10 +103,6 @@ export default function OverviewVisual({
           (invalid ? "Catalogue counts changed. Try again." : undefined)
         }
         onRetry={onRetry}
-        stats={[
-          { label: "Complete", value: complete.toLocaleString() },
-          { label: "Needs attention", value: issues.toLocaleString() },
-        ]}
         segments={[
           { label: "Complete", value: percent, color: "cat-1" },
           { label: "Needs attention", value: 100 - percent, color: "cat-2" },
@@ -113,56 +113,6 @@ export default function OverviewVisual({
       />
     );
   }
-  const values = [resources.verified, resources.reviews];
-  const [verified, awaiting] = values.map(
-    (resource) => resource?.data?.total ?? 0
-  );
-  const total = verified + awaiting;
-  const error = values.find((resource) => resource?.state === "error");
-  const state: WidgetState = error
-    ? "error"
-    : values.some((resource) => !resource || resource.state === "loading")
-    ? "loading"
-    : total === 0
-    ? "empty"
-    : "ready";
-  const percent = total ? Math.round((verified / total) * 100) : 0;
-  return (
-    <GaugeCard
-      title="Advisor verification"
-      subtitle="Verification status across advisor profiles, including inactive accounts."
-      as="h2"
-      state={state}
-      emptyMessage="Advisor profiles will appear here as registrations are completed."
-      errorMessage={error?.error}
-      onRetry={onRetry}
-      stats={[
-        { label: "Verified", value: verified.toLocaleString() },
-        { label: "Awaiting review", value: awaiting.toLocaleString() },
-      ]}
-      menu={{
-        label: "Chart options",
-        extraItems: [
-          { label: "Refresh data", icon: RefreshCw, onClick: onRetry },
-        ],
-      }}
-      actions={
-        <CardLinkButton
-          href="/reviewer/advisors"
-          label="Open advisor directory"
-        />
-      }
-      segments={[
-        { label: "Verified", value: percent, color: "cat-1" as const },
-        {
-          label: "Awaiting review",
-          value: 100 - percent,
-          color: "cat-2" as const,
-        },
-      ]}
-      label="Advisor verification status"
-      centerLabel={`${percent}%`}
-      centerCaption="verified"
-    />
-  );
+  // Reviewer: verification lives in the Advisors card (one row per dimension), not a second chart.
+  return null;
 }

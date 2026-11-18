@@ -29,3 +29,15 @@ export function useStageParam<T extends Stage>(stages: T[], onStage: (id: string
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stages]);
 }
+
+export type LifecycleParam = "active" | "hold" | "cancel" | "all";
+
+/** Applies `?lifecycle=hold` (or active / cancel / all) from a link once, e.g. the home's On hold tile. */
+export function useLifecycleParam(onLifecycle: (value: LifecycleParam) => void) {
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("lifecycle");
+    if (value === "active" || value === "hold" || value === "cancel" || value === "all") onLifecycle(value);
+    // Applied once per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}

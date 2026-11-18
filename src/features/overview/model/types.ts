@@ -13,6 +13,8 @@ export interface OverviewContext {
   agencyAdmin?: boolean;
   canViewCommission?: boolean;
   canCreateApplication?: boolean;
+  /** Advisor whose profile Unibexs hasn't verified yet. */
+  awaitingVerification?: boolean;
 }
 export interface OverviewItem {
   id: string;
@@ -27,7 +29,7 @@ export interface OverviewItem {
 export interface OverviewData {
   universityCommission?: import("./dashboardData").UniversityCommission[];
   /** Advisor counts (all advisors the viewer can see): active / suspended, company / individual. */
-  advisorStats?: { active: number; inactive: number; agency: number; individual: number };
+  advisorStats?: { active: number; inactive: number; agency: number; individual: number; verified: number; unverified: number };
   universities?: { id: string; name: string; logo_file_key?: string }[];
   total: number;
   items: OverviewItem[];
