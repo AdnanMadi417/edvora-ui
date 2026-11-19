@@ -357,6 +357,7 @@ export default function AgencyMembersTable({
                       >
                         <TableActions label={member.name}>
                           <TableAction
+                            view
                             label={`View ${member.name}`}
                             icon={<Eye className="h-4 w-4" />}
                             href={`/partner/team-members/${member.partner_id}`}

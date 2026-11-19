@@ -183,6 +183,7 @@ export default function LanguageCentersDirectory({
       cell: (center) => (
         <TableActions label={center.name}>
           <TableAction
+            view
             primary
             label={`View ${center.name}`}
             icon={<Eye className="h-4 w-4" />}

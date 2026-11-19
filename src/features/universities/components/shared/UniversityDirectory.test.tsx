@@ -66,9 +66,8 @@ it("keeps editing and visibility actions for data-entry without deletion", () =>
   expect(
     screen.getByRole("link", { name: "Create university" })
   ).toHaveAttribute("href", "/data-entry/universities/create");
-  expect(screen.getAllByRole("link", { name: "Edit university" })).toHaveLength(
-    3
-  );
+  // Edit sits in each row's menu (several actions per row).
+  expect(screen.getAllByRole("button", { name: /^More actions for/ })).toHaveLength(3);
   expect(rowAction("Unhide university")).toBeInTheDocument();
   expect(queryRowAction("Delete university")).not.toBeInTheDocument();
 });

@@ -70,7 +70,7 @@ export default function LogisticsProviderCard({
   const languages = provider.languages?.join(" · ");
   const universities = provider.universities_served ?? [];
   const actions: CatalogCardAction[] = [
-    { label: "View details", href, ariaLabel: `View details of ${provider.name}`, variant: whatsapp ? "secondary" : "primary" },
+    { label: "View details", view: true, href, ariaLabel: `View details of ${provider.name}`, variant: whatsapp ? "secondary" : "primary" },
   ];
   if (whatsapp)
     actions.push({ label: "WhatsApp", href: `https://wa.me/${whatsapp}`, ariaLabel: `WhatsApp ${provider.name}`, variant: "primary", external: true });

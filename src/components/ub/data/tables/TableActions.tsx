@@ -12,11 +12,13 @@ import React, {
 } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { MoreHorizontal } from "lucide-react";
+import { Eye, MoreHorizontal } from "lucide-react";
 import ActionSheet from "components/ub/feedback/dialogs/ActionSheet";
 import { focusRing } from "components/ub/recipes";
 
 export const TableRowActionLabel = createContext("Row");
+/** The row's own link (DataTable getRowHref, ItemList getHref): the target of "View". */
+export const TableRowHref = createContext<string | undefined>(undefined);
 export interface TableActionProps {
   label: string;
   icon?: ReactNode;
@@ -26,8 +28,15 @@ export interface TableActionProps {
   disabled?: boolean;
   primary?: boolean;
   danger?: boolean;
+  /** Only opens the row's details. Never shown on its own: the row opens it. */
+  view?: boolean;
 }
-/** Declarative action, rendered by TableActions as an icon or a labelled menu item. */
+/**
+ * Declarative action. TableActions applies one rule everywhere:
+ * no actions besides View → nothing (the row opens its details);
+ * one action → that action, shown directly;
+ * two or more → a ⋮ menu with View first, then the actions.
+ */
 export function TableAction(_props: TableActionProps) {
   return null;
 }
@@ -49,6 +58,8 @@ function actionText(action: TableActionProps, rowLabel: string) {
     : action.label;
 }
 
+// An action without an icon shows its short label instead.
+const textTrigger = `inline-flex min-h-10 shrink-0 items-center rounded-ub-full px-3 text-ub-label-sm text-ub-text-link transition-colors duration-200 hover:bg-ub-selected disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
 const trigger = `grid h-10 w-10 shrink-0 place-items-center rounded-ub-full text-ub-text-secondary transition-colors duration-200 hover:bg-ub-selected hover:text-ub-text-link disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
 
 export default function TableActions({
@@ -60,9 +71,25 @@ export default function TableActions({
 }) {
   const contextLabel = useContext(TableRowActionLabel);
   const label = labelProp ?? contextLabel;
-  const actions = collect(children);
-  const primary = actions.find((action) => action.primary);
-  const secondary = actions.filter((action) => action !== primary);
+  const rowHref = useContext(TableRowHref);
+  const all = collect(children);
+  const viewHref = rowHref ?? all.find((action) => action.view)?.href;
+  const isView = (action: TableActionProps) =>
+    action.view || (!!viewHref && action.href === viewHref);
+  const others = all.filter((action) => !isView(action));
+  // One action: shown directly. Two or more: all in the menu, View first.
+  const single = others.length === 1 ? others[0] : null;
+  const menuItems: TableActionProps[] = single
+    ? []
+    : [
+        ...(viewHref
+          ? [{ label: `View ${label}`, href: viewHref, icon: <Eye className="h-4 w-4" /> }]
+          : []),
+        ...others,
+      ];
+  const primary = single;
+  const secondary = menuItems;
+  const actions = single ? [single] : menuItems;
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -121,7 +148,7 @@ export default function TableActions({
       link.click();
     } else action.onSelect?.(event);
   };
-  if (!actions.length) return <span className="text-ub-text-tertiary">—</span>;
+  if (!others.length) return null;
   return (
     <div
       ref={ref}
@@ -130,16 +157,16 @@ export default function TableActions({
       onClick={(event) => event.stopPropagation()}
     >
       {primary && (
-        <span className="hidden md:inline-flex">
+        <span className="inline-flex">
           {primary.href && !primary.disabled ? (
             <Link
               href={primary.href}
               target={primary.target}
               title={actionText(primary, label)}
               aria-label={primary.label}
-              className={trigger}
+              className={primary.icon ? trigger : textTrigger}
             >
-              {primary.icon}
+              {primary.icon ?? actionText(primary, label)}
             </Link>
           ) : (
             <button
@@ -148,13 +175,14 @@ export default function TableActions({
               aria-label={primary.label}
               disabled={primary.disabled}
               onClick={(event) => run(primary, event)}
-              className={trigger}
+              className={primary.icon ? trigger : textTrigger}
             >
-              {primary.icon}
+              {primary.icon ?? actionText(primary, label)}
             </button>
           )}
         </span>
       )}
+      {secondary.length > 0 && (
       <button
         ref={button}
         type="button"
@@ -162,11 +190,12 @@ export default function TableActions({
         title="More actions"
         aria-expanded={open}
         aria-haspopup={mobile ? "dialog" : "menu"}
-        className={`${trigger} ${secondary.length ? "" : "md:hidden"}`}
+        className={trigger}
         onClick={() => setOpen((value) => !value)}
       >
         <MoreHorizontal className="h-5 w-5" />
       </button>
+      )}
       {open &&
         !mobile &&
         createPortal(
@@ -248,7 +277,7 @@ export default function TableActions({
         open={open && mobile}
         onClose={() => setOpen(false)}
         title={`${label} actions`}
-        actions={(mobile ? actions : secondary).map((action) => ({
+        actions={secondary.map((action) => ({
           label: actionText(action, label),
           ariaLabel: action.label,
           icon: action.icon

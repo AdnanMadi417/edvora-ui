@@ -40,15 +40,14 @@ it("preserves off-page selection and keeps business amounts and management actio
     />
   );
   expect(screen.getByText("MYR 4,200")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
-    "href",
-    `/admin/knowledge-hub/${sampleProgram.id}/edit`
-  );
   await user.click(
     screen.getByRole("checkbox", { name: `Select ${sampleProgram.name}` })
   );
   expect(select).toHaveBeenCalledTimes(1);
   expect(select).toHaveBeenCalledWith(sampleProgram.id);
+  // Several actions: they share one menu.
+  await user.click(screen.getAllByRole("button", { name: /^More actions for/ })[0]);
+  expect(screen.getByRole("menuitem", { name: "Edit" })).toBeInTheDocument();
 });
 
 it.each([

@@ -33,7 +33,7 @@ export default function UniversityCard({ university, href, programsHref }: Unive
         },
       ]}
       actions={[
-        { label: "View details", href, ariaLabel: `View details of ${university.name}` },
+        { label: "View details", view: true, href, ariaLabel: `View details of ${university.name}` },
         { label: "View programs", href: programsHref, ariaLabel: `View programs at ${university.name}`, variant: "primary" },
       ]}
     />

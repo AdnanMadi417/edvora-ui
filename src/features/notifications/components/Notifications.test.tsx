@@ -30,8 +30,19 @@ it("shows a compact notification and preserves mark-read and navigation", async 
   expect(screen.queryByText(/Fatima Yusuf/)).not.toBeInTheDocument();
   expect(screen.queryByText("Application Review")).not.toBeInTheDocument();
   expect(screen.getByRole("img", { name: "Unread" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "View application" })).toHaveAttribute("href", "/admin/applications/app-1");
+  // No separate View button: the whole row is the link.
+  expect(screen.queryByRole("link", { name: "View application" })).not.toBeInTheDocument();
   await user.click(heading);
   await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/applications/app-1"));
   expect(markAsRead).toHaveBeenCalledWith("notification-1");
+});
+
+it("opens a notification from the keyboard", async () => {
+  const user = userEvent.setup();
+  push.mockClear();
+  render(<Notifications applicationBasePath="/admin/applications" />);
+  const row = (await screen.findByText("Ruqayyah Zhang — New application")).closest('[role="link"]') as HTMLElement;
+  row.focus();
+  await user.keyboard("{Enter}");
+  await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/applications/app-1"));
 });

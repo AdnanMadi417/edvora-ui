@@ -228,6 +228,7 @@ export default function RolesTable() {
                       <td data-label="Actions" className="px-4 py-4 text-end">
                         <TableActions label={role.name}>
                           <TableAction
+                            view
                             label={`View ${role.name}`}
                             icon={<Eye className="h-4 w-4" />}
                             href={`/admin/roles/${role.id}`}

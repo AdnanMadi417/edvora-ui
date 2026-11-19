@@ -7,15 +7,10 @@ import type { AccountManagerPartnerListItem } from "features/partners/types";
 import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
 
 import AdvisorEntityCell, {
-  advisorName,
   advisorSubtitle,
 } from "../shared/AdvisorEntityCell";
-import TableActions, {
-  TableAction,
-} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Eye } from "lucide-react";
 import { useAccountManagerPartners } from "features/partners/hooks";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import AppDate from "components/ub/data/formatting/AppDate";
@@ -92,21 +87,7 @@ export default function AccountManagerPartnersList() {
         <AppDate value={partner.created_at} format="short" fallback="—" />
       ),
     },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      cell: (partner) => (
-        <TableActions label={advisorName(partner)}>
-          <TableAction
-            label="View advisor"
-            icon={<Eye className="h-4 w-4" />}
-            href={`/account-manager/advisors/${partner.id}`}
-            primary
-          />
-        </TableActions>
-      ),
-    },
+    // No actions column: the only action was View, and the row opens it.
   ];
 
   return (

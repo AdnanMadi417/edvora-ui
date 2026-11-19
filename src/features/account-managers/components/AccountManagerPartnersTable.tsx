@@ -4,14 +4,13 @@ import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ArrowRightLeft, Users, RefreshCw, Share2, ShieldOff, Handshake, Eye,
+  ArrowRightLeft, Users, RefreshCw, Share2, ShieldOff, Handshake,
 } from "lucide-react";
 import { usePartners } from "features/partners/hooks";
 import type { Partner } from "features/partners/types";
 import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
-import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import AppDate from "components/ub/data/formatting/AppDate";
-import AdvisorEntityCell, { advisorName, advisorSubtitle } from "features/partners/components/shared/AdvisorEntityCell";
+import AdvisorEntityCell, { advisorSubtitle } from "features/partners/components/shared/AdvisorEntityCell";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import TablePagination from "components/ub/data/tables/TablePagination";
@@ -121,16 +120,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
       header: "Registered",
       cell: (partner) => <AppDate value={partner.created_at} format="short" fallback="—" />,
     },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      cell: (partner) => (
-        <TableActions label={advisorName(partner)}>
-          <TableAction label="View advisor" icon={<Eye className="h-4 w-4" />} href={`/admin/advisors/${partner.id}`} primary />
-        </TableActions>
-      ),
-    },
+    // No actions column: the only action was View, and the row opens it.
   ];
 
   return (

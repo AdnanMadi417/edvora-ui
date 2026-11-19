@@ -35,7 +35,7 @@ export default function LanguageCenterCard({
         { label: "Branches", value: branches ? `${branches} ${branches === 1 ? "branch" : "branches"}` : "Main campus only" },
         { label: "Location", value: center.location || "To be confirmed", wide: true },
       ]}
-      actions={[{ label: "View details", href, ariaLabel: `View details of ${center.name}`, variant: "primary" }]}
+      actions={[{ label: "View details", view: true, href, ariaLabel: `View details of ${center.name}`, variant: "primary" }]}
     />
   );
 }

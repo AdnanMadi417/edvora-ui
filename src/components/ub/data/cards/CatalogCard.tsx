@@ -3,7 +3,9 @@
 import { useRef, type ReactNode } from "react";
 import Link from "next/link";
 import EntityCell, { type EntityCellStatus } from "components/ub/data/display/EntityCell";
-import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
+import { buttonBase, buttonSizes, buttonVariants, focusRing } from "components/ub/recipes";
+import { ArrowUpRight, Eye } from "lucide-react";
+import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 
 export interface CatalogCardFact {
   label: string;
@@ -23,6 +25,8 @@ export interface CatalogCardAction {
   variant?: "primary" | "secondary";
   /** Opens in a new tab (external links, WhatsApp). */
   external?: boolean;
+  /** Only opens the card's details. Never a button: the card itself opens it. */
+  view?: boolean;
 }
 
 export interface CatalogCardProps {
@@ -70,6 +74,9 @@ export default function CatalogCard({
 }: CatalogCardProps) {
   const cardLink = useRef<HTMLAnchorElement>(null);
   const external = hrefExternal ? { target: "_blank", rel: "noopener noreferrer" } : {};
+  // The card opens its details, so "View details" is never a separate button.
+  const others = actions.filter((action) => !action.view && action.href !== href);
+  const viewLabel = actions.find((action) => action.view || action.href === href)?.ariaLabel ?? `View details of ${name}`;
   return (
     <article
       aria-label={name}
@@ -79,16 +86,20 @@ export default function CatalogCard({
       } ${className}`}
     >
       {href && (
-        // Pointer shortcut only: keyboard and screen readers use the buttons.
+        // Pointer shortcut for the whole card; keyboard and screen readers use the title link.
         <Link ref={cardLink} href={href} aria-hidden="true" tabIndex={-1} className="absolute inset-0 z-10 rounded-ub-lg" {...external} />
       )}
 
       <div className="flex flex-1 flex-col gap-4 p-4 sm:p-5">
-        <h3
-          className={`relative min-w-0 ${href ? "z-20 cursor-pointer" : ""}`}
-          onClick={href ? () => cardLink.current?.click() : undefined}
-        >
-          <EntityCell name={name} avatar={avatar} status={status} subtitle={subtitle} tooltip />
+        <h3 className={`relative min-w-0 ${href ? "z-20" : ""}`}>
+          {href ? (
+            // The title is the card's link to its details (there is no View details button).
+            <Link href={href} aria-label={viewLabel} className={`block rounded-ub-md ${focusRing}`} {...external}>
+              <EntityCell name={name} avatar={avatar} status={status} subtitle={subtitle} tooltip />
+            </Link>
+          ) : (
+            <EntityCell name={name} avatar={avatar} status={status} subtitle={subtitle} tooltip />
+          )}
         </h3>
 
         {tags && <div className="flex min-w-0 flex-wrap gap-1.5">{tags}</div>}
@@ -113,27 +124,45 @@ export default function CatalogCard({
         )}
       </div>
 
-      {(footer || actions.length > 0) && (
+      {(footer || others.length > 0) && (
         <div className="relative z-20 mt-auto border-t border-ub-border bg-ub-surface-subtle px-4 py-3 sm:px-5">
-          {footer ?? (
-            <div className="flex gap-2">
-              {actions.slice(0, 2).map((action) => (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  aria-label={action.ariaLabel}
-                  {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  className={`min-w-0 flex-1 ${buttonBase} ${buttonSizes.sm} ${
-                    buttonVariants[action.variant ?? "secondary"]
-                  }`}
-                >
-                  <span className="truncate">{action.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          {footer ??
+            (others.length === 1 ? (
+              <ActionLink action={others[0]} />
+            ) : (
+              // Two or more: one menu, View first.
+              <div className="flex justify-end">
+                <ActionsDropdown
+                  iconOnly
+                  label={`Actions for ${name}`}
+                  items={[
+                    ...(href ? [{ label: "View details", icon: Eye, onClick: () => cardLink.current?.click() }] : []),
+                    ...others.map((action) => ({ label: action.label, icon: ArrowUpRight, onClick: () => open(action) })),
+                  ]}
+                />
+              </div>
+            ))}
         </div>
       )}
     </article>
+  );
+}
+
+function open(action: CatalogCardAction) {
+  if (action.external) window.open(action.href, "_blank", "noopener,noreferrer");
+  else window.location.assign(action.href);
+}
+
+/** The card's one action, shown directly. */
+function ActionLink({ action }: { action: CatalogCardAction }) {
+  return (
+    <Link
+      href={action.href}
+      aria-label={action.ariaLabel}
+      {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className={`flex w-full min-w-0 ${buttonBase} ${buttonSizes.sm} ${buttonVariants[action.variant ?? "secondary"]}`}
+    >
+      <span className="truncate">{action.label}</span>
+    </Link>
   );
 }

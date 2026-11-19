@@ -198,6 +198,7 @@ export default function ProviderDirectory({
           columns={columns}
           rows={rows}
           getRowId={(provider) => provider.id}
+          getRowLabel={(provider) => provider.name}
           getRowHref={(provider) => `${basePath}/${provider.id}`}
           caption="Logistics providers"
           getRowClassName={() => "md:[&>td]:py-4"}

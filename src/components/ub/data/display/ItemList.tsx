@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { TableRowHref } from "components/ub/data/tables/TableActions";
 import type { ComponentType, ReactNode } from "react";
 import { focusRing, skeleton } from "components/ub/recipes";
 import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
@@ -109,7 +110,7 @@ export default function ItemList<T>({
               ) : (
                 <span className="flex min-w-0 flex-1 items-center gap-3 py-2">{body}</span>
               )}
-              {renderActions && <span className="shrink-0">{renderActions(item)}</span>}
+              {renderActions && <span className="shrink-0"><TableRowHref.Provider value={href}>{renderActions(item)}</TableRowHref.Provider></span>}
             </li>
           );
         })}

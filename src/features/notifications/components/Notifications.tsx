@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AlertTriangle, Bell, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertTriangle, Bell, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 
@@ -178,6 +177,11 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   const isLoadingMoreUnread = isUnreadTab && loading && accumulatedUnread.length > 0;
   const hasMoreUnread = isUnreadTab && accumulatedUnread.length < total;
 
+  const openNotification = async (id: string, unread: boolean, href?: string | null) => {
+    if (unread) await markAsRead(id);
+    if (href) router.push(href);
+  };
+
   return (
     <section aria-label="Notifications" className="mb-6 mt-6 overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface">
       {/* Header */}
@@ -258,11 +262,17 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
               return (
                 <div
                   key={notification.id}
-                  onClick={async () => {
-                    if (isUnread) await markAsRead(notification.id);
-                    if (href) router.push(href);
+                  // The whole row opens the item; there is no separate View button.
+                  role={href ? "link" : undefined}
+                  tabIndex={href ? 0 : undefined}
+                  onClick={() => openNotification(notification.id, isUnread, href)}
+                  onKeyDown={(event) => {
+                    if (href && event.key === "Enter") {
+                      event.preventDefault();
+                      openNotification(notification.id, isUnread, href);
+                    }
                   }}
-                  className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
+                  className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ub-border-focus ${
                     index !== displayed.length - 1 ? "border-b border-ub-border" : ""
                   } ${isUnread ? "bg-ub-selected hover:bg-ub-row-hover" : "hover:bg-ub-row-hover"}`}
                 >
@@ -291,17 +301,6 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                   {/* Actions */}
                   <div className="flex shrink-0 items-center gap-2 self-center">
                     {isUnread && <span className="h-2.5 w-2.5 rounded-ub-full bg-ub-action-primary" aria-label="Unread" role="img" />}
-                    {href && (
-                      <Link
-                        href={href}
-                        onClick={(e) => e.stopPropagation()}
-                        title="View application"
-                        aria-label="View application"
-                        className="flex h-11 w-11 items-center justify-center rounded-ub-md text-ub-text-secondary transition hover:bg-ub-surface-subtle hover:text-ub-text-link"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Link>
-                    )}
                   </div>
                 </div>
               );

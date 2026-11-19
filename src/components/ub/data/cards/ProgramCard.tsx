@@ -84,7 +84,7 @@ export default function ProgramCard({ program, href, applyHref }: ProgramCardPro
     });
 
   const actions: CatalogCardAction[] = [
-    { label: "View details", href, ariaLabel: `View details of ${program.name} (opens in a new tab)`, external: true },
+    { label: "View details", view: true, href, ariaLabel: `View details of ${program.name} (opens in a new tab)`, external: true },
   ];
   if (applyHref)
     actions.push({ label: "Apply now", href: hrefString(applyHref), ariaLabel: `Apply now for ${program.name}`, variant: "primary" });

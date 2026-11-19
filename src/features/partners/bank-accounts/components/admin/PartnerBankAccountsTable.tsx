@@ -3,11 +3,10 @@ import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Eye, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
-import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import EntityCell from "components/ub/data/display/EntityCell";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
@@ -102,16 +101,7 @@ export default function PartnerBankAccountsTable() {
         </span>
       ),
     },
-    {
-      key: "actions",
-      header: "Actions",
-      align: "end",
-      cell: (row) => (
-        <TableActions label={row.partner_name}>
-          <TableAction label={`View ${row.partner_name}`} icon={<Eye className="h-4 w-4" />} href={`/admin/advisors/${row.partner_id}`} primary />
-        </TableActions>
-      ),
-    },
+    // No actions column: the only action was View, and the row opens it.
   ];
 
   return (

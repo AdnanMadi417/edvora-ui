@@ -59,9 +59,8 @@ it("creates a service with a trimmed name and refreshes", async () => {
 it("renames a service without reloading", async () => {
   const user = userEvent.setup();
   render(<LogisticsServicesDirectory />);
-  await user.click(
-    screen.getByRole("button", { name: "Edit Airport transfer" })
-  );
+  await user.click(screen.getByRole("button", { name: "More actions for Airport transfer" }));
+  await user.click(screen.getByRole("menuitem", { name: "Edit Airport transfer" }));
   const input = screen.getByRole("textbox", { name: "Service name" });
   await user.clear(input);
   await user.type(input, "Airport pickup");
@@ -73,9 +72,8 @@ it("keeps API errors in the open form", async () => {
   mockEdit.mockRejectedValue(new Error("Unable to save"));
   const user = userEvent.setup();
   render(<LogisticsServicesDirectory />);
-  await user.click(
-    screen.getByRole("button", { name: "Edit Airport transfer" })
-  );
+  await user.click(screen.getByRole("button", { name: "More actions for Airport transfer" }));
+  await user.click(screen.getByRole("menuitem", { name: "Edit Airport transfer" }));
   await user.type(
     screen.getByRole("textbox", { name: "Service name" }),
     " updated"

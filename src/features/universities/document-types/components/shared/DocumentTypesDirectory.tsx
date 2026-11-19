@@ -73,6 +73,7 @@ export default function DocumentTypesDirectory() {
       cell: (type) => (
         <TableActions>
           <TableAction
+            view
             label={`View ${type.type}`}
             icon={<Eye className="h-4 w-4" />}
             href={`${base}/${type.id}`}

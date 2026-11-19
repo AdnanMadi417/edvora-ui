@@ -9,9 +9,8 @@ import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataT
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
-import Tooltip from "components/ub/feedback/dialogs/Tooltip";
 import AppDate from "components/ub/data/formatting/AppDate";
-import IconButton from "components/ub/core/buttons/IconButton";
+import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -139,24 +138,35 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
     {
       key: "actions",
       header: "Actions",
+      // One action shows directly; two or more go in the menu with View payout first.
       cell: (item) => (
-        <span className="flex items-center gap-1">
+        <TableActions label={item.bank_reference || "payout"}>
           {item.receipt_file_url && (
-            <>
-              <Tooltip content="View Receipt" position="left">
-                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "view")} disabled={loadingProof?.id === item.payout_id} aria-label="View receipt" title="View receipt" icon={<Eye className={busy(item, "view") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
-              </Tooltip>
-              <Tooltip content="Download Receipt" position="left">
-                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "download")} disabled={loadingProof?.id === item.payout_id} aria-label="Download receipt" title="Download receipt" icon={<Download className={busy(item, "download") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
-              </Tooltip>
-            </>
+            <TableAction
+              label="View receipt"
+              icon={<Eye className={busy(item, "view") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
+              onSelect={() => handleProof(item, "view")}
+              disabled={loadingProof?.id === item.payout_id}
+            />
+          )}
+          {item.receipt_file_url && (
+            <TableAction
+              label="Download receipt"
+              icon={<Download className={busy(item, "download") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
+              onSelect={() => handleProof(item, "download")}
+              disabled={loadingProof?.id === item.payout_id}
+            />
           )}
           {item.can_void && (
-            <Tooltip content="Void & correct" position="left">
-              <IconButton variant="tertiary" size="sm" onClick={() => openVoidModal(item)} disabled={loadingVoidId === item.payout_id} aria-label="Void & correct" title="Void & correct" icon={<Ban className={loadingVoidId === item.payout_id ? "h-4 w-4 animate-pulse text-ub-tone-danger-text motion-reduce:animate-none" : "h-4 w-4 text-ub-tone-danger-text"} aria-hidden="true" />} />
-            </Tooltip>
+            <TableAction
+              label="Void & correct"
+              icon={<Ban className="h-4 w-4" aria-hidden="true" />}
+              onSelect={() => openVoidModal(item)}
+              disabled={loadingVoidId === item.payout_id}
+              danger
+            />
           )}
-        </span>
+        </TableActions>
       ),
     },
   ];

@@ -182,6 +182,7 @@ export default function UniversityTypeDirectory({
           rows={rows}
           caption="University application requirement types"
           getRowId={(type) => type.id}
+          getRowLabel={(type) => type.name}
           getRowHref={(type) => `${basePath}/${type.id}`}
           loading={loading}
           error={error}

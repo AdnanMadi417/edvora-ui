@@ -147,6 +147,7 @@ export default function UniversitiesDataTable(props: Props) {
         rows={props.universities}
         caption="University directory"
         getRowId={(university) => university.id}
+        getRowLabel={(university) => university.name}
         getRowHref={(university) => `${props.basePath}/${university.id}`}
         sort={props.sort}
         onSortChange={props.onSortChange}

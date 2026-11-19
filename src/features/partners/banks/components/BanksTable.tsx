@@ -205,6 +205,7 @@ export default function BanksTable({
           columns={columns}
           rows={rows}
           getRowId={(bank) => bank.id}
+          getRowLabel={(bank) => bank.name}
           getRowHref={(bank) => `${basePath}/${bank.id}`}
           caption="Bank reference list"
           loading={loading}
