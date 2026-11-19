@@ -184,37 +184,12 @@ const ADVISORS: OverviewItem[] = [
 ];
 
 /** A block with the names of the components it uses above it. */
-// Sample monthly intake for CompositionCard: each year's months add up to its total
-// (intakes peak in January, May and September).
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const INTAKE_WEIGHTS = [16, 9, 6, 5, 11, 6, 5, 7, 18, 7, 5, 5];
+// Sample yearly totals for CompositionCard (2026 runs to September).
 const STUDENT_YEARS = [
-  { year: 2024, classified: 722, missing: 203, months: 12 },
-  { year: 2025, classified: 763, missing: 167, months: 12 },
-  { year: 2026, classified: 547, missing: 24, months: 9 },
+  { year: 2024, classified: 722, missing: 203 },
+  { year: 2025, classified: 763, missing: 167 },
+  { year: 2026, classified: 547, missing: 24 },
 ];
-function spread(total: number, weights: number[]) {
-  const sum = weights.reduce((s, w) => s + w, 0);
-  const raw = weights.map((w) => (total * w) / sum);
-  const out = raw.map(Math.floor);
-  const order = raw.map((r, i) => [r - Math.floor(r), i] as const).sort((x, y) => y[0] - x[0]);
-  const left = total - out.reduce((s, v) => s + v, 0);
-  for (let k = 0; k < left; k++) out[order[k][1]] += 1;
-  return out;
-}
-function monthRows(classified: number, missing: number, months: number) {
-  const weights = INTAKE_WEIGHTS.slice(0, months);
-  const c = spread(classified, weights);
-  const m = spread(missing, weights);
-  return weights.map((_, i) => ({
-    label: MONTHS[i],
-    total: c[i] + m[i],
-    parts: [
-      { key: "classified", label: "Classified", value: c[i] },
-      { key: "missing", label: "Not recorded", value: m[i], color: "var(--ub-neutral-400)" },
-    ],
-  }));
-}
 
 function Block({ names, children, className = "", show }: { names: string[]; children: ReactNode; className?: string; show: boolean }) {
   return (
@@ -356,13 +331,16 @@ export default function DummyDashboard() {
               { key: "certificate", label: "Certificate", value: 6, href: "#cc-certificate" },
             ]}
             reconciliation={{
-              title: "Students per month",
+              title: "Students per year",
               note: "Classified + level not recorded = official total",
               matchesDonut: "classified",
-              groups: STUDENT_YEARS.map(({ year, classified, missing, months }) => ({
-                id: String(year),
+              rows: STUDENT_YEARS.map(({ year, classified, missing }) => ({
                 label: String(year),
-                rows: monthRows(classified, missing, months),
+                total: classified + missing,
+                parts: [
+                  { key: "classified", label: "Classified", value: classified },
+                  { key: "missing", label: "Not recorded", value: missing, color: "var(--ub-neutral-400)" },
+                ],
               })),
             }}
           />
