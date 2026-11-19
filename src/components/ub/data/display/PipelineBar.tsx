@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { APPLICATION_STAGES, type ApplicationStage } from "config/applicationStages";
 import { focusRing } from "components/ub/recipes";
 import StageTag from "../badges/StageTag";
+import { SEGMENT_CLASS, SEGMENT_ROW_CLASS } from "components/ub/dashboard/charts/segments";
 
 export interface PipelineBarProps {
   /** Number of applications per stage id; stages with 0 or missing counts are left out. */
@@ -34,9 +35,9 @@ export default function PipelineBar({ counts, label = "Applications by stage", s
 
   return (
     <div className={className}>
-      <div role="img" aria-label={total ? `${label}: ${total} total. ${summary}` : `${label}: none yet`} className="flex h-3 overflow-hidden rounded-ub-full bg-ub-disabled">
+      <div role="img" aria-label={total ? `${label}: ${total} total. ${summary}` : `${label}: none yet`} className={clsx("h-3", SEGMENT_ROW_CLASS, !total && "rounded-ub-xs bg-ub-chart-track")}>
         {stages.map((s) => (
-          <span key={s.id} className="h-full" style={{ width: `${((counts[s.id] ?? 0) / total) * 100}%`, background: stageColor(s) }} />
+          <span key={s.id} className={SEGMENT_CLASS} style={{ flexGrow: counts[s.id] ?? 0, flexBasis: 0, background: stageColor(s) }} />
         ))}
       </div>
       {showLegend && stages.length > 0 && (

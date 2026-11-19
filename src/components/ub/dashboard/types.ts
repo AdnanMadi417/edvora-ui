@@ -33,6 +33,13 @@ export const CHART_STROKE: Record<Exclude<ChartColor, "hatch">, string> = {
   muted: "stroke-ub-chart-muted",
 };
 
+export const CHART_FILL: Record<Exclude<ChartColor, "hatch">, string> = {
+  "cat-1": "fill-ub-chart-cat-1",
+  "cat-2": "fill-ub-chart-cat-2",
+  "cat-3": "fill-ub-chart-cat-3",
+  muted: "fill-ub-chart-muted",
+};
+
 /** Pure: compact numbers for axes and bubbles (1,284 · 12.9K · 4.2M). */
 export function compactNumber(n: number): string {
   const abs = Math.abs(n);

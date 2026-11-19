@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
 import { CHART_OTHER, CHART_PALETTE } from "config/chartPalette";
+import { ringSegmentPath, ringSegmentStroke } from "./segments";
 
 export interface DonutSegment {
   key: string;
@@ -27,29 +28,10 @@ export interface DonutChartProps {
   className?: string;
 }
 
-// Ring from r=37 to r=47 in a 100×100 box. Each slice is a ring segment with
-// RC-radius rounded corners (a filled path shrunk by RC, stroked RC×2 with round
-// joins) and a GAP-wide surface gap of the same width from the inside to the outside.
+// Ring from r=37 to r=47 in a 100×100 box; slices use the shared segment style (segments.ts).
 const R_IN = 37;
 const R_OUT = 47;
-const RC = 2;
-const GAP = 1.6;
 const TAU = Math.PI * 2;
-
-const point = (r: number, angle: number) => `${(50 + r * Math.sin(angle)).toFixed(3)} ${(50 - r * Math.cos(angle)).toFixed(3)}`;
-
-/** A ring segment from a0 to a1 (radians, clockwise from the top) with rounded corners. */
-function segmentPath(a0: number, a1: number) {
-  const ro = R_OUT - RC;
-  const ri = R_IN + RC;
-  const inset = (r: number) => (GAP / 2 + RC) / r;
-  // Keep at least a sliver so tiny slices still show as a rounded dot.
-  const clamp = (start: number, end: number) => (end - start > 0.0005 ? [start, end] : [(start + end) / 2 - 0.00025, (start + end) / 2 + 0.00025]);
-  const [o0, o1] = clamp(a0 + inset(ro), a1 - inset(ro));
-  const [i0, i1] = clamp(a0 + inset(ri), a1 - inset(ri));
-  const large = (end: number, start: number) => (end - start > Math.PI ? 1 : 0);
-  return `M ${point(ro, o0)} A ${ro} ${ro} 0 ${large(o1, o0)} 1 ${point(ro, o1)} L ${point(ri, i1)} A ${ri} ${ri} 0 ${large(i1, i0)} 0 ${point(ri, i0)} Z`;
-}
 
 /** Full ring of slices with rounded corners and an even gap between them, starting at the top and going clockwise. */
 export default function DonutChart({ segments, centerValue, centerLabel, label, className }: DonutChartProps) {
@@ -58,7 +40,7 @@ export default function DonutChart({ segments, centerValue, centerLabel, label, 
   let start = 0;
   const arcs = visible.map((s) => {
     const share = s.value / total;
-    const arc = { ...s, share: share * 100, d: visible.length > 1 ? segmentPath(start * TAU, (start + share) * TAU) : null };
+    const arc = { ...s, share: share * 100, d: visible.length > 1 ? ringSegmentPath({ rIn: R_IN, rOut: R_OUT, a0: start * TAU, a1: (start + share) * TAU }) : null };
     start += share;
     return arc;
   });
@@ -72,7 +54,7 @@ export default function DonutChart({ segments, centerValue, centerLabel, label, 
         {!arcs.length && <circle cx="50" cy="50" r={ring} fill="none" strokeWidth={R_OUT - R_IN} className="stroke-ub-chart-track" />}
         {arcs.map((a) =>
           a.d ? (
-            <path key={a.key} d={a.d} strokeWidth={RC * 2} strokeLinejoin="round" style={{ fill: a.color, stroke: a.color }}>
+            <path key={a.key} d={a.d} {...ringSegmentStroke} style={{ fill: a.color, stroke: a.color }}>
               <title>{`${a.label}: ${a.value.toLocaleString()} (${Math.round(a.share)}%)`}</title>
             </path>
           ) : (

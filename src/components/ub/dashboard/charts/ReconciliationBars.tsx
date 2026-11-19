@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { CHART_PALETTE } from "config/chartPalette";
+import { SEGMENT_CLASS, SEGMENT_ROW_CLASS, SEGMENT_TRACK_CLASS } from "./segments";
 
 export interface ReconciliationPart {
   key: string;
@@ -53,17 +54,19 @@ export default function ReconciliationBars({ rows, unit, sharedScale = true, for
   const summaryOf = (row: ReconciliationRow) =>
     `${row.label}: ${formatValue(row.total)} ${unit}. ${row.parts.map((p) => `${p.label} ${formatValue(p.value)}`).join(", ")}`;
   const bar = (row: ReconciliationRow, scale: number, className: string) => (
-    <div aria-hidden="true" className={clsx("flex w-full gap-0.5 overflow-hidden rounded-ub-full bg-ub-chart-track", className)}>
+    <div aria-hidden="true" className={clsx(SEGMENT_ROW_CLASS, className)}>
       {colored(row)
         .filter((p) => p.value > 0)
         .map((p) => (
           <span
             key={p.key}
             title={`${row.label} · ${p.label}: ${formatValue(p.value)}`}
-            className="h-full first:rounded-s-ub-full last:rounded-e-ub-full"
-            style={{ width: `${(p.value / scale) * 100}%`, background: p.color }}
+            className={SEGMENT_CLASS}
+            style={{ flexGrow: p.value, flexBasis: 0, background: p.color }}
           />
         ))}
+      {/* The gap to the largest period on a shared scale. */}
+      {scale > row.total && <span className={SEGMENT_TRACK_CLASS} style={{ flexGrow: scale - row.total, flexBasis: 0 }} />}
     </div>
   );
 

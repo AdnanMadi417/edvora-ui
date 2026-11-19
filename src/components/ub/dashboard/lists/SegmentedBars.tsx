@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { focusRing } from "components/ub/recipes";
+import { SEGMENT_CLASS, SEGMENT_ROW_CLASS } from "../charts/segments";
 
 /** Status tones say good / waiting / problem; categorical slots only name things. */
 export type SegmentTone = "success" | "warning" | "danger" | "neutral" | "cat-1" | "cat-2";
@@ -51,11 +52,11 @@ export default function SegmentedBars({ rows, unit, className }: SegmentedBarsPr
         return (
           <section key={row.label} aria-label={row.label} className="min-w-0">
             <h3 className="text-ub-label-md text-ub-text-secondary">{row.label}</h3>
-            <div aria-hidden="true" className="mt-2 flex h-2.5 w-full gap-0.5 overflow-hidden rounded-ub-full bg-ub-chart-track">
+            <div aria-hidden="true" className={clsx("mt-2 h-2.5", SEGMENT_ROW_CLASS)}>
               {row.parts
                 .filter((p) => p.value > 0)
                 .map((p) => (
-                  <span key={p.id} className={clsx("h-full", FILL[p.tone])} style={{ width: `${total ? (p.value / total) * 100 : 0}%` }} />
+                  <span key={p.id} className={clsx(SEGMENT_CLASS, FILL[p.tone])} style={{ flexGrow: p.value, flexBasis: 0 }} />
                 ))}
             </div>
             <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">

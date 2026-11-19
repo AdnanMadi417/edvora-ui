@@ -71,7 +71,7 @@ export default function PillBarChart({ data, highlightIndex, formatValue = compa
               <span
                 aria-hidden="true"
                 className={clsx(
-                  "w-full max-w-6 rounded-ub-full transition-[height,background-color] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
+                  "w-full max-w-6 rounded-ub-xs transition-[height,background-color] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
                   d.status === "pending" ? "ub-chart-hatch" : active ? "bg-ub-chart-cat-1" : hover === i ? "bg-ub-chart-hatch" : "bg-ub-chart-muted",
                 )}
                 style={{ height: `${d.value === 0 ? 0 : Math.max(6, (d.value / max) * 100)}%` }}
