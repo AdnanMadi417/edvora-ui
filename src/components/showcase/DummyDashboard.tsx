@@ -57,6 +57,7 @@ import {
   StatTile,
   StatusTag,
   DonutStatsCard,
+  CompositionCard,
   GroupedBarChart,
   AreaLineChart,
   AvatarStrip,
@@ -80,8 +81,8 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "RadialStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
-  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "RadialRingsChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "RadialStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "RadialRingsChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
@@ -183,6 +184,38 @@ const ADVISORS: OverviewItem[] = [
 ];
 
 /** A block with the names of the components it uses above it. */
+// Sample monthly intake for CompositionCard: each year's months add up to its total
+// (intakes peak in January, May and September).
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const INTAKE_WEIGHTS = [16, 9, 6, 5, 11, 6, 5, 7, 18, 7, 5, 5];
+const STUDENT_YEARS = [
+  { year: 2024, classified: 722, missing: 203, months: 12 },
+  { year: 2025, classified: 763, missing: 167, months: 12 },
+  { year: 2026, classified: 547, missing: 24, months: 9 },
+];
+function spread(total: number, weights: number[]) {
+  const sum = weights.reduce((s, w) => s + w, 0);
+  const raw = weights.map((w) => (total * w) / sum);
+  const out = raw.map(Math.floor);
+  const order = raw.map((r, i) => [r - Math.floor(r), i] as const).sort((x, y) => y[0] - x[0]);
+  const left = total - out.reduce((s, v) => s + v, 0);
+  for (let k = 0; k < left; k++) out[order[k][1]] += 1;
+  return out;
+}
+function monthRows(classified: number, missing: number, months: number) {
+  const weights = INTAKE_WEIGHTS.slice(0, months);
+  const c = spread(classified, weights);
+  const m = spread(missing, weights);
+  return weights.map((_, i) => ({
+    label: MONTHS[i],
+    total: c[i] + m[i],
+    parts: [
+      { key: "classified", label: "Classified", value: c[i] },
+      { key: "missing", label: "Not recorded", value: m[i], color: "var(--ub-neutral-400)" },
+    ],
+  }));
+}
+
 function Block({ names, children, className = "", show }: { names: string[]; children: ReactNode; className?: string; show: boolean }) {
   return (
     <div className={`flex min-w-0 flex-col gap-2 ${className}`}>
@@ -306,6 +339,35 @@ export default function DummyDashboard() {
           </Block>
         </div>
 
+        <Block show={labels} names={["CompositionCard", "ReconciliationBars"]}>
+          <CompositionCard
+            title="Study level and recruitment mix"
+            subtitle="Students by study level, reconciled to the official total · 2024 to September 2026"
+            unit="students"
+            centerLabel="Classified students"
+            summary={{ value: 2426, label: "Total students", detail: "925 + 930 + 571", icon: GraduationCap }}
+            items={[
+              { key: "bachelor", label: "Bachelor", value: 1124, href: "#cc-bachelor" },
+              { key: "english", label: "English", value: 518, href: "#cc-english" },
+              { key: "foundation", label: "Foundation", value: 130, href: "#cc-foundation" },
+              { key: "master", label: "Master", value: 116, href: "#cc-master" },
+              { key: "phd", label: "PhD", value: 110, href: "#cc-phd" },
+              { key: "diploma", label: "Diploma", value: 28, href: "#cc-diploma" },
+              { key: "certificate", label: "Certificate", value: 6, href: "#cc-certificate" },
+            ]}
+            reconciliation={{
+              title: "Students per month",
+              note: "Classified + level not recorded = official total",
+              matchesDonut: "classified",
+              groups: STUDENT_YEARS.map(({ year, classified, missing, months }) => ({
+                id: String(year),
+                label: String(year),
+                rows: monthRows(classified, missing, months),
+              })),
+            }}
+          />
+        </Block>
+
         <div className="grid gap-6 lg:grid-cols-2">
           <Block show={labels} names={["DonutStatsCard", "DonutChart"]}>
             <DonutStatsCard
@@ -423,8 +485,8 @@ export default function DummyDashboard() {
               <ActivityFeed
                 label="Recent activity"
                 items={[
-                  { id: "a1", title: "Fatima Yusuf submitted a new application for Ruqayyah Zhang", nextStep: "Review the documents and assign it for checking.", at: new Date().toISOString(), href: "#af-1" },
-                  { id: "a2", title: "Li Wei signed up as an individual Advisor from China", nextStep: "Review the profile and verify their documents.", at: new Date(Date.now() - 3 * 86_400_000).toISOString(), href: "#af-2" },
+                  { id: "a1", title: "Fatima Yusuf submitted a new application for Ruqayyah Zhang", nextStep: "Review the documents and assign it for checking.", at: "2026-11-18T09:30:00Z", href: "#af-1" },
+                  { id: "a2", title: "Li Wei signed up as an individual Advisor from China", nextStep: "Review the profile and verify their documents.", at: "2026-10-29T14:00:00Z", href: "#af-2" },
                 ]}
               />
             </DashboardCard>

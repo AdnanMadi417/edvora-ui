@@ -42,7 +42,7 @@ export function activityTime(at: string | undefined, now = Date.now()): string {
  */
 export default function ActivityFeed({ items, label, className }: ActivityFeedProps) {
   return (
-    <ul aria-label={label} className={clsx("flex flex-col divide-y divide-ub-border-subtle", className)}>
+    <ul aria-label={label} className={clsx("flex flex-col divide-y divide-ub-border", className)}>
       {items.map((item) => {
         const when = activityTime(item.at);
         const body = (

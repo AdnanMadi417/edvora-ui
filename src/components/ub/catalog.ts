@@ -365,6 +365,20 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Role home: active applications by stage and by university"],
     avoid: "Change over time (use AreaLineChart) or comparing many categories (use a bar chart).",
   },
+  CompositionCard: {
+    category: "data",
+    imports: ['import { CompositionCard } from "components/ub/dashboard";'],
+    useFor: "A whole split into parts with how it reconciles to the official total: donut with the total in the hole, an optional headline, a two-column legend (share with one decimal, count, link), and optional per-period bars (e.g. classified + not recorded = total). Past five parts the donut folds the rest into Other, and the legend still lists each one under it.",
+    usedIn: ["Reports: students by study level and recruitment mix"],
+    avoid: "Change over time (use AreaLineChart), or parts that don't add up to one whole.",
+  },
+  ReconciliationBars: {
+    category: "data",
+    imports: ['import { ReconciliationBars } from "components/ub/dashboard";'],
+    useFor: "Each period's total as one bar split into the parts that make it (classified + not recorded), on one shared scale, with the total on the end and each part's count under it.",
+    usedIn: ["CompositionCard"],
+    avoid: "Comparing many series per period (use GroupedBarChart).",
+  },
   RadialStatsCard: {
     category: "data",
     imports: ['import { RadialStatsCard } from "components/ub/dashboard";'],

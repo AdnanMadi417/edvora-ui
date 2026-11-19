@@ -36,6 +36,8 @@ export { default as ActivityFeed, activityTime, type ActivityFeedItem, type Acti
 export { default as BarChartCard, type BarChartCardProps } from "./cards/BarChartCard";
 export { default as GaugeCard, type GaugeCardProps } from "./cards/GaugeCard";
 export { default as DonutStatsCard, foldSlices, type DonutStatsCardProps, type DonutStatsView, type DonutStatsItem } from "./cards/DonutStatsCard";
+export { default as CompositionCard, type CompositionCardProps, type CompositionSummary } from "./cards/CompositionCard";
+export { default as ReconciliationBars, type ReconciliationBarsProps, type ReconciliationRow, type ReconciliationPart } from "./charts/ReconciliationBars";
 export { default as DonutChart, DONUT_COLORS, DONUT_OTHER_COLOR, type DonutSegment } from "./charts/DonutChart";
 export { default as GroupedBarChart, type GroupedBarChartProps, type GroupedBarSeries, type GroupedBarGroup } from "./charts/GroupedBarChart";
 export { default as AreaLineChart, type AreaLineChartProps, type AreaLinePoint } from "./charts/AreaLineChart";
