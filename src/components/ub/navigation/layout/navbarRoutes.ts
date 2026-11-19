@@ -1,6 +1,5 @@
 export const profileRouteMap: Record<string, string> = {
   admin: "/admin/profile",
-  language_centre_admin: "/language-centre-admin/centre-profile",
   account_manager: "/account-manager/profile",
   partner: "/partner/profile",
   reviewer: "/reviewer/profile",

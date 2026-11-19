@@ -21,7 +21,6 @@ import {
   FileText,
   Settings,
 } from "lucide-react";
-import { FEATURES } from "config/featureFlags";
 
 const AdminRoutes: IRoute[] = [
   { name: "Home", layout: "/admin", path: "/home", icon: Home },
@@ -63,16 +62,6 @@ const AdminRoutes: IRoute[] = [
     path: "/staff-users",
     icon: Users,
   },
-  ...(FEATURES.languageCentreAdmins
-    ? [
-        {
-          name: "Language Centre Admins",
-          layout: "/admin",
-          path: "/language-centre-admins",
-          icon: Users,
-        },
-      ]
-    : []),
   {
     name: "Knowledge Hub",
     parentLink: true,

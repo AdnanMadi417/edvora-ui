@@ -1,6 +1,6 @@
 "use client";
 import { tableSectionPadding } from "components/ub/recipes";
-import { WORKSPACE_EVENT } from "features/language-centre-admin/services/centreWorkspace";
+import { WORKSPACE_EVENT } from "./workspace/centreWorkspace";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {

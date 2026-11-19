@@ -46,7 +46,6 @@ const Navbar = ({
   setOpen?: (v: boolean) => void;
 }) => {
   const { user, loading } = useMe();
-  const centreAdmin = user?.role === "language_centre_admin";
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
   const isAgencyPartner = partner?.type === "agency";
   const photoFileKey = isAgencyPartner
@@ -58,7 +57,6 @@ const Navbar = ({
     "";
 
   const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({
-    enabled: !centreAdmin,
     pollIntervalMs: 30000,
   });
 
@@ -127,37 +125,34 @@ const Navbar = ({
       </TitleTag>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-        {!centreAdmin && (
-          <NotificationsPreviewPopover
-            notificationsPath={getNotificationsRoute(user?.role)}
-            applicationBasePath={getApplicationsBasePath(user?.role)}
-            partnerBasePath={getPartnersBasePath(user?.role)}
-            onNotificationHandled={refetchUnreadCount}
+        <NotificationsPreviewPopover
+          notificationsPath={getNotificationsRoute(user?.role)}
+          applicationBasePath={getApplicationsBasePath(user?.role)}
+          partnerBasePath={getPartnersBasePath(user?.role)}
+          onNotificationHandled={refetchUnreadCount}
+        >
+          <Link
+            href={getNotificationsRoute(user?.role)}
+            aria-label={
+              unreadCount > 0
+                ? `Notifications, ${unreadLabel} unread`
+                : "Notifications"
+            }
+            className={topBarIconButton}
           >
-            <Link
-              href={getNotificationsRoute(user?.role)}
-              aria-label={
-                unreadCount > 0
-                  ? `Notifications, ${unreadLabel} unread`
-                  : "Notifications"
-              }
-              className={topBarIconButton}
-            >
-              <Bell className="h-5 w-5" aria-hidden />
-              {unreadCount > 0 && (
-                <span
-                  aria-hidden
-                  className="absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-ub-full bg-ub-danger-600 px-1 text-[10px] font-semibold leading-none text-ub-text-on-action ring-2 ring-ub-surface"
-                >
-                  {unreadLabel}
-                </span>
-              )}
-            </Link>
-          </NotificationsPreviewPopover>
-        )}
+            <Bell className="h-5 w-5" aria-hidden />
+            {unreadCount > 0 && (
+              <span
+                aria-hidden
+                className="absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-ub-full bg-ub-danger-600 px-1 text-[10px] font-semibold leading-none text-ub-text-on-action ring-2 ring-ub-surface"
+              >
+                {unreadLabel}
+              </span>
+            )}
+          </Link>
+        </NotificationsPreviewPopover>
 
         <AvatarMenu
-          restricted={centreAdmin}
           loading={loading}
           hasUser={!!user}
           userName={user?.name}

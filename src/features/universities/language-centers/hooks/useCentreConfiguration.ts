@@ -9,7 +9,7 @@ import {
 import {
   publishedCentreConfiguration,
   WORKSPACE_EVENT,
-} from "features/language-centre-admin/services/centreWorkspace";
+} from "../workspace/centreWorkspace";
 import { getDemoCentreConfiguration } from "../fixtures/demoData";
 const key = (id: string) => `unibexs:language-centre:v1:${id}`;
 export function readCentreConfiguration(

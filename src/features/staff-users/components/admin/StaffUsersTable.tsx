@@ -4,7 +4,6 @@ import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
 
-import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -38,7 +37,7 @@ import SuspendReactivateStaffUserModal from "./SuspendReactivateStaffUserModal";
 import InviteStaffUserModal from "./InviteStaffUserModal";
 import ResendStaffInvitationOtpModal from "./ResendStaffInvitationOtpModal";
 import FilterButton from "components/ub/core/buttons/FilterButton";
-import { FEATURES } from "config/featureFlags";
+
 
 const ITEMS_PER_PAGE = 20;
 
@@ -194,13 +193,6 @@ export default function StaffUsersTable() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {FEATURES.languageCentreAdmins && (
-            <LinkBtn
-              href="/admin/language-centre-admins"
-              label="Language Centre Admins"
-              icon={<Users className="h-4 w-4" />}
-            />
-          )}
           <Button
             text="Invite staff user"
             variant="primary"

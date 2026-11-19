@@ -6,12 +6,10 @@ import {
 } from "features/universities/language-centers/configuration";
 import { demoCentreConfigurations } from "features/universities/language-centers/fixtures/demoData";
 import {
-  CENTRE_ADMIN_ROLE,
   type CentreActor,
   type CentreWorkspace,
   type ManagedCentre,
-  type CentreAdminUser,
-} from "../model/types";
+} from "./types";
 import { z } from "zod";
 export const WORKSPACE_KEY = "unibexs:centre-admin-workspace:v1";
 export const WORKSPACE_EVENT = "centre-workspace-updated";
@@ -44,15 +42,8 @@ const workspaceSchema = z.object({
       images: z.array(asset.extend({ id: z.string() })).max(4),
     })
   ),
-  users: z.array(
-    z.object({
-      id: z.string().min(1),
-      name: z.string().min(1),
-      email: z.string().email(),
-      centreId: z.string().min(1),
-      status: z.enum(["invited", "active", "suspended", "removed"]),
-    })
-  ),
+  // Older saved workspaces also held centre-admin accounts; they are ignored.
+  users: z.array(z.unknown()).optional(),
 });
 export function initialWorkspace(): CentreWorkspace {
   const centres: ManagedCentre[] = Object.entries(demoCentreConfigurations).map(
@@ -119,36 +110,13 @@ export function initialWorkspace(): CentreWorkspace {
   return {
     version: 1,
     centres,
-    users: [
-      {
-        id: "mock-language_centre_admin",
-        name: "Demo centre administrator",
-        email: "centre.admin@example.com",
-        centreId: "lc_001",
-        status: "active",
-      },
-      {
-        id: "centre-admin-colleague",
-        name: "Centre colleague",
-        email: "colleague@example.com",
-        centreId: "lc_001",
-        status: "active",
-      },
-      {
-        id: "independent-admin",
-        name: "Independent centre administrator",
-        email: "independent@example.com",
-        centreId: "independent_001",
-        status: "active",
-      },
-    ],
   };
 }
 export function readWorkspace(): CentreWorkspace {
   const raw = localStorage.getItem(WORKSPACE_KEY);
-  return raw
-    ? (workspaceSchema.parse(JSON.parse(raw)) as CentreWorkspace)
-    : initialWorkspace();
+  if (!raw) return initialWorkspace();
+  const { version, centres } = workspaceSchema.parse(JSON.parse(raw));
+  return { version, centres } as CentreWorkspace;
 }
 function commit(value: CentreWorkspace) {
   const checked = workspaceSchema.parse(value);
@@ -157,14 +125,6 @@ function commit(value: CentreWorkspace) {
       throw new Error(
         "A university-linked centre requires a university; independent centres cannot be linked."
       );
-  if (
-    value.users.some(
-      (user) =>
-        user.status !== "removed" &&
-        !value.centres.some((centre) => centre.id === user.centreId)
-    )
-  )
-    throw new Error("Each user must be assigned to an existing centre.");
   try {
     localStorage.setItem(WORKSPACE_KEY, JSON.stringify(checked));
   } catch {
@@ -177,125 +137,8 @@ function commit(value: CentreWorkspace) {
 export function requirePlatformAdmin(actor: CentreActor | null | undefined) {
   if (actor?.role !== "admin")
     throw new Error(
-      "Only Unibexs Admins can manage centre assignments and accounts."
+      "Only Unibexs Admins can manage language centres."
     );
-}
-export function assignedCentre(
-  actor: CentreActor | null | undefined,
-  value = readWorkspace()
-): ManagedCentre {
-  if (!actor || actor.role !== CENTRE_ADMIN_ROLE)
-    throw new Error("This area is only available to Language Centre Admins.");
-  const member = value.users.find((user) => user.id === actor.id);
-  if (!member || member.status !== "active")
-    throw new Error(
-      "Your centre access is unavailable. Ask a Unibexs Admin to activate your account and assign your centre."
-    );
-  const centre = value.centres.find((item) => item.id === member.centreId);
-  if (!centre)
-    throw new Error(
-      "Your assigned centre is unavailable. Contact a Unibexs Admin."
-    );
-  return centre;
-}
-export function saveAssignedCentre(
-  actor: CentreActor,
-  centreId: string,
-  patch: Pick<ManagedCentre, "configuration" | "branches" | "logo" | "images">
-) {
-  const value = readWorkspace();
-  const own = assignedCentre(actor, value);
-  if (own.id !== centreId)
-    throw new Error("You can only update your assigned centre.");
-  const keys = Object.keys(patch);
-  if (
-    keys.some(
-      (key) => !["configuration", "branches", "logo", "images"].includes(key)
-    )
-  )
-    throw new Error(
-      "Centre type and university association are managed by Unibexs Admins."
-    );
-  const configuration = configurationSchema.parse(
-    patch.configuration
-  ) as CentreConfiguration;
-  const updated = {
-    ...own,
-    configuration,
-    branches: patch.branches,
-    logo: patch.logo,
-    images: patch.images,
-  };
-  const otherBranchIds = new Set(
-    value.centres
-      .filter((centre) => centre.id !== own.id)
-      .flatMap((centre) => centre.branches.map((branch) => branch.id))
-  );
-  if (updated.branches.some((branch) => otherBranchIds.has(branch.id)))
-    throw new Error("A branch from another centre cannot be assigned here.");
-  if (
-    new Set(updated.branches.map((branch) => branch.id)).size !==
-    updated.branches.length
-  )
-    throw new Error("Each branch must have a unique ID.");
-  value.centres = value.centres.map((centre) =>
-    centre.id === own.id ? updated : centre
-  );
-  commit(value);
-}
-export function inviteCentreAdmin(
-  actor: CentreActor,
-  input: { name: string; email: string; centreId: string }
-) {
-  requirePlatformAdmin(actor);
-  const value = readWorkspace();
-  const payload = z
-    .object({
-      name: z.string().trim().min(1, "Enter the user's name."),
-      email: z.string().trim().email("Enter a valid email."),
-      centreId: z.string().min(1, "Choose a centre."),
-    })
-    .parse(input);
-  if (!value.centres.some((centre) => centre.id === payload.centreId))
-    throw new Error("Choose an existing centre.");
-  if (
-    value.users.some(
-      (user) =>
-        user.status !== "removed" &&
-        user.email.toLowerCase() === payload.email.toLowerCase()
-    )
-  )
-    throw new Error("This email already has a centre-admin account.");
-  value.users.push({
-    name: payload.name,
-    centreId: payload.centreId,
-    email: payload.email.toLowerCase(),
-    id: newId(),
-    status: "invited",
-  });
-  commit(value);
-}
-export function updateCentreAdmin(
-  actor: CentreActor,
-  id: string,
-  patch: { centreId?: string; status?: CentreAdminUser["status"] }
-) {
-  requirePlatformAdmin(actor);
-  const value = readWorkspace();
-  const member = value.users.find((user) => user.id === id);
-  if (!member || member.status === "removed")
-    throw new Error("This account is no longer available.");
-  if (
-    patch.centreId !== undefined &&
-    !value.centres.some((centre) => centre.id === patch.centreId)
-  )
-    throw new Error("Choose an existing centre.");
-  if (Object.keys(patch).some((key) => !["centreId", "status"].includes(key)))
-    throw new Error("Unsupported account change.");
-  value.users = value.users.map((user) =>
-    user.id === id ? { ...user, ...patch } : user
-  );
-  commit(value);
 }
 export function setCentreAssociation(
   actor: CentreActor,
@@ -384,7 +227,7 @@ export function updatePublishedCentreBasics(
   if (!centre) throw new Error("Centre unavailable.");
   if (!["admin", "data_entry"].includes(actor.role))
     throw new Error(
-      "Update centre information through your assigned-centre workspace."
+      "Only Unibexs Admins and data entry can update language centres."
     );
   const nextUniversity = input.university_id || null;
   if (nextUniversity !== centre.universityId && actor.role !== "admin")
@@ -417,9 +260,6 @@ export function removePublishedCentre(actor: CentreActor, id: string) {
   if (!value.centres.some((centre) => centre.id === id))
     throw new Error("Centre unavailable.");
   value.centres = value.centres.filter((centre) => centre.id !== id);
-  value.users = value.users.map((user) =>
-    user.centreId === id ? { ...user, status: "removed" } : user
-  );
   commit(value);
 }
 export function publishedCentreWasRemoved(id: string) {

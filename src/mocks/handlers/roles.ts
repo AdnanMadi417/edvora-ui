@@ -11,12 +11,6 @@ export const ROLES: Role[] = [
   { id: 4, code: "finance_officer", name: "Finance Officer", is_system: false },
   { id: 5, code: "marketing_lead", name: "Marketing Lead", is_system: false },
   { id: 6, code: "support_agent", name: "Support Agent", is_system: false },
-  {
-    id: 7,
-    code: "language_centre_admin",
-    name: "Language Centre Admin",
-    is_system: true,
-  },
 ];
 
 const RESOURCES: [string, string[]][] = [

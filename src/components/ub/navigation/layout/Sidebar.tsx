@@ -38,7 +38,6 @@ const ROLE_LABELS: Record<string, string> = {
   partner: "Advisor",
   data_entry: "Data entry",
   reviewer: "Reviewer",
-  language_centre_admin: "Language Centre Admin",
 };
 
 function getRoleLabel(role: string): string {
@@ -51,7 +50,6 @@ const PROFILE_PATHS: Record<string, string> = {
   admin: "/admin/profile",
   reviewer: "/reviewer/profile",
   data_entry: "/data-entry/profile",
-  language_centre_admin: "/language-centre-admin/centre-profile",
 };
 
 const scrollArea =
@@ -110,10 +108,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     user?.name ||
     "";
 
-  const homePath =
-    user?.role === "language_centre_admin"
-      ? "/language-centre-admin/overview"
-      : "/";
+  const homePath = "/";
   const profilePath = user?.role ? PROFILE_PATHS[user.role] : undefined;
 
   useEffect(() => {

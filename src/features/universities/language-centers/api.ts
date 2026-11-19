@@ -3,7 +3,7 @@ import {
   publishedCentreConfiguration,
   updatePublishedCentreBasics,
   removePublishedCentre,
-} from "features/language-centre-admin/services/centreWorkspace";
+} from "./workspace/centreWorkspace";
 import api from "lib/useApi";
 import type { LanguageCenter, LanguageCenterInput } from "./types";
 // The app's existing preview sessions are selected by role area. Local workspace
@@ -11,12 +11,7 @@ import type { LanguageCenter, LanguageCenterInput } from "./types";
 const previewActor = () => {
   const area =
     typeof window === "undefined" ? "" : window.location.pathname.split("/")[1];
-  const role =
-    area === "data-entry"
-      ? "data_entry"
-      : area === "language-centre-admin"
-      ? "language_centre_admin"
-      : area;
+  const role = area === "data-entry" ? "data_entry" : area;
   return { id: `mock-${role}`, role };
 };
 const path = "/knowledge-hub/language-centers";

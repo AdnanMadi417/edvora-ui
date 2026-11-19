@@ -10,10 +10,7 @@ export function mockUser(role: string): SessionUser {
   return {
     id: role === "partner" ? MOCK_PARTNER.user_id : `mock-${role}`,
     partner_id: role === "partner" ? MOCK_PARTNER.id : null,
-    name:
-      role === "language_centre_admin"
-        ? "Demo centre administrator"
-        : "Demo user",
+    name: "Demo user",
     email: `${role.replace("_", "-")}@example.com`,
     role,
     has_completed_onboarding: true,

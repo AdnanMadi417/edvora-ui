@@ -1,6 +1,6 @@
 # Role dashboards
 
-The five Home routes use `RoleOverview` with role-scoped resources and the existing session authorization checks. The hidden Language Centre Admin role remains outside this dashboard rollout.
+The five Home routes use `RoleOverview` with role-scoped resources and the existing session authorization checks.
 
 ## Priorities
 
