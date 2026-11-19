@@ -307,7 +307,7 @@ export default function DummyDashboard() {
             </DashboardCard>
           </Block>
           <Block show={labels} names={["DashboardCard", "ActivityHeatmap", "ChartLegend"]} className="lg:col-span-2">
-            <DashboardCard title="Document uploads" subtitle="When Advisors upload">
+            <DashboardCard title="Performance" subtitle="When Advisors upload documents">
               <ActivityHeatmap rows={DAYS} columns={HOURS} values={UPLOADS} unit="uploads" label="Document uploads by day and hour" />
               <ChartLegend className="mt-4" marker="square" items={[{ label: "Uploads", color: "cat-1" }, { label: "Quiet hours", color: "muted" }]} />
             </DashboardCard>
