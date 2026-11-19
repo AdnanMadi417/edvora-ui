@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import CompositionCard from "./CompositionCard";
 
 const items = [
@@ -16,7 +16,7 @@ const rows = [
   { label: "2026", total: 571, parts: [{ key: "classified", label: "Classified", value: 547 }, { key: "missing", label: "Not recorded", value: 24 }] },
 ];
 
-test("shows shares to one decimal, folds small parts into Other but still lists them, and reconciles each year", () => {
+test("lists every part with its own share, and reconciles each year", () => {
   const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
   render(
     <CompositionCard
@@ -29,9 +29,8 @@ test("shows shares to one decimal, folds small parts into Other but still lists 
     />
   );
   expect(screen.getByRole("link", { name: "Bachelor: 1,124 students, 55.3%" })).toHaveAttribute("href", "/bachelor");
-  const other = screen.getByRole("list", { name: "Other: PhD, Diploma, Certificate" });
-  expect(within(other).getByText("7.1%")).toBeInTheDocument();
-  expect(within(other).getByText("0.3%")).toBeInTheDocument();
+  expect(screen.queryByText("Other")).not.toBeInTheDocument();
+  for (const share of ["25.5%", "6.4%", "5.7%", "5.4%", "1.4%", "0.3%"]) expect(screen.getByText(share)).toBeInTheDocument();
   expect(screen.getByText("2,426")).toBeInTheDocument();
   expect(screen.getByRole("listitem", { name: "2026: 571 students. Classified 547, Not recorded 24" })).toBeInTheDocument();
   // 722 + 763 + 547 = 2,032 = the donut, so no warning.

@@ -11,6 +11,7 @@ import DonutChart from "../charts/DonutChart";
 import ReconciliationBars, { type ReconciliationRow } from "../charts/ReconciliationBars";
 import { foldSlices, type DonutStatsItem } from "./DonutStatsCard";
 import type { WidgetState } from "../types";
+import { CHART_PALETTE_EXTENDED } from "config/chartPalette";
 
 export interface CompositionSummary {
   /** The headline number, e.g. 2426. */
@@ -47,7 +48,7 @@ export interface CompositionCardProps {
   unit: string;
   /** Keep the given order instead of largest first. */
   keepOrder?: boolean;
-  /** Slices before the rest fold into Other (max 5, the validated colour slots). */
+  /** Every part gets its own slice and legend row, up to 7 (the colour slots); only past that do the smallest fold into Other. */
   maxSlices?: number;
   /** Decimals on shares (default 1: 55.3%). */
   percentDigits?: number;
@@ -67,8 +68,8 @@ const num = (value: number) => value.toLocaleString();
  * A whole split into parts, with how it reconciles to the official total:
  * donut (total in the hole) · optional headline · legend (dot, name, share,
  * link) · optional per-period bars (e.g. classified + not recorded = total).
- * Past five parts the smallest fold into Other in the donut; the legend still
- * lists each of them under Other, so nothing is hidden.
+ * Every part is listed with its own colour (up to 7); only past that do the
+ * smallest fold into Other, and the legend still lists each one under it.
  */
 export default function CompositionCard({
   title,
@@ -79,7 +80,7 @@ export default function CompositionCard({
   reconciliation,
   unit,
   keepOrder = false,
-  maxSlices = 5,
+  maxSlices = CHART_PALETTE_EXTENDED.length,
   percentDigits = 1,
   formatValue = num,
   actions,
@@ -99,7 +100,7 @@ export default function CompositionCard({
   const [groupId, setGroupId] = useState(groups[groups.length - 1]?.id ?? "");
   const group = groups.find((g) => g.id === groupId) ?? groups[groups.length - 1];
   const total = items.reduce((sum, i) => sum + Math.max(0, i.value), 0);
-  const slices = foldSlices(items, maxSlices, keepOrder);
+  const slices = foldSlices(items, maxSlices, keepOrder, CHART_PALETTE_EXTENDED);
   const shown = new Set(slices.map((s) => s.key));
   const folded = items.filter((i) => i.value > 0 && !shown.has(i.key)).sort((a, b) => b.value - a.value);
   const pct = (value: number) => `${total ? ((value / total) * 100).toFixed(percentDigits) : (0).toFixed(percentDigits)}%`;

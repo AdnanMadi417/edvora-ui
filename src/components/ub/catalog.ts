@@ -368,7 +368,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
   CompositionCard: {
     category: "data",
     imports: ['import { CompositionCard } from "components/ub/dashboard";'],
-    useFor: "A whole split into parts with how it reconciles to the official total: donut with the total in the hole, an optional headline, a two-column legend (share with one decimal, count, link), and optional per-period bars (e.g. classified + not recorded = total). Past five parts the donut folds the rest into Other, and the legend still lists each one under it.",
+    useFor: "A whole split into parts with how it reconciles to the official total: donut with the total in the hole, an optional headline, a two-column legend (share with one decimal, count, link), and optional per-period bars (e.g. classified + not recorded = total). Every part gets its own colour and legend row (up to seven).",
     usedIn: ["Reports: students by study level and recruitment mix"],
     avoid: "Change over time (use AreaLineChart), or parts that don't add up to one whole.",
   },

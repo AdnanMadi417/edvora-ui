@@ -51,12 +51,17 @@ export interface DonutStatsCardProps {
 const num = (value: number) => value.toLocaleString();
 
 /** Largest first, capped at `max`, the rest folded into one "Other" slice. */
-export function foldSlices(items: DonutStatsItem[], max = 5, keepOrder = false): (DonutStatsItem & { color: string })[] {
+export function foldSlices(
+  items: DonutStatsItem[],
+  max = 5,
+  keepOrder = false,
+  palette: readonly string[] = DONUT_COLORS
+): (DonutStatsItem & { color: string })[] {
   const sorted = keepOrder ? items.filter((i) => i.value > 0) : [...items].filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
-  const cap = Math.min(max, DONUT_COLORS.length);
+  const cap = Math.min(max, palette.length);
   const head = sorted.length > cap ? sorted.slice(0, cap - 1) : sorted;
   const rest = sorted.slice(head.length);
-  const shown: (DonutStatsItem & { color: string })[] = head.map((item, i) => ({ ...item, color: DONUT_COLORS[i] as string }));
+  const shown: (DonutStatsItem & { color: string })[] = head.map((item, i) => ({ ...item, color: palette[i] as string }));
   if (rest.length)
     shown.push({ key: "__other", label: `Other (${rest.length})`, value: rest.reduce((sum, i) => sum + i.value, 0), color: DONUT_OTHER_COLOR });
   return shown;
