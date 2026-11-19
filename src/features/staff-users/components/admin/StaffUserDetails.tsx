@@ -142,7 +142,7 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
                     </span>
                   ),
                 },
-                { label: "Assigned role", value: staffUser.role?.name },
+                // The role and status are the header tags.
               ]}
               divided
             />
@@ -154,16 +154,11 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
             <h2 className="text-ub-heading-sm">Account access</h2>
           </div>
           <div className="space-y-5 p-4 sm:p-6">
-            <Alert
-              tone={staffUser.is_active ? "info" : "warning"}
-              title={
-                staffUser.is_active ? "Access enabled" : "Access suspended"
-              }
-            >
+            <p className="text-ub-body-sm text-ub-text-secondary">
               {staffUser.is_active
-                ? "This staff member can sign in with their assigned role."
-                : "This staff member cannot sign in until their account is reactivated."}
-            </Alert>
+                ? "Suspending stops this staff member from signing in until you reactivate them."
+                : "Reactivating lets this staff member sign in with their role again."}
+            </p>
             <Button
               onClick={() => setIsSuspendOpen(true)}
               icon={

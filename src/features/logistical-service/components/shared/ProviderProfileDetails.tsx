@@ -135,94 +135,14 @@ export default function ProviderProfileDetails({
                 icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
               />
             )}
-            {!editable && service.whatsapp && (
-              <LinkBtn
-                href={`https://wa.me/${service.whatsapp.replace(/\D/g, "")}`}
-                label="WhatsApp"
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="primary"
-                icon={<MessageCircle className="h-4 w-4" />}
-              />
-            )}
           </div>
         </header>
-        <dl className="grid grid-cols-3 divide-x divide-ub-border border-t border-ub-border bg-ub-surface-subtle px-2 py-4 sm:px-4 rtl:divide-x-reverse">
-          {[
-            { label: "Services", count: services.length, Icon: Truck },
-            { label: "Packages", count: packages.length, Icon: Package },
-            {
-              label: "Universities",
-              count: universities.length,
-              Icon: GraduationCap,
-            },
-          ].map(({ label, count, Icon }) => (
-            <div key={label} className="px-3 sm:px-5">
-              <dt className="flex items-center gap-2 text-ub-caption text-ub-text-secondary">
-                <Icon className="hidden h-4 w-4 sm:block" />
-                {label}
-              </dt>
-              <dd className="mt-1 text-ub-heading-md ub-tabular text-ub-text-primary">
-                {count}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {/* No count strip: the lists below are the services, packages and universities. */}
       </Card>
 
       <div className="grid items-start gap-5 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-5 sm:space-y-6">
-          {!editable && (
-            <SectionCard
-              title="Pricing overview"
-              as="h2"
-              description="Listed prices in Malaysian ringgit."
-            >
-              <dl className="grid gap-3 sm:grid-cols-2">
-                {[
-                  {
-                    label: "Individual services",
-                    range: service.services_price_range,
-                  },
-                  {
-                    label: "Support packages",
-                    range: service.packages_price_range,
-                  },
-                ].map(({ label, range }) => (
-                  <div
-                    key={label}
-                    className="rounded-ub-lg border border-ub-border bg-ub-surface-subtle p-4"
-                  >
-                    <dt className="text-ub-body-sm text-ub-text-secondary">
-                      {label}
-                    </dt>
-                    <dd className="mt-2 text-ub-heading-md text-ub-text-primary">
-                      {range ? (
-                        <>
-                          <span className="text-ub-body-sm font-normal text-ub-text-secondary">
-                            From{" "}
-                          </span>
-                          {money(range.min_price)}
-                        </>
-                      ) : (
-                        "Not listed"
-                      )}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              {service.price_range &&
-                Boolean(services.length || packages.length) && (
-                  <p className="mt-4 text-ub-body-sm text-ub-text-secondary">
-                    Overall price range: {money(service.price_range.min_price)}
-                    {service.price_range.max_price !==
-                    service.price_range.min_price
-                      ? ` – ${money(service.price_range.max_price)}`
-                      : ""}
-                  </p>
-                )}
-            </SectionCard>
-          )}
+          {/* No pricing overview: every service and package shows its own price. */}
 
           {Boolean(services.length) && (
             <SectionCard

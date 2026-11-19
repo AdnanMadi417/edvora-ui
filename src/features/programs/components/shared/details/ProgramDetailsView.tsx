@@ -6,13 +6,11 @@ import { useId, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import {
-  Award,
   Building2,
   CalendarDays,
   Check,
   Copy,
   FileText,
-  GraduationCap,
   MapPin,
 } from "lucide-react";
 import type {
@@ -141,9 +139,8 @@ export default function ProgramDetailsView({
         ? "On campus"
         : null,
     ],
+    // City and country are in the page header.
     ["Campus", program.branch?.name],
-    ["Country", program.university.country],
-    ["Location", program.branch?.state],
     [
       "English requirement",
       program.english_required_score
@@ -197,17 +194,8 @@ export default function ProgramDetailsView({
             </div>
           </div>
           {breadcrumbs}
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Tag hue="indigo" className="capitalize">
-              {program.qualification_level}
-            </Tag>
-            {program.has_scholarship && (
-              <Tag hue="amber" icon={<Award className="h-3 w-3" />}>
-                Scholarship available
-              </Tag>
-            )}
-          </div>
-          <h2 className="mt-3 max-w-4xl text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
+          {/* Qualification is in Program overview; scholarships have their own section. */}
+          <h2 className="mt-5 max-w-4xl text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
             {program.name}
           </h2>
           {managementActions && (
@@ -469,16 +457,8 @@ export default function ProgramDetailsView({
             </section>
           )}
           <div className="rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-ub-xs">
-            <p className="flex items-center gap-2 text-ub-label-sm text-ub-text-tertiary">
-              <GraduationCap className="h-4 w-4" aria-hidden="true" />
-              First-year tuition
-            </p>
-            <p className="ub-tabular mt-2 text-ub-heading-xl-mobile text-ub-text-primary">
-              {program.first_year_tuition != null
-                ? fee(program.first_year_tuition, program.yearly_fee_currency)
-                : "Fees on request"}
-            </p>
-            <dl className="mt-5 border-y border-ub-border py-4">
+            {/* Tuition lives once, in Tuition & fees. */}
+            <dl className="border-b border-ub-border pb-4">
               <dt className="text-ub-label-sm text-ub-text-tertiary">
                 Duration
               </dt>

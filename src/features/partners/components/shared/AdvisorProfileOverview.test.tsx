@@ -42,7 +42,8 @@ it("groups company details, documents, contact links and manager controls", () =
   expect(
     screen.getByRole("heading", { name: "Company information" })
   ).toBeInTheDocument();
-  expect(screen.getByText("Study Agency")).toBeInTheDocument();
+  // The company name is the page title (AdvisorProfileHeader), not repeated in this card.
+  expect(screen.queryByText("Study Agency")).not.toBeInTheDocument();
   expect(renderDocument).toHaveBeenCalledWith(
     "Company registration document",
     "registration.pdf"

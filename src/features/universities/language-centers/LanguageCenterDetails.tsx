@@ -193,7 +193,8 @@ export default function LanguageCenterDetails({
           </h2>
         </div>
       </header>
-      <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+      {/* No side card: the header names and links the university, and the breadcrumb goes back. */}
+      <div className="grid min-w-0 items-start gap-5">
         <div className="min-w-0 space-y-5">
           <CentreRecordDetails
             centreId={center.id}
@@ -259,32 +260,6 @@ export default function LanguageCenterDetails({
             </DetailsSection>
           )}
         </div>
-        <aside
-          aria-label="Language centre summary"
-          className="space-y-4 xl:sticky xl:top-24"
-        >
-          <DetailsSection
-            title={
-              center.centre_type === "independent" ? "Centre" : "University"
-            }
-          >
-            <p className="mb-4 text-ub-body-sm text-ub-text-secondary">
-              {center.centre_type === "independent"
-                ? "Independent language center"
-                : university?.name || "University unavailable"}
-            </p>
-            <div className="flex flex-col gap-3">
-              {center.centre_type !== "independent" && (
-                <LinkBtn
-                  href={universityHref}
-                  label="View university"
-                  icon={<UniversityIcon className="h-4 w-4" />}
-                />
-              )}
-              {back}
-            </div>
-          </DetailsSection>
-        </aside>
       </div>
       {!readOnly && editing && (
         <LanguageCenterForm

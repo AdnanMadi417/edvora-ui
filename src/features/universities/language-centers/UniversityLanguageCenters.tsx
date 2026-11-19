@@ -9,7 +9,7 @@ import { parseApiError } from "utils/parseApiError";
 import { languageCentersApi } from "./api";
 import type { LanguageCenter } from "./types";
 import { useCentreConfiguration } from "./hooks/useCentreConfiguration";
-import CentreConfigurationView from "./components/CentreConfigurationView";
+import type { CentreConfiguration } from "./configuration";
 
 export default function UniversityLanguageCenters(props: {
   universityId: string;
@@ -29,7 +29,7 @@ export default function UniversityLanguageCenters(props: {
   return (
     <div className="space-y-4">
       {centre.value.enabled ? (
-        <CentreConfigurationView value={centre.value} />
+        <CentreSummary value={centre.value} {...props} />
       ) : (
         <DetailsSection title="Language Centre">
           <p className="text-ub-body-sm text-ub-text-secondary">
@@ -38,6 +38,45 @@ export default function UniversityLanguageCenters(props: {
         </DetailsSection>
       )}
     </div>
+  );
+}
+
+/**
+ * The university's language centre in one card: name, where, how many
+ * courses, and a link. Courses, fees and packages live once, on the centre's
+ * own page.
+ */
+function CentreSummary({ value, universityId, basePath }: { value: CentreConfiguration; universityId: string; basePath: string }) {
+  const [centreId, setCentreId] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    languageCentersApi
+      .list()
+      .then((response) => {
+        const match = response.data.items.find((c) => c.university_id === universityId);
+        if (!cancelled && match) setCentreId(match.id);
+      })
+      .catch(() => {
+        // The filtered list below still gets people there.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [universityId]);
+  const courses = value.courses.length;
+  const href = centreId
+    ? `${basePath}/language-centers/${encodeURIComponent(centreId)}`
+    : `${basePath}/language-centers?university_id=${encodeURIComponent(universityId)}`;
+  return (
+    <DetailsSection
+      title="Language Centre"
+      action={<LinkBtn size="sm" variant="secondary" icon={<Languages className="h-4 w-4" />} label="View language centre" href={href} />}
+    >
+      <p className="text-ub-label-md text-ub-text-primary">{value.name || "Language Centre"}</p>
+      <p className="mt-1 text-ub-body-sm text-ub-text-secondary">
+        {[value.location, `${courses} ${courses === 1 ? "course" : "courses"}`].filter(Boolean).join(" · ")}
+      </p>
+    </DetailsSection>
   );
 }
 

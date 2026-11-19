@@ -11,7 +11,6 @@ import {
   BookOpen,
   Building2,
   GraduationCap,
-  MapPin,
   Pencil,
 } from "lucide-react";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -80,14 +79,17 @@ export default function UniversityProfileView({
                   }
                 />
               </div>
+              {/* Name once; type, category and country are in University overview. */}
               <div className="min-w-0">
-                <p className="text-ub-label-md text-ub-text-secondary">
+                <Breadcrumbs
+                  items={[
+                    { label: "Universities", href: basePath },
+                    { label: university.name },
+                  ]}
+                />
+                <h1 className="mt-1 max-w-4xl text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
                   {university.name}
-                </p>
-                <p className="mt-1 flex items-center gap-1 text-ub-body-sm text-ub-text-tertiary">
-                  <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {university.country || "Location to be confirmed"}
-                </p>
+                </h1>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -112,28 +114,6 @@ export default function UniversityProfileView({
               )}
             </div>
           </div>
-          <Breadcrumbs
-            items={[
-              { label: "Universities", href: basePath },
-              { label: university.name },
-            ]}
-          />
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Tag hue="indigo">
-              {university.is_public
-                ? "Public university"
-                : "Private university"}
-            </Tag>
-            {university.university_type_name && (
-              <Tag hue="sky">{university.university_type_name}</Tag>
-            )}
-            {university.has_language_center && (
-              <Tag hue="teal">Language center available</Tag>
-            )}
-          </div>
-          <h2 className="mt-3 max-w-4xl text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
-            {university.name}
-          </h2>
         </div>
         <DetailsSectionNav
           label="University sections"
@@ -168,13 +148,6 @@ export default function UniversityProfileView({
                     university.university_type_name || "To be confirmed",
                   ],
                   ["Country", university.country || "To be confirmed"],
-                  ["Campuses", String(branches.length)],
-                  [
-                    "Language center",
-                    university.has_language_center
-                      ? "Available"
-                      : "Not available",
-                  ],
                 ].map(([label, value]) => (
                   <div key={label}>
                     <dt className="text-ub-label-sm text-ub-text-tertiary">

@@ -34,7 +34,9 @@ it("converts tuition and commission together and copies the displayed fee summar
   const summary = screen.getByRole("complementary", {
     name: "Program summary",
   });
-  expect(within(summary).getByText("USD 8,125")).toBeInTheDocument();
+  // Tuition shows once, in Tuition & fees; the summary keeps the commission.
+  expect(within(summary).queryByText("USD 8,125")).not.toBeInTheDocument();
+  expect(screen.getAllByText("USD 8,125").length).toBeGreaterThan(0);
   expect(within(summary).getByText("USD 1,050")).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Copy fee summary" }));
   expect(screen.getByRole("status")).toHaveTextContent("Fee summary copied");

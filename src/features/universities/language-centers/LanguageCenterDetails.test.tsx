@@ -87,9 +87,11 @@ it.each(["/admin", "/data-entry", "/partner"])(
     expect(
       screen.getByRole("link", { name: "Test University" })
     ).toHaveAttribute("href", `${basePath}/universities/uni-1`);
+    // The breadcrumb is the way back (no separate button).
     expect(
-      screen.getByRole("link", { name: "Back to language centres" })
+      screen.getByRole("link", { name: "Language Centres" })
     ).toHaveAttribute("href", `${basePath}/language-centers`);
+    expect(screen.queryByRole("link", { name: "Back to language centres" })).not.toBeInTheDocument();
     if (basePath === "/partner")
       expect(
         screen.queryByRole("button", { name: "Actions" })

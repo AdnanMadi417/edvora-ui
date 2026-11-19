@@ -1,6 +1,6 @@
 import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import type { ReactNode } from "react";
-import { Pencil, MapPin, Building2, User } from "lucide-react";
+import { Pencil, Building2, User } from "lucide-react";
 import type { PartnerDetails } from "features/partners/types";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
@@ -72,11 +72,6 @@ export default function AdvisorProfileHeader({
           <h1 className="break-words text-ub-heading-lg text-ub-text-primary">
             {name}
           </h1>
-          <p className="break-all text-ub-body-sm text-ub-text-secondary">
-            {company && partner.name !== name
-              ? `Primary contact: ${partner.name}`
-              : partner.email}
-          </p>
           <div className="flex flex-wrap items-center gap-2">
             <Tag hue={partner.is_active ? "teal" : "grey"}>
               {partner.is_active ? "Active" : "Inactive"}
@@ -85,12 +80,6 @@ export default function AdvisorProfileHeader({
               <Tag hue={partner.is_verified ? "sky" : "amber"}>
                 {partner.is_verified ? "Verified" : "Pending verification"}
               </Tag>
-            )}
-            {partner.country && (
-              <span className="inline-flex items-center gap-1 text-ub-body-sm text-ub-text-secondary">
-                <MapPin className="h-4 w-4" />
-                {partner.country}
-              </span>
             )}
           </div>
         </div>

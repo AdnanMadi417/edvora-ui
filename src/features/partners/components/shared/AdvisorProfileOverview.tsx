@@ -67,6 +67,34 @@ export default function AdvisorProfileOverview({
           key: partner.individual_details?.passport_photo_file_key,
         },
       ];
+  // Status, verification and type are in the page header.
+  const accountItems = [
+    ...(!forAdvisor && "assigned_manager_name" in partner
+      ? [
+          {
+            label: "Assigned manager",
+            value: partner.assigned_manager_name || "Unassigned",
+          },
+        ]
+      : []),
+    ...(partner.agency_role
+      ? [
+          {
+            label: "Agency role",
+            value: formatAgencyRole(partner.agency_role),
+          },
+        ]
+      : []),
+    ...(partner.agency_membership
+      ? [
+          {
+            label: "Member of",
+            value: partner.agency_membership.agency_name,
+          },
+        ]
+      : []),
+  ];
+
   return (
     <div className="grid items-start gap-5 bg-ub-surface-subtle p-3 sm:gap-6 sm:p-6 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-5 sm:space-y-6">
@@ -92,10 +120,7 @@ export default function AdvisorProfileOverview({
             items={
               company
                 ? [
-                    {
-                      label: "Company name",
-                      value: partner.company_details?.company_name,
-                    },
+                    // The name is the page title; email and country are in Contact details.
                     { label: "Website", value: link(website) },
                     { label: "Primary contact", value: partner.name },
                     {
@@ -110,7 +135,6 @@ export default function AdvisorProfileOverview({
                     },
                   ]
                 : [
-                    { label: "Full name", value: partner.name },
                     {
                       label: "Date of birth",
                       value: details?.date_of_birth ? (
@@ -203,61 +227,15 @@ export default function AdvisorProfileOverview({
             />
           </div>
         </SectionCard>
-        <SectionCard
-          title="Account overview"
-          as="h2"
-          action={<ShieldCheck className="h-5 w-5 text-ub-text-tertiary" />}
-        >
-          <DescriptionList
-            divided
-            items={[
-              {
-                label: "Account status",
-                value: (
-                  <Tag hue={partner.is_active ? "teal" : "grey"}>
-                    {partner.is_active ? "Active" : "Inactive"}
-                  </Tag>
-                ),
-              },
-              {
-                label: "Verification",
-                value: (
-                  <Tag hue={partner.is_verified ? "sky" : "amber"}>
-                    {partner.is_verified ? "Verified" : "Pending verification"}
-                  </Tag>
-                ),
-              },
-              {
-                label: "Advisor type",
-                value: company ? "Company" : "Individual",
-              },
-              ...(!forAdvisor && "assigned_manager_name" in partner
-                ? [
-                    {
-                      label: "Assigned manager",
-                      value: partner.assigned_manager_name || "Unassigned",
-                    },
-                  ]
-                : []),
-              ...(partner.agency_role
-                ? [
-                    {
-                      label: "Agency role",
-                      value: formatAgencyRole(partner.agency_role),
-                    },
-                  ]
-                : []),
-              ...(partner.agency_membership
-                ? [
-                    {
-                      label: "Member of",
-                      value: partner.agency_membership.agency_name,
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        </SectionCard>
+        {accountItems.length > 0 && (
+          <SectionCard
+            title="Account overview"
+            as="h2"
+            action={<ShieldCheck className="h-5 w-5 text-ub-text-tertiary" />}
+          >
+            <DescriptionList divided items={accountItems} />
+          </SectionCard>
+        )}
         <SectionCard title="Account activity" as="h2">
           <DescriptionList
             divided

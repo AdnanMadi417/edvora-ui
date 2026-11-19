@@ -28,9 +28,7 @@ export default function CentreConfigurationView({
     <DetailsSection title="Language Centre">
       <div className="space-y-5">
         <div className="space-y-2">
-          <h3 className="text-ub-heading-sm text-ub-text-primary">
-            {value.name}
-          </h3>
+          {/* The centre name is the page title. */}
           {value.description && (
             <p className="whitespace-pre-wrap text-ub-body-sm text-ub-text-secondary">
               {value.description}

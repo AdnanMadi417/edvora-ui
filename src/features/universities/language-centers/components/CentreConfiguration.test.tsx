@@ -108,10 +108,8 @@ it("renders saved advisor prices, services and refundable deposits while hiding 
       dataUrl: "data:application/pdf;base64,JVBERi0=",
     },
   };
-  saveCentreConfiguration("uni-1", value);
-  render(
-    <UniversityLanguageCenters universityId="uni-1" basePath="/partner" />
-  );
+  // Courses, fees and packages show once, on the centre's own page.
+  render(<CentreConfigurationView value={value} />);
   await waitFor(() =>
     expect(screen.getByText("MYR 1,500 / month")).toBeVisible()
   );
@@ -132,6 +130,22 @@ it("renders saved advisor prices, services and refundable deposits while hiding 
   expect(
     screen.queryByRole("link", { name: /Edit Language Centre/ })
   ).not.toBeInTheDocument();
+});
+
+it("the university page shows the centre as one summary card with a link, not its courses", async () => {
+  const value: CentreConfiguration = {
+    ...emptyConfiguration(),
+    enabled: true,
+    name: "University Language Centre",
+    location: "Bukit Jalil",
+    courses: [{ ...emptyCourse(), name: "Academic English", language: "English" }],
+  };
+  saveCentreConfiguration("uni-2", value);
+  render(<UniversityLanguageCenters universityId="uni-2" basePath="/partner" />);
+  await waitFor(() => expect(screen.getByText("University Language Centre")).toBeVisible());
+  expect(screen.getByText("Bukit Jalil · 1 course")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /View language centre/ })).toHaveAttribute("href", expect.stringContaining("/partner/language-centers"));
+  expect(screen.queryByText("Academic English")).not.toBeInTheDocument();
 });
 
 it("shows every course by default and allows details to be collapsed", async () => {
