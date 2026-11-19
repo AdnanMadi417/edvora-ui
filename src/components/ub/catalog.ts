@@ -372,6 +372,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Reports: students by study level and recruitment mix"],
     avoid: "Change over time (use AreaLineChart), or parts that don't add up to one whole.",
   },
+  RankedBarsCard: {
+    category: "data",
+    imports: ['import { RankedBarsCard, RankedBars } from "components/ub/dashboard";'],
+    useFor: "Categories ranked largest first as horizontal bars on one scale, one colour: name, value and share per row (rows can link). The tail folds into Others; records with no value (notRecorded) are stated on top instead of ranked. RankedBars is the chart alone for use inside another card.",
+    usedIn: ["Reports: applications by country, region, institution type and field of study"],
+    avoid: "Parts of a whole with few categories (use CompositionCard), change over time (use AreaLineChart), or a rainbow of one colour per bar.",
+  },
   ReconciliationBars: {
     category: "data",
     imports: ['import { ReconciliationBars } from "components/ub/dashboard";'],

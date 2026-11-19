@@ -56,6 +56,7 @@ import {
   StatusTag,
   DonutStatsCard,
   CompositionCard,
+  RankedBarsCard,
   GroupedBarChart,
   AreaLineChart,
   AvatarStrip,
@@ -78,8 +79,8 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
-  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "RankedBarsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "RankedBars", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
   { group: "Data kit", path: "components/ub/data/cards", names: ["StatCard (data kit)"] },
@@ -179,6 +180,17 @@ const ADVISORS: OverviewItem[] = [
 ];
 
 /** A block with the names of the components it uses above it. */
+// Sample data for RankedBarsCard.
+const SAMPLE_COUNTRIES: [string, number][] = [
+  ["China", 25938], ["Bangladesh", 8831], ["Indonesia", 5412], ["India", 3940], ["Pakistan", 3305],
+  ["Myanmar", 1820], ["Sudan", 1544], ["Japan", 1210], ["Kazakhstan", 1025], ["Yemen", 980], ["Nigeria", 860],
+];
+const SAMPLE_FIELDS: [string, number][] = [
+  ["Social sciences, business and law", 8810], ["Engineering, manufacturing and construction", 4354],
+  ["Science, mathematics and computing", 4325], ["General programmes", 3794], ["Arts and humanities", 1776],
+  ["Health and welfare", 1650], ["Education", 1306], ["Services", 843], ["Agriculture and veterinary", 699],
+];
+
 // Sample yearly totals for CompositionCard (2026 runs to September).
 const STUDENT_YEARS = [
   { year: 2024, classified: 722, missing: 203 },
@@ -305,6 +317,29 @@ export default function DummyDashboard() {
               <ActivityHeatmap rows={DAYS} columns={HOURS} values={UPLOADS} unit="uploads" label="Document uploads by day and hour" />
               <ChartLegend className="mt-4" marker="square" items={[{ label: "Uploads", color: "cat-1" }, { label: "Quiet hours", color: "muted" }]} />
             </DashboardCard>
+          </Block>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Block show={labels} names={["RankedBarsCard", "RankedBars"]}>
+            <RankedBarsCard
+              title="Applications by country"
+              subtitle="Where new applicants come from · January to September 2026"
+              unit="applications"
+              top={8}
+              items={SAMPLE_COUNTRIES.map(([label, value]) => ({ key: label, label, value, href: `#rb-${label}` }))}
+              note="Sample data. Others: every country outside the top seven."
+            />
+          </Block>
+          <Block show={labels} names={["RankedBarsCard"]}>
+            <RankedBarsCard
+              title="Applications by field of study"
+              subtitle="What new applicants want to study · January to September 2026"
+              unit="applications"
+              notRecorded={53544}
+              items={SAMPLE_FIELDS.map(([label, value]) => ({ key: label, label, value }))}
+              note="Sample data. Field of study is optional on the application form."
+            />
           </Block>
         </div>
 
