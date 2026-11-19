@@ -45,8 +45,6 @@ import {
   PeopleListItem,
   PeriodSelect,
   PillBarChart,
-  PipelineBar,
-  PipelineFlow,
   ProgressCard,
   QuickActions,
   ListFooter,
@@ -83,7 +81,6 @@ export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
   { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "RadialStatsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
   { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "RadialRingsChart", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
-  { group: "Pipeline", path: "components/ub/dashboard/pipeline", names: ["PipelineFlow", "PipelineBar"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed", "AvatarStrip"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
   { group: "Data kit", path: "components/ub/data/cards", names: ["StatCard (data kit)"] },
@@ -120,7 +117,6 @@ const FLOW = [
   { id: "arrival", label: "Arrival and enrollment", count: 2, stageId: "arrival-logistics" },
   { id: "commission", label: "Commission", count: 3, stageId: "commission-paid" },
 ];
-const COUNTS = { "documents-pending": 1, "offer-received": 2, "visa-in-progress": 2, "arrival-logistics": 2, "commission-paid": 3 };
 
 // Overview fixtures: the same shapes the role home loads from the API.
 const PIPELINE_PLAN: ResourcePlan = {
@@ -211,7 +207,6 @@ function Block({ names, children, className = "", show }: { names: string[]; chi
 export default function DummyDashboard() {
   const [period, setPeriod] = useState<DashboardPeriod>("month");
   const [labels, setLabels] = useState(true);
-  const [flowStage, setFlowStage] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-ub-canvas text-ub-text-primary">
@@ -404,13 +399,6 @@ export default function DummyDashboard() {
               { id: "individual", label: "Individual", value: 15 },
             ]}
           />
-        </Block>
-
-        <Block show={labels} names={["DashboardCard", "PipelineFlow", "PipelineBar"]}>
-          <DashboardCard title="Pipeline" subtitle="Press a stage to filter; press it again to clear.">
-            <PipelineFlow stages={FLOW} selectedId={flowStage} onSelect={setFlowStage} />
-            <PipelineBar className="mt-6" counts={COUNTS} label="Applications by stage" />
-          </DashboardCard>
         </Block>
 
         <div className="grid gap-6 lg:grid-cols-3">
