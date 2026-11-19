@@ -47,7 +47,6 @@ import {
   ActivityFeed,
   ReminderCard,
   Sparkline,
-  StatCard,
   StatTile,
   StatusTag,
   DonutStatsCard,
@@ -70,7 +69,7 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatTile", "DonutStatsCard", "CompositionCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
   { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "RankedBars", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
   { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed"] },
   { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewItems", "CommissionStatusChart"] },
@@ -236,14 +235,6 @@ export default function DummyDashboard() {
           />
         </Block>
 
-        <Block show={labels} names={["StatCard", "DeltaPill", "IconTile", "CardLinkButton"]}>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard variant="highlighted" icon={GraduationCap} label="Action required" value="7" caption="Waiting on you" action={<CardLinkButton href="#c-overview" label="Open action required" tone="secondary" />} />
-            <StatCard variant="icon" icon={ClipboardCheck} label="Active applications" value="10" delta={{ value: 12, comparedTo: "vs last month" }} />
-            <StatCard variant="bars" label="Arriving in 30 days" value="3" bars={[1, 2, 1, 3, 2, 4, 3]} caption="7 weeks" />
-            <StatCard variant="icon" icon={Wallet} iconTone="success" label="Expected commission" value={<Amount value={7950} />} delta={{ value: 8, comparedTo: "vs last intake" }} />
-          </div>
-        </Block>
 
         <Block show={labels} names={["StatTile", "DeltaPill", "IconTile"]}>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

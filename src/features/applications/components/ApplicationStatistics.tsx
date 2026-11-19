@@ -1,5 +1,5 @@
 import { ClipboardList } from "lucide-react";
-import StatCard from "components/ub/dashboard/cards/StatCard";
+import StatTile from "components/ub/dashboard/cards/StatTile";
 
 export interface ApplicationStatisticsProps {
   total: number;
@@ -25,30 +25,27 @@ export default function ApplicationStatistics({
       aria-label="Application statistics"
       className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3"
     >
-      <StatCard
+      <StatTile
         label={scopeLabel}
         value={total.toLocaleString()}
-        caption="Across your pipeline"
-        variant="highlighted"
+        footer={{ text: "Across your pipeline" }}
         className="col-span-2 sm:col-span-1"
         icon={ClipboardList}
         state={state}
         errorMessage={error || undefined}
       />
-      <StatCard
+      <StatTile
         label="Stages in use"
         value={stagesInUse.toLocaleString()}
-        caption="Stages with applications"
-        variant="default"
-          state={state}
+        footer={{ text: "Stages with applications" }}
+        state={state}
         errorMessage={error || undefined}
       />
-      <StatCard
+      <StatTile
         label="In commission stage"
         value={commissionCount.toLocaleString()}
-        caption="Includes every status in that stage"
-        variant="default"
-          iconTone="success"
+        footer={{ text: "Includes every status in that stage" }}
+        iconTone="success"
         state={state}
         errorMessage={error || undefined}
       />

@@ -319,12 +319,11 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Every dashboard widget"],
     avoid: "Detail-page sections: use SectionCard.",
   },
-  "StatCard, DeltaPill and IconTile": {
+  "DeltaPill and IconTile": {
     category: "data",
-    imports: ['import { StatCard, DeltaPill, IconTile } from "components/ub/dashboard";'],
-    useFor: "KPI cards with a change pill; four variants.",
-    usedIn: ["Admin dashboard KPIs", "Commission overview"],
-    avoid: "The glass KPI on Advisor home: use data/StatCard.",
+    imports: ['import { DeltaPill, IconTile } from "components/ub/dashboard";'],
+    useFor: "A change against a stated comparison (green when good, red when bad, never colour alone) and the tinted icon square used in StatTile and list rows.",
+    usedIn: ["StatTile", "List rows"],
   },
   "PillBarChart and ChartLegend": {
     category: "data",
@@ -356,7 +355,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
     category: "data",
     imports: ['import { Sparkline, PipelineBar } from "components/ub/dashboard";'],
     useFor: "A trend inside a card; applications by stage.",
-    usedIn: ["StatCard trends", "Tracker summary"],
+    usedIn: ["StatTile trends", "Tracker summary"],
   },
   DonutStatsCard: {
     category: "data",
@@ -449,7 +448,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
   },
   "Admin dashboard": {
     category: "data",
-    imports: ['import { DashboardCard, StatCard, PillBarChart } from "components/ub/dashboard";'],
+    imports: ['import { DashboardCard, StatTile, PillBarChart } from "components/ub/dashboard";'],
     useFor: "Reference composition of the widget library.",
     usedIn: ["/design-system Dashboard patterns"],
   },
@@ -459,7 +458,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
     imports: [imp("SectionCard", "data/cards/SectionCard")],
     useFor: "Every read-only block on a detail page: one header plus the loading, empty and error states.",
     usedIn: ["Application Details: summary, student, documents, offer, visa, commission, activity", "Advisor details", "Payout details"],
-    avoid: "Interactive cards (use the interactive card recipe) and glass summaries (StatCard).",
+    avoid: "Interactive cards (use the interactive card recipe) and KPI summaries (StatTile).",
   },
   KeyValueGrid: {
     category: "data",
@@ -998,13 +997,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Existing tables and detail pages"],
     legacyOf: "Tag",
   },
-  DetailStatusBadge: {
-    category: "data",
-    imports: [imp("DetailStatusBadge", "data/badges/DetailStatusBadge")],
-    useFor: "Status with a dot on detail pages.",
-    usedIn: ["Existing detail pages"],
-    legacyOf: "Tag dot",
-  },
   SectionIconBadge: {
     category: "icons",
     imports: [imp("SectionIconBadge", "icons/SectionIconBadge")],
@@ -1085,12 +1077,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
   },
 
   // ── Data display ──────────────────────────────────────────────────────
-  StatCard: {
-    category: "data",
-    imports: [imp("StatCard", "data/cards/StatCard")],
-    useFor: "KPI: label with icon, value, delta tag, context and optional sparkline.",
-    usedIn: ["Advisor home (4 stat cards)", "Commission totals", "Admin dashboards"],
-  },
   PipelineBar: {
     category: "data",
     imports: [imp("PipelineBar", "data/display/PipelineBar")],

@@ -200,7 +200,7 @@ export function DataDisplaySection() {
       <Pick demos={["ApplicationTracker"]}>
         <NewBrand />
       </Pick>
-      <Pick demos={["StatCard", "List and ListItem"]}>
+      <Pick demos={["StatTile", "List and ListItem"]}>
         <NewData />
       </Pick>
       <Pick demos={["PipelineBar", "DescriptionList"]}>

@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Bell, Download, FileText, GraduationCap, Inbox, Plus, UserPlus, Users, Wallet } from "lucide-react";
+import { AlertCircle, Bell, Download, FileText, GraduationCap, Inbox, Plus, UserPlus, Users } from "lucide-react";
 import Tag, { type TagHue } from "components/ub/data/badges/Tag";
 import DaysTag from "components/ub/data/badges/DaysTag";
 import Chip from "components/ub/data/badges/Chip";
 import CountBadge from "components/ub/data/badges/CountBadge";
 import { Avatar, AvatarGroup, type AvatarSize } from "components/ub/data/media/Avatar";
-import StatCard from "components/ub/data/cards/StatCard";
 import { List, ListItem } from "components/ub/data/display/List";
 import DataTable, { DataTablePrimaryCell, type DataTableColumn, type DataTableDensity } from "components/ub/data/tables/DataTable";
 import TablePagination from "components/ub/data/tables/TablePagination";
@@ -88,7 +87,6 @@ export default function NewData() {
   const [intakes, setIntakes] = useState<string[]>(["Jan 2027"]);
   const [levels, setLevels] = useState<string[]>(["Degree"]);
   const [applied, setApplied] = useState(["Sunway University", "Kuala Lumpur"]);
-  const [statLoading, setStatLoading] = useState<"data" | "loading">("data");
   const [tableState, setTableState] = useState<(typeof TABLE_STATES)[number]>("data");
   const [density, setDensity] = useState<DataTableDensity>("comfortable");
   const [selected, setSelected] = useState<string[]>([]);
@@ -237,23 +235,6 @@ export default function NewData() {
         </Variant>
       </Demo>
 
-      <Demo name="StatCard" path="components/ub/data/cards/StatCard.tsx" description="Light glass, data-xl tabular value, delta tag with sign and icon, context caption, optional sparkline.">
-        <StateSwitch<"data" | "loading"> value={statLoading} options={["data", "loading"] as const} onChange={setStatLoading} label="Stat card state" />
-        <div className="grid gap-4 rounded-ub-lg bg-ub-canvas p-4 ub-canvas-light sm:grid-cols-3">
-          <StatCard
-            loading={statLoading === "loading"}
-            label="Students placed"
-            icon={<GraduationCap />}
-            value="128"
-            delta={{ value: 12 }}
-            context="vs last intake"
-            sparkline={[62, 70, 68, 84, 91, 104, 128]}
-            sparklineLabel="Students placed over the last 7 intakes, rising from 62 to 128"
-          />
-          <StatCard loading={statLoading === "loading"} label="Commission this month" icon={<Wallet />} value={rm(42600)} delta={{ value: -4.5 }} context="vs September" />
-          <StatCard loading={statLoading === "loading"} label="Documents overdue" icon={<FileText />} value="3" delta={{ value: -2, unit: "", goodWhen: "down" }} context="vs last week" />
-        </div>
-      </Demo>
 
       <Demo name="List and ListItem" path="components/ub/data/display/List.tsx" description="Divided rows with leading, title, description, meta and a trailing action. Rows can be buttons or links; dense is 44px." className="grid gap-6 lg:grid-cols-2">
         <Variant label="Interactive (button rows)">

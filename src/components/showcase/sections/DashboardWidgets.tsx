@@ -31,7 +31,6 @@ import {
   ProgressCard,
   ReminderCard,
   Sparkline,
-  StatCard,
   StatTile,
   StatusTag,
   DonutStatsCard,
@@ -169,26 +168,16 @@ export default function DashboardWidgets() {
       </Demo>
 
       <Demo
-        name="StatCard, DeltaPill and IconTile"
-        path="components/ub/dashboard/cards/StatCard.tsx"
-        description="Label, big tabular value, delta pill (green when the change is good, red when bad; arrow and sign, so never colour alone) and caption. Variants: default, highlighted (brand fill, one per view), with icon, with mini bars."
-        code={`<StatCard label="Commission paid" value={<Amount value={84200} />} delta={{ value: 12, comparedTo: "vs last month" }} caption="RM75,100 last month" variant="icon" icon={Wallet} />`}
+        name="DeltaPill and IconTile"
+        path="components/ub/dashboard/shared/DeltaPill.tsx"
+        description="DeltaPill: green when the change is good, red when bad, with arrow and sign so it's never colour alone; goodWhen=&quot;down&quot; for metrics where lower is better. IconTile: the tinted icon square used in StatTile and list rows."
+        code={`<DeltaPill value={12} comparedTo="vs last month" />  <IconTile icon={Wallet} tone="success" />`}
         props={[
-          { name: "label / value / caption", type: "string / ReactNode / ReactNode", description: "Value uses Amount or Numeral." },
-          { name: "delta", type: "{ value, unit?, goodWhen?, comparedTo? }", description: "DeltaPill; goodWhen=\"down\" for metrics where lower is better." },
-          { name: "variant", type: '"default" | "highlighted" | "icon" | "bars"', default: '"default"', description: "Highlighted: brand fill. Icon: IconTile. Bars: mini bars from `bars`." },
-          { name: "icon / iconTone / bars / action", type: "IconComponent / tone / number[] / ReactNode", description: "Variant extras; action is usually a CardLinkButton." },
-          { name: "state", type: '"ready" | "loading" | "error"', description: "Skeleton or error with Try again." },
+          { name: "value / unit / goodWhen / comparedTo", type: "number / string / \"up\" | \"down\" / string", description: "DeltaPill." },
+          { name: "icon / tone / size", type: "IconComponent / tone / \"sm\" | \"md\" | \"lg\"", description: "IconTile." },
         ]}
       >
-        <StateSwitch<"ready" | "loading" | "error"> value={statState} options={["ready", "loading", "error"] as const} onChange={setStatState} label="Stat state" />
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard state={statState} onRetry={() => setStatState("ready")} variant="highlighted" icon={GraduationCap} label="Students placed" value="21" delta={{ value: 18, comparedTo: "vs last intake" }} caption="Target 30 this intake" action={<CardLinkButton href="#" label="Open placed students" tone="secondary" />} />
-          <StatCard state={statState} onRetry={() => setStatState("ready")} variant="icon" icon={Wallet} iconTone="success" label="Commission paid" value={<Amount value={84200} />} delta={{ value: 12, comparedTo: "vs last month" }} caption="RM75,100 last month" />
-          <StatCard state={statState} onRetry={() => setStatState("ready")} variant="bars" label="Applications" value="126" bars={[8, 12, 9, 14, 18, 15, 22, 19, 26]} delta={{ value: -4, comparedTo: "vs last week" }} caption="9 weeks" />
-          <StatCard state={statState} onRetry={() => setStatState("ready")} label="Average days in stage" value="6.4" delta={{ value: -1.2, unit: " days", goodWhen: "down", comparedTo: "vs last month" }} caption="Lower is better" />
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <DeltaPill value={12} comparedTo="vs last month" />
           <DeltaPill value={-4.5} comparedTo="vs last week" />
           <DeltaPill value={3} unit="" goodWhen="down" comparedTo="overdue vs yesterday" />
@@ -555,10 +544,10 @@ export default function DashboardWidgets() {
         <div className="ub-canvas-light grid gap-4 rounded-ub-xl p-4 md:gap-6 md:p-6">
           <DashboardHeader as="h3" title="Applications overview" subtitle="Monday 3 November · 14 applications need you" secondaryActions={<><PeriodSelect value={period} onChange={setPeriod} /><Button variant="secondary" size="sm" icon={<Download className="h-4 w-4" aria-hidden="true" />} text="Export" /></>} primaryAction={<Button variant="primary" size="sm" icon={<Users className="h-4 w-4" aria-hidden="true" />} text="Assign Advisors" />} />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard variant="highlighted" icon={GraduationCap} label="Students placed" value="21" delta={{ value: 18, comparedTo: "vs last intake" }} caption="Target 30" />
-            <StatCard variant="icon" icon={Wallet} iconTone="success" label="Commission paid" value={<Amount value={84200} />} delta={{ value: 12, comparedTo: "vs last month" }} caption="RM75,100 last month" />
-            <StatCard variant="bars" label="Applications" value="126" bars={[8, 12, 9, 14, 18, 15, 22, 19, 26]} delta={{ value: -4, comparedTo: "vs last week" }} caption="9 weeks" />
-            <StatCard label="Avg days in stage" value="6.4" delta={{ value: -1.2, unit: " days", goodWhen: "down", comparedTo: "vs last month" }} caption="Lower is better" />
+            <StatTile icon={GraduationCap} label="Students placed" value="21" delta={{ value: 18, comparedTo: "vs last intake" }} footer={{ text: "Target 30" }} />
+            <StatTile icon={Wallet} iconTone="success" label="Commission paid" value={<Amount value={84200} />} delta={{ value: 12, comparedTo: "vs last month" }} footer={{ text: "RM75,100 last month" }} />
+            <StatTile label="Applications" value="126" delta={{ value: -4, comparedTo: "vs last week" }} media={<Sparkline values={[8, 12, 9, 14, 18, 15, 22, 19, 26]} variant="bars" label="Applications, last 9 weeks" className="h-10 w-full" />} footer={{ text: "9 weeks" }} />
+            <StatTile label="Avg days in stage" value="6.4" delta={{ value: -1.2, unit: " days", goodWhen: "down", comparedTo: "vs last month" }} footer={{ text: "Lower is better" }} />
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
             <DashboardCard className="lg:col-span-2" title="Applications this week" actions={<CardMenu onViewAll={noop} onExport={noop} onHide={noop} />} footer={<CardFooterStats items={[{ label: "Submitted", value: "126" }, { label: "Offers", value: "38" }, { label: "Placed", value: "21" }]} />}>

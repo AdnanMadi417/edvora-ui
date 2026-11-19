@@ -7,7 +7,8 @@ import Button from "components/ub/core/buttons/Button";
 import TextButton from "components/ub/core/buttons/TextButton";
 import Amount from "components/ub/core/typography/Amount";
 import RefId from "components/ub/core/typography/RefId";
-import StatCard from "components/ub/data/cards/StatCard";
+import StatTile from "components/ub/dashboard/cards/StatTile";
+import Sparkline from "components/ub/dashboard/charts/Sparkline";
 import DaysTag from "components/ub/data/badges/DaysTag";
 import CountBadge from "components/ub/data/badges/CountBadge";
 import PipelineBar from "components/ub/data/display/PipelineBar";
@@ -54,10 +55,10 @@ export default function AdvisorHome({ headingLevel = 1 }: { headingLevel?: 1 | 2
 
       {/* Glass stat cards (dark guide §3: glass on summaries only) */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Active applications" icon={<FileText className="h-5 w-5" />} value={STATS.active.value} delta={{ value: STATS.active.delta, unit: "" }} context={STATS.active.context} sparkline={STATS.active.sparkline} />
-        <StatCard label="Offers this intake" icon={<Award className="h-5 w-5" />} value={STATS.offers.value} delta={{ value: STATS.offers.delta }} context={STATS.offers.context} />
-        <StatCard label="Commission pending" icon={<BadgeDollarSign className="h-5 w-5" />} value={<Amount value={STATS.commission.value} />} delta={{ value: STATS.commission.delta }} context={STATS.commission.context} />
-        <StatCard label="Placed this year" icon={<GraduationCap className="h-5 w-5" />} value={STATS.placed.value} delta={{ value: STATS.placed.delta }} context={STATS.placed.context} sparkline={STATS.placed.sparkline} />
+        <StatTile label="Active applications" icon={FileText} value={STATS.active.value} delta={{ value: STATS.active.delta, unit: "", comparedTo: STATS.active.context }} media={<Sparkline values={STATS.active.sparkline} variant="bars" label="Active applications, recent trend" className="h-10 w-full" />} />
+        <StatTile label="Offers this intake" icon={Award} value={STATS.offers.value} delta={{ value: STATS.offers.delta, comparedTo: STATS.offers.context }} />
+        <StatTile label="Commission pending" icon={BadgeDollarSign} value={<Amount value={STATS.commission.value} />} delta={{ value: STATS.commission.delta, comparedTo: STATS.commission.context }} />
+        <StatTile label="Placed this year" icon={GraduationCap} value={STATS.placed.value} delta={{ value: STATS.placed.delta, comparedTo: STATS.placed.context }} media={<Sparkline values={STATS.placed.sparkline} variant="bars" label="Placed this year, recent trend" className="h-10 w-full" />} />
       </div>
 
       <div className="grid items-start gap-6 xl:grid-cols-3">

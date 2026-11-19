@@ -69,7 +69,7 @@ export default function DashboardPatterns() {
       <ApplicationPipelineDemo />
 
       {/* Dashboard widget library (components/ub/dashboard). */}
-      <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "StatCard, DeltaPill and IconTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "PipelineFlow", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>
+      <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "DeltaPill and IconTile", "StatTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "PipelineFlow", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>
         <DashboardWidgets />
       </Pick>
 

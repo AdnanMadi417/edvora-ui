@@ -115,7 +115,7 @@ export const tagTones: Record<TagTone, string> = {
   info: "border-ub-tone-info-border bg-ub-tone-info-bg text-ub-tone-info-text",
   neutral: "border-ub-tone-neutral-border bg-ub-tone-neutral-bg text-ub-tone-neutral-text",
   brand: "border-ub-tone-brand-border bg-ub-tone-brand-bg text-ub-tone-brand-text",
-  // KPI deltas: success in light, the teal dark pair in dark (guide §4 StatCard)
+  // KPI deltas: success in light, the teal dark pair in dark (guide §4 StatTile)
   positive: "border-ub-delta-up-border bg-ub-delta-up-bg text-ub-delta-up-text",
 };
 

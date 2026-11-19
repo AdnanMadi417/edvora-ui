@@ -36,7 +36,7 @@ export const PAIRS: Pair[] = [
   { fg: "--ub-count-text", bg: "--ub-count-bg", kind: "text", label: "count badge" },
   { fg: "--ub-tab-active-text", bg: "--ub-bg-surface", kind: "text", label: "active tab label" },
   { fg: "--ub-brand-subtle-text", bg: "--ub-brand-subtle-bg", kind: "text", label: "avatar initials / callout title" },
-  { fg: "--ub-delta-up-text", bg: "--ub-delta-up-bg", kind: "text", label: "StatCard delta (up)" },
+  { fg: "--ub-delta-up-text", bg: "--ub-delta-up-bg", kind: "text", label: "StatTile delta (up)" },
   { fg: "--ub-text-on-action", bg: "--ub-bg-toast", kind: "text", label: "toast text" },
   { fg: "--ub-text-on-action", bg: "--ub-bg-tooltip", kind: "text", label: "tooltip text" },
   ...STATUS.map((r) => ({ fg: `--ub-${r}-text`, bg: `--ub-${r}-bg`, kind: "text" as const, label: `${r} alert text` })),

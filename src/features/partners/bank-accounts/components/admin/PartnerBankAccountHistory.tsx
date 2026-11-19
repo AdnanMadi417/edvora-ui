@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { History as HistoryIcon } from "lucide-react";
 import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
-import DetailStatusBadge from "components/ub/data/badges/DetailStatusBadge";
+import Tag from "components/ub/data/badges/Tag";
 import Skeleton from "components/ub/feedback/states/Skeleton";
 import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
@@ -95,9 +95,9 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
                             {entry.account_holder_name} · {entry.account_number} · {entry.currency}
                           </p>
                         </div>
-                        <DetailStatusBadge variant={entry.is_active ? "success" : "neutral"}>
+                        <Tag dot tone={entry.is_active ? "success" : "neutral"}>
                           {entry.is_active ? "Active" : "Replaced"}
-                        </DetailStatusBadge>
+                        </Tag>
                       </div>
                       <p className="mt-2 text-xs text-ub-text-tertiary">
                         Recorded by {entry.recorded_by_name} ({entry.recorded_by_email}) ·{" "}

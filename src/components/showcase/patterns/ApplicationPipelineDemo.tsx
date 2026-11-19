@@ -30,7 +30,7 @@ export default function ApplicationPipelineDemo() {
     <Demo
       name="Application pipeline & statistics"
       path="features/applications/partner/components/PipelineCard.tsx"
-      description="Role-scoped application statistics built with StatCard, a stage distribution bar and selectable stage tiles. Counts include the entire selected application status, independent of the table page or search."
+      description="Role-scoped application statistics built with StatTile, a stage distribution bar and selectable stage tiles. Counts include the entire selected application status, independent of the table page or search."
     >
       <PipelineCard
         stages={stages}

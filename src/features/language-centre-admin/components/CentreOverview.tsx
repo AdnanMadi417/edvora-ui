@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
-import StatCard from "components/ub/dashboard/cards/StatCard";
+import StatTile from "components/ub/dashboard/cards/StatTile";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import { useAssignedCentre } from "./CentreAccessBoundary";
 const base = "/language-centre-admin";
@@ -51,29 +51,25 @@ export default function CentreOverview() {
         }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
+        <StatTile
           label="Courses"
           value={config.courses.length}
           icon={BookOpen}
-          variant="highlighted"
         />
-        <StatCard
+        <StatTile
           label="Branches"
           value={centre.branches.length}
           icon={Building2}
-          variant="icon"
         />
-        <StatCard
+        <StatTile
           label="Upcoming intakes"
           value={intakes.length}
           icon={CalendarDays}
-          variant="icon"
         />
-        <StatCard
+        <StatTile
           label="Missing profile information"
           value={missing.length}
           icon={CircleAlert}
-          variant="icon"
         />
       </div>
       <div className="grid gap-5 lg:grid-cols-2">

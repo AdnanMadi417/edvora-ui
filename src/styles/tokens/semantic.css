@@ -234,7 +234,7 @@
   --ub-count-bg: var(--ub-bg-surface-raised);              /* count badge */
   --ub-count-border: var(--ub-border-default);
   --ub-count-text: var(--ub-text-primary);
-  --ub-delta-up-bg: var(--ub-tag-teal-bg-dark);            /* StatCard delta: teal dark pair */
+  --ub-delta-up-bg: var(--ub-tag-teal-bg-dark);            /* StatTile delta: teal dark pair */
   --ub-delta-up-border: color-mix(in srgb, var(--ub-tag-teal-solid) 40%, transparent);
   --ub-delta-up-text: var(--ub-tag-teal-text-dark);
   --ub-progress-track: var(--ub-border-default);           /* guide §2.7: track #2B3140 */

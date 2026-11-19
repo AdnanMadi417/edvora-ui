@@ -6,7 +6,7 @@ import { Layers, Pencil } from "lucide-react";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Tag from "components/ub/data/badges/Tag";
 import SectionCard from "components/ub/data/cards/SectionCard";
-import StatCard from "components/ub/dashboard/cards/StatCard";
+import StatTile from "components/ub/dashboard/cards/StatTile";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import SelectInput from "components/ub/forms/selection/SelectInput";
 import type { UniversityTypeDetails } from "features/universities/configuration/types";
@@ -61,23 +61,14 @@ export default function UniversityTypeDetailsView({
         </div>
       </header>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatCard
+        <StatTile
           label="Configured fields"
           value={university.required_fields.length}
-          caption="Application submission rules"
-          variant="highlighted"
+          footer={{ text: "Application submission rules" }}
           className="col-span-2 sm:col-span-1"
         />
-        <StatCard
-          label="Required"
-          value={required}
-          caption="Must be completed"
-        />
-        <StatCard
-          label="Optional"
-          value={optional}
-          caption="Can be left blank"
-        />
+        <StatTile label="Required" value={required} footer={{ text: "Must be completed" }} />
+        <StatTile label="Optional" value={optional} footer={{ text: "Can be left blank" }} />
       </div>
       <SectionCard
         title="Application requirements"

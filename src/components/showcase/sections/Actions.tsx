@@ -12,7 +12,6 @@ import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import ApproveRejectToggle from "components/ub/core/buttons/ApproveRejectToggle";
 import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import DetailStatusBadge from "components/ub/data/badges/DetailStatusBadge";
 import type { StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import FilterChip from "components/ub/data/badges/FilterChip";
@@ -241,13 +240,6 @@ export function Badges() {
             </StatusBadge>
           );
         })}
-      </Demo>
-      <Demo name="DetailStatusBadge" path="components/ub/data/badges/DetailStatusBadge.tsx" className="flex flex-wrap gap-3">
-        {VARIANTS.map((v) => (
-          <DetailStatusBadge key={v} variant={v}>
-            {VARIANT_LABEL[v]}
-          </DetailStatusBadge>
-        ))}
       </Demo>
       <Demo name="SectionIconBadge" path="components/ub/icons/SectionIconBadge.tsx" className="flex flex-wrap gap-6">
         {(

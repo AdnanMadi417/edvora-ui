@@ -129,7 +129,7 @@ const STRUCTURE = `src/
     forms/                   # Input, Checkbox, Radio, Toggle, Stepper, Combobox, FileUpload, legacy fields
     navigation/              # NavbarTop, Sidebar, NavbarBottom, Tabs, Breadcrumbs, Pagination, ContextMenu
     feedback/                # Alert, Toast, Tooltip, Modal, Drawer, ActionSheet, ProgressBar, EmptyData
-    data/                    # Card, StatCard, Tag, DaysTag, Chip, Avatar, List, DataTable, table kit
+    data/                    # Card, Tag, DaysTag, Chip, Avatar, List, DataTable, table kit
     brand/                   # Logo, GlassPanel, NotchedCard, VerifiedBadge, VerificationStamp, ApplicationTracker
     icons/                   # Icon wrapper, SectionIconBadge
   config/

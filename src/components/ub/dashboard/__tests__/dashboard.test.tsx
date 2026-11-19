@@ -10,7 +10,7 @@ import {
   PillBarChart,
   ProgressCard,
   ReminderCard,
-  StatCard,
+  StatTile,
   StatusTag,
   TaskList,
   TaskListItem,
@@ -95,11 +95,11 @@ describe("dashboard widgets", () => {
     fireEvent.keyDown(cells[0], { key: "ArrowDown" });
     expect(screen.getByRole("gridcell", { name: "Tue 9am: 3 uploads" })).toHaveFocus();
   });
-  it("StatCard, DashboardCard and footer stats render; loading is busy", () => {
-    const { rerender } = render(<StatCard label="Commission paid" value="RM84,200" delta={{ value: 12 }} caption="RM75,100 last month" />);
+  it("StatTile, DashboardCard and footer stats render; loading is busy", () => {
+    const { rerender } = render(<StatTile label="Commission paid" value="RM84,200" delta={{ value: 12 }} footer={{ text: "RM75,100 last month" }} />);
     expect(screen.getByRole("heading", { name: "Commission paid" })).toBeInTheDocument();
-    rerender(<StatCard label="Commission paid" value="RM84,200" state="loading" />);
-    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+    rerender(<StatTile label="Commission paid" value="RM84,200" state="loading" />);
+    expect(document.querySelector("[data-ub-stat-tile]")).toHaveAttribute("aria-busy", "true");
     render(<DashboardCard title="Applications" footer={<CardFooterStats items={[{ label: "Submitted", value: "126" }, { label: "Offers", value: "38" }]} />}>Body</DashboardCard>);
     expect(screen.getByText("Submitted")).toBeInTheDocument();
   });

@@ -3,8 +3,8 @@
 import React from "react";
 import { FileSignature, Send, RotateCcw } from "lucide-react";
 
-import DetailStatusBadge from "components/ub/data/badges/DetailStatusBadge";
-import type { StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
+import Tag from "components/ub/data/badges/Tag";
+import { STATUS_BADGE_TONE, type StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import Button from "components/ub/core/buttons/Button";
 import Skeleton from "components/ub/feedback/states/Skeleton";
@@ -102,9 +102,9 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
           )}
         </div>
         {agreement && (
-          <DetailStatusBadge variant={STATUS_VARIANT[agreement.status]}>
+          <Tag dot tone={STATUS_BADGE_TONE[STATUS_VARIANT[agreement.status]]}>
             {STATUS_LABEL[agreement.status]}
-          </DetailStatusBadge>
+          </Tag>
         )}
       </div>
 
