@@ -37,7 +37,6 @@ import {
   DonutStatsCard,
   GroupedBarChart,
   AreaLineChart,
-  AvatarStrip,
   RadialStatsCard,
   SegmentedBars,
   TaskList,
@@ -334,31 +333,6 @@ export default function DashboardWidgets() {
           formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
           points={[["2026-04", "Apr", 1200], ["2026-05", "May", 3400], ["2026-06", "Jun", 2600], ["2026-07", "Jul", 5200], ["2026-08", "Aug", 2100], ["2026-09", "Sep", 4300], ["2026-10", "Oct", 3800], ["2026-11", "Nov", 6100]].map(([key, label, value]) => ({ key: String(key), label: String(label), value: Number(value) }))}
         />
-      </Demo>
-
-      <Demo
-        name="AvatarStrip"
-        path="components/ub/dashboard/lists/AvatarStrip.tsx"
-        description="People in a scrollable row: 64px avatar with the status circle, name and one line, each opening the profile. Previous / next buttons on the end page through and hide at the ends; mirrored in RTL."
-        code={`<AvatarStrip label="Advisors awaiting review" people={[{ id: "p1", name: "Global Pathways", subtitle: "Agency · Nigeria", status: "unverified", href: "/admin/advisors/p1" }]} />`}
-        props={[
-          { name: "people", type: "{ id, name, subtitle?, avatarSrc?, status?, statusLabel?, href?, ariaLabel? }[]", description: "status is a backend value shown as the circle." },
-          { name: "label", type: "string", description: "Accessible name of the row." },
-        ]}
-      >
-        <div className="max-w-lg">
-          <AvatarStrip
-            label="Advisors awaiting review"
-            people={["Global Pathways Education", "Bright Futures Consultancy", "Nur Aisyah Binti Kamal", "Chinedu Okafor", "Tanvir Hossain", "Sara Mahmoud", "Lim Wei Jie"].map((name, i) => ({
-              id: `p${i}`,
-              name,
-              subtitle: i < 2 ? "Agency" : "Individual",
-              status: i % 3 === 0 ? "active" : "unverified",
-              statusLabel: i % 3 === 0 ? "Verified" : "Awaiting review",
-              href: "#c-avatarstrip",
-            }))}
-          />
-        </div>
       </Demo>
 
       <Demo

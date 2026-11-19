@@ -133,17 +133,20 @@ export default function AreaLineChart({ points, label, formatValue = (v) => v.to
           </span>
         ))}
       </div>
-      <table className="sr-only">
-        <caption>{label}</caption>
-        <tbody>
-          {points.map((p) => (
-            <tr key={p.key}>
-              <th scope="row">{p.label}</th>
-              <td>{formatValue(p.value)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* A table ignores the 1px sr-only size; the wrapper hides it without widening the page. */}
+      <div className="sr-only">
+        <table>
+          <caption>{label}</caption>
+          <tbody>
+            {points.map((p) => (
+              <tr key={p.key}>
+                <th scope="row">{p.label}</th>
+                <td>{formatValue(p.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

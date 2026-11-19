@@ -28,7 +28,6 @@ import {
   ActivityHeatmap,
   BarChartCard,
   BreakdownTable,
-  CardFooterStats,
   CardLinkButton,
   CardMenu,
   CategoryColumnChart,
@@ -38,13 +37,10 @@ import {
   DashboardHeader,
   DeltaPill,
   GaugeCard,
-  GaugeChart,
-  GaugeLegendStats,
   IconTile,
   PeopleList,
   PeopleListItem,
   PeriodSelect,
-  PillBarChart,
   ProgressCard,
   QuickActions,
   ListFooter,
@@ -56,21 +52,16 @@ import {
   StatusTag,
   DonutStatsCard,
   CompositionCard,
-  RankedBarsCard,
   GroupedBarChart,
   AreaLineChart,
-  AvatarStrip,
   TaskList,
   TaskListItem,
   WidgetStatus,
   type DashboardPeriod,
 } from "components/ub/dashboard";
-import LegacyStatCard from "components/ub/data/cards/StatCard";
-import OverviewVisual from "features/overview/components/OverviewVisual";
 import OverviewItems from "features/overview/components/OverviewItems";
 import CommissionStatusChart from "features/overview/components/CommissionStatusChart";
-import UniversityCommissionCard from "features/overview/components/UniversityCommissionCard";
-import type { OverviewItem, OverviewResource, ResourcePlan } from "features/overview/model/types";
+import type { OverviewItem, OverviewResource } from "features/overview/model/types";
 import type { UniversityCommission } from "features/overview/model/dashboardData";
 
 const NOW = new Date("2026-11-18T09:00:00+08:00");
@@ -79,11 +70,10 @@ const noop = () => undefined;
 /** Every reusable component on this page, by layer, with where it lives. */
 export const DASHBOARD_COMPONENTS: { group: string; path: string; names: string[] }[] = [
   { group: "Shared", path: "components/ub/dashboard/shared", names: ["DashboardHeader", "PeriodSelect", "CardMenu", "DeltaPill", "IconTile", "StatusTag", "WidgetStatus"] },
-  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "RankedBarsCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
+  { group: "Cards", path: "components/ub/dashboard/cards", names: ["DashboardCard", "CardLinkButton", "CardFooterStats", "StatCard", "StatTile", "DonutStatsCard", "CompositionCard", "BarChartCard", "GaugeCard", "ReminderCard", "CountdownCard", "ProgressCard"] },
   { group: "Charts", path: "components/ub/dashboard/charts", names: ["PillBarChart", "CategoryColumnChart", "DonutChart", "ReconciliationBars", "RankedBars", "GroupedBarChart", "AreaLineChart", "GaugeChart", "GaugeLegendStats", "ActivityHeatmap", "Sparkline", "ChartLegend"] },
-  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed", "AvatarStrip"] },
-  { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewVisual", "OverviewItems", "CommissionStatusChart", "UniversityCommissionCard"] },
-  { group: "Data kit", path: "components/ub/data/cards", names: ["StatCard (data kit)"] },
+  { group: "Lists", path: "components/ub/dashboard/lists", names: ["TaskList", "TaskListItem", "PeopleList", "PeopleListItem", "BreakdownTable", "QuickActions", "ListFooter", "ActivityFeed"] },
+  { group: "Overview (role home)", path: "features/overview/components", names: ["OverviewItems", "CommissionStatusChart"] },
 ];
 
 const WEEK = [
@@ -119,22 +109,6 @@ const FLOW = [
 ];
 
 // Overview fixtures: the same shapes the role home loads from the API.
-const PIPELINE_PLAN: ResourcePlan = {
-  id: "pipeline",
-  title: "Application pipeline",
-  subtitle: "All active applications, grouped by their current stage.",
-  href: "#c-overview",
-  emptyMessage: "No active applications in your pipeline yet.",
-  load: async () => ({ total: 0, items: [] }),
-};
-const PIPELINE: OverviewResource = {
-  state: "ready",
-  data: {
-    total: 10,
-    items: [],
-    distribution: FLOW.map((s) => ({ key: s.id, label: s.label, value: s.count, stageId: s.stageId })),
-  },
-};
 const record = (id: string, student: string, amount: number, status: string) => ({
   id,
   applicationId: `app_${id}`,
@@ -169,18 +143,12 @@ const NEXT_STEPS: OverviewItem[] = [
   { id: "a2", title: "Review requested corrections and upload the required documents.", description: "Amina Hossain · Asia Pacific University", href: "#c-overview", status: "Correction Requested", statusLabel: "Corrections requested by Unibexs" },
   { id: "a3", title: "Confirm commission receipt or raise a dispute.", description: "Samuel Abdallah · UCSI University", href: "#c-overview", status: "Commission Paid", statusLabel: "Commission to confirm" },
 ];
-const UPDATES: OverviewItem[] = [
-  { id: "u1", title: "Unibexs moved Sara Ochieng's application to Corrections requested", description: "Upload the corrected documents so the review can continue.", href: "#c-overview", at: "2026-11-18T08:10:00+08:00" },
-  { id: "u2", title: "Sunway University sent an offer letter for Nur Aisyah Binti Kamal", description: "Pay the visa fee to keep the offer.", href: "#c-overview", at: "2026-11-16T14:30:00+08:00" },
-  { id: "u3", title: "Unibexs approved Kevin Abdallah's visa payment", description: "The visa application is now with EMGS.", href: "#c-overview", at: "2026-11-02T11:00:00+08:00" },
-];
 const ADVISORS: OverviewItem[] = [
   { id: "p1", title: "Global Pathways Education", description: "Agency · Nigeria", href: "#c-overview", status: "Verified" },
   { id: "p2", title: "Bright Futures Consultancy", description: "Agency · Bangladesh", href: "#c-overview", status: "Under Review", statusLabel: "In review" },
 ];
 
-/** A block with the names of the components it uses above it. */
-// Sample data for RankedBarsCard.
+// Sample data for the ranked CompositionCard samples.
 const SAMPLE_COUNTRIES: [string, number][] = [
   ["China", 25938], ["Bangladesh", 8831], ["Indonesia", 5412], ["India", 3940], ["Pakistan", 3305],
   ["Myanmar", 1820], ["Sudan", 1544], ["Japan", 1210], ["Kazakhstan", 1025], ["Yemen", 980], ["Nigeria", 860],
@@ -198,6 +166,7 @@ const STUDENT_YEARS = [
   { year: 2026, classified: 547, missing: 24 },
 ];
 
+/** A block with the names of the components it uses above it. */
 function Block({ names, children, className = "", show }: { names: string[]; children: ReactNode; className?: string; show: boolean }) {
   return (
     <div className={`flex min-w-0 flex-col gap-2 ${className}`}>
@@ -321,14 +290,14 @@ export default function DummyDashboard() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Block show={labels} names={["RankedBarsCard", "RankedBars"]}>
-            <RankedBarsCard
+          <Block show={labels} names={["CompositionCard (ranked)", "RankedBars"]}>
+            <CompositionCard
               title="Applications by country"
               subtitle="Where new applicants come from · January to September 2026"
               unit="applications"
-              top={8}
+              centerLabel="Applications by country"
+              layout="ranked"
               items={SAMPLE_COUNTRIES.map(([label, value]) => ({ key: label, label, value, href: `#rb-${label}` }))}
-              note="Sample data. Others: every country outside the top seven."
             />
           </Block>
           <Block show={labels} names={["CompositionCard (ranked)", "ReconciliationBars"]}>
@@ -423,14 +392,6 @@ export default function DummyDashboard() {
                 label="Commission paid per month in RM"
                 formatValue={(v) => `RM${v.toLocaleString("en-MY")}`}
                 points={[["2026-06", "Jun", 3000], ["2026-07", "Jul", 0], ["2026-08", "Aug", 5250], ["2026-09", "Sep", 2100], ["2026-10", "Oct", 4300], ["2026-11", "Nov", 3800]].map(([key, label, value]) => ({ key: String(key), label: String(label), value: Number(value) }))}
-              />
-            </DashboardCard>
-          </Block>
-          <Block show={labels} names={["DashboardCard", "AvatarStrip"]}>
-            <DashboardCard title="Advisors awaiting review">
-              <AvatarStrip
-                label="Advisors awaiting review"
-                people={["Global Pathways Education", "Bright Futures Consultancy", "Nur Aisyah Binti Kamal", "Chinedu Okafor", "Tanvir Hossain", "Sara Mahmoud"].map((name, i) => ({ id: `a${i}`, name, subtitle: i < 2 ? "Agency" : "Individual", status: "unverified", statusLabel: "Awaiting review", href: "#c-overview" }))}
               />
             </DashboardCard>
           </Block>
@@ -564,25 +525,14 @@ export default function DummyDashboard() {
             Role home (overview) components
           </h2>
           <div className="grid gap-6 lg:grid-cols-2">
-            <Block show={labels} names={["OverviewVisual"]}>
-              <OverviewVisual role="partner" plans={[PIPELINE_PLAN]} resources={{ pipeline: PIPELINE }} onRetry={noop} />
-            </Block>
             <Block show={labels} names={["CommissionStatusChart"]}>
               <CommissionStatusChart resource={COMMISSION} onRetry={noop} />
             </Block>
           </div>
-          <Block show={labels} names={["UniversityCommissionCard"]}>
-            <UniversityCommissionCard resource={COMMISSION} admin={false} onRetry={noop} />
-          </Block>
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-2">
             <Block show={labels} names={["OverviewItems (tasks)"]}>
               <DashboardCard title="Your next steps">
                 <OverviewItems resourceId="actionRequired" title="Your next steps" items={NEXT_STEPS} />
-              </DashboardCard>
-            </Block>
-            <Block show={labels} names={["OverviewItems (activity)"]}>
-              <DashboardCard title="Recent activity">
-                <OverviewItems resourceId="updates" title="Recent activity" items={UPDATES} />
               </DashboardCard>
             </Block>
             <Block show={labels} names={["OverviewItems (people)"]}>
@@ -593,24 +543,7 @@ export default function DummyDashboard() {
           </div>
         </section>
 
-        <Block show={labels} names={["StatCard (data kit)"]}>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <LegacyStatCard label="Commission paid" value={<Amount value={84200} />} delta={{ value: 12 }} context="vs last month" sparkline={[12, 18, 15, 22, 26]} sparklineLabel="Commission, last 5 months" />
-            <LegacyStatCard label="Students placed" value="21" delta={{ value: -4 }} context="vs last intake" />
-          </div>
-        </Block>
 
-        <Block show={labels} names={["DashboardCard", "PillBarChart", "GaugeChart", "GaugeLegendStats", "CardFooterStats"]}>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <DashboardCard title="Applications (hand-built card)" footer={<CardFooterStats items={[{ label: "Submitted", value: "126" }, { label: "Offers", value: "38" }]} />}>
-              <PillBarChart data={WEEK} label="Applications per day" unit="applications" />
-            </DashboardCard>
-            <DashboardCard title="Placement (hand-built card)">
-              <GaugeChart segments={PLACEMENT} centerLabel="62%" centerCaption="placed" label="Placement this intake" />
-              <GaugeLegendStats items={PLACEMENT} className="mt-4" />
-            </DashboardCard>
-          </div>
-        </Block>
       </main>
     </div>
   );

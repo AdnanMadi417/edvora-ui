@@ -372,12 +372,12 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Reports: students by study level and recruitment mix"],
     avoid: "Change over time (use AreaLineChart), or parts that don't add up to one whole.",
   },
-  RankedBarsCard: {
+  RankedBars: {
     category: "data",
-    imports: ['import { RankedBarsCard, RankedBars } from "components/ub/dashboard";'],
-    useFor: "Categories ranked largest first as horizontal bars on one scale, one colour: name, value and share per row (rows can link). The tail folds into Others; records with no value (notRecorded) are stated on top instead of ranked. RankedBars is the chart alone for use inside another card.",
-    usedIn: ["Reports: applications by country, region, institution type and field of study"],
-    avoid: "Parts of a whole with few categories (use CompositionCard), change over time (use AreaLineChart), or a rainbow of one colour per bar.",
+    imports: ['import { RankedBars } from "components/ub/dashboard";'],
+    useFor: "Categories ranked largest first as bars on one scale, one colour, value and share per row; the tail folds into Others and notRecorded is stated on top. CompositionCard uses it for more than seven parts.",
+    usedIn: ["CompositionCard (ranked layout)"],
+    avoid: "Parts of a whole with seven or fewer parts (use CompositionCard's donut).",
   },
   ReconciliationBars: {
     category: "data",
@@ -420,13 +420,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "One series over time with a soft area, crosshair on hover and arrow keys, hidden table.",
     usedIn: ["Role home commission card: Paid by month"],
     avoid: "Made-up history: only chart dated records the API returns.",
-  },
-  AvatarStrip: {
-    category: "data",
-    imports: ['import { AvatarStrip } from "components/ub/dashboard";'],
-    useFor: "A scrollable row of people (64px avatar with status circle, name, one line) each opening their profile, with previous / next buttons.",
-    usedIn: ["Role home: Advisors awaiting review, Your advisors"],
-    avoid: "Long lists people need to compare or sort: use a table.",
   },
   StatTile: {
     category: "data",

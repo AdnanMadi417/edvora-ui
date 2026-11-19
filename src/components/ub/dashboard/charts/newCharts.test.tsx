@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import DonutStatsCard, { foldSlices } from "../cards/DonutStatsCard";
 import GroupedBarChart from "./GroupedBarChart";
 import AreaLineChart from "./AreaLineChart";
-import AvatarStrip from "../lists/AvatarStrip";
 import { niceTicks } from "./chartScale";
 import { groupPaidByMonth } from "features/overview/model/dashboardData";
 
@@ -69,13 +68,6 @@ it("AreaLineChart reads points with the arrow keys", () => {
   expect(screen.getByText("Jun: 3,000")).toBeInTheDocument();
   fireEvent.keyDown(chart, { key: "End" });
   expect(screen.getByText("Jul: 0")).toBeInTheDocument();
-});
-
-it("AvatarStrip links each person with their status circle", () => {
-  const { container } = render(<AvatarStrip label="Advisors" people={[{ id: "1", name: "Global Pathways", subtitle: "Agency", status: "unverified", statusLabel: "Awaiting review", href: "/a/1", ariaLabel: "Open advisor: Global Pathways" }]} />);
-  expect(screen.getByRole("list", { name: "Advisors" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Open advisor: Global Pathways" })).toHaveAttribute("href", "/a/1");
-  expect(container.querySelector('[title="Awaiting review"]')).not.toBeNull();
 });
 
 it("RadialStatsCard shows the total, each count and share, and filters on press", async () => {

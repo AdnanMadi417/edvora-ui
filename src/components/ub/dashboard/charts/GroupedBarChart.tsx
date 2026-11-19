@@ -133,29 +133,32 @@ export default function GroupedBarChart({
           </span>
         ))}
       </div>
-      <table className="sr-only">
-        <caption>{label}</caption>
-        <thead>
-          <tr>
-            <th scope="col">Group</th>
-            {series.map((s) => (
-              <th key={s.key} scope="col">
-                {s.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {groups.map((g) => (
-            <tr key={g.key}>
-              <th scope="row">{g.label}</th>
-              {g.values.map((v, i) => (
-                <td key={series[i]?.key ?? i}>{formatValue(v)}</td>
+      {/* A table ignores the 1px sr-only size; the wrapper hides it without widening the page. */}
+      <div className="sr-only">
+        <table>
+          <caption>{label}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Group</th>
+              {series.map((s) => (
+                <th key={s.key} scope="col">
+                  {s.label}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {groups.map((g) => (
+              <tr key={g.key}>
+                <th scope="row">{g.label}</th>
+                {g.values.map((v, i) => (
+                  <td key={series[i]?.key ?? i}>{formatValue(v)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

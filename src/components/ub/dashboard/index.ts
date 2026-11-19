@@ -37,7 +37,6 @@ export { default as BarChartCard, type BarChartCardProps } from "./cards/BarChar
 export { default as GaugeCard, type GaugeCardProps } from "./cards/GaugeCard";
 export { default as DonutStatsCard, foldSlices, type DonutStatsCardProps, type DonutStatsView, type DonutStatsItem } from "./cards/DonutStatsCard";
 export { default as RankedBars, type RankedBarsProps, type RankedBarItem } from "./charts/RankedBars";
-export { default as RankedBarsCard, type RankedBarsCardProps } from "./cards/RankedBarsCard";
 export { default as CompositionCard, type CompositionCardProps, type CompositionSummary } from "./cards/CompositionCard";
 export { default as ReconciliationBars, type ReconciliationBarsProps, type ReconciliationRow, type ReconciliationPart } from "./charts/ReconciliationBars";
 export { default as DonutChart, DONUT_COLORS, DONUT_OTHER_COLOR, type DonutSegment } from "./charts/DonutChart";
@@ -47,4 +46,3 @@ export { niceTicks } from "./charts/chartScale";
 export { default as RadialRingsChart, type RadialRing, type RadialRingsChartProps } from "./charts/RadialRingsChart";
 export { default as RadialStatsCard, type RadialStatsCardProps, type RadialStatsItem } from "./cards/RadialStatsCard";
 export { default as SegmentedBars, type SegmentedBarsProps, type SegmentedBarRow, type SegmentedBarPart, type SegmentTone } from "./lists/SegmentedBars";
-export { default as AvatarStrip, type AvatarStripProps, type AvatarStripPerson } from "./lists/AvatarStrip";
