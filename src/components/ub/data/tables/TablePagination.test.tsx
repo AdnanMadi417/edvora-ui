@@ -1,13 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import TablePagination from "./TablePagination";
+import TablePagination, { linePages } from "./TablePagination";
 
 const props = { currentPage: 1, onPageChange: jest.fn(), itemsPerPage: 20, itemCount: 20, totalCount: 201, itemLabel: "applications" };
 
-it("shows one line per page (up to seven), the current one marked, with working navigation", () => {
+it("shows at most three small lines around the current page, with working navigation", () => {
   const onPageChange = jest.fn();
-  render(<TablePagination {...props} totalCount={101} onPageChange={onPageChange} />);
-  expect(screen.getByRole("status")).toHaveTextContent("101 applications");
-  expect(screen.getAllByRole("button", { name: /^Page \d+$/ })).toHaveLength(6);
+  render(<TablePagination {...props} onPageChange={onPageChange} />);
+  expect(screen.getByRole("status")).toHaveTextContent("201 applications");
+  expect(screen.getAllByRole("button", { name: /^Page \d+$/ })).toHaveLength(3);
   expect(screen.getByRole("button", { name: "Page 1" })).toHaveAttribute("aria-current", "page");
   expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "Page 3" }));
@@ -35,8 +35,9 @@ it("handles an empty result and the last partial page", () => {
   expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
 });
 
-it("past seven pages reads Page x of y instead of lines", () => {
-  render(<TablePagination {...props} currentPage={3} />);
-  expect(screen.queryByRole("button", { name: /^Page \d+$/ })).toBeNull();
-  expect(screen.getByText(/Page/)).toHaveTextContent("Page 3 of 11");
+it("keeps the three lines inside the page range", () => {
+  expect(linePages(1, 11)).toEqual([1, 2, 3]);
+  expect(linePages(5, 11)).toEqual([4, 5, 6]);
+  expect(linePages(11, 11)).toEqual([9, 10, 11]);
+  expect(linePages(2, 2)).toEqual([1, 2]);
 });
