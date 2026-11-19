@@ -8,7 +8,10 @@ import { focusRing } from "components/ub/recipes";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import DashboardCard from "./DashboardCard";
 import DonutChart from "../charts/DonutChart";
-import ReconciliationBars, { type ReconciliationRow } from "../charts/ReconciliationBars";
+import ReconciliationBars, {
+  type ReconciliationRow,
+} from "../charts/ReconciliationBars";
+import RankedBars from "../charts/RankedBars";
 import { foldSlices, type DonutStatsItem } from "./DonutStatsCard";
 import type { WidgetState } from "../types";
 import { CHART_PALETTE_EXTENDED } from "config/chartPalette";
@@ -50,6 +53,12 @@ export interface CompositionCardProps {
   keepOrder?: boolean;
   /** Every part gets its own slice and legend row, up to 7 (the colour slots); only past that do the smallest fold into Other. */
   maxSlices?: number;
+  /**
+   * donut: ring + legend (up to 7 parts). ranked: one bar per part, largest
+   * first, every part listed (countries, fields of study). Default: donut up
+   * to 7 parts, ranked past that.
+   */
+  layout?: "donut" | "ranked";
   /** Decimals on shares (default 1: 55.3%). */
   percentDigits?: number;
   formatValue?: (value: number) => string;
@@ -68,8 +77,8 @@ const num = (value: number) => value.toLocaleString();
  * A whole split into parts, with how it reconciles to the official total:
  * donut (total in the hole) · optional headline · legend (dot, name, share,
  * link) · optional per-period bars (e.g. classified + not recorded = total).
- * Every part is listed with its own colour (up to 7); only past that do the
- * smallest fold into Other, and the legend still lists each one under it.
+ * Up to 7 parts: a donut, each part with its own colour. Past 7 it switches
+ * to ranked bars (one colour, largest first) so every part is still listed.
  */
 export default function CompositionCard({
   title,
@@ -81,6 +90,7 @@ export default function CompositionCard({
   unit,
   keepOrder = false,
   maxSlices = CHART_PALETTE_EXTENDED.length,
+  layout,
   percentDigits = 1,
   formatValue = num,
   actions,
@@ -93,24 +103,59 @@ export default function CompositionCard({
 }: CompositionCardProps) {
   const prefix = useId();
   const groups = useMemo(
-    () => reconciliation?.groups ?? (reconciliation?.rows ? [{ id: "all", label: "All", rows: reconciliation.rows }] : []),
+    () =>
+      reconciliation?.groups ??
+      (reconciliation?.rows
+        ? [{ id: "all", label: "All", rows: reconciliation.rows }]
+        : []),
     [reconciliation?.groups, reconciliation?.rows]
   );
   const matchKey = reconciliation?.matchesDonut;
   const [groupId, setGroupId] = useState(groups[groups.length - 1]?.id ?? "");
-  const group = groups.find((g) => g.id === groupId) ?? groups[groups.length - 1];
+  const group =
+    groups.find((g) => g.id === groupId) ?? groups[groups.length - 1];
   const total = items.reduce((sum, i) => sum + Math.max(0, i.value), 0);
-  const slices = foldSlices(items, maxSlices, keepOrder, CHART_PALETTE_EXTENDED);
+  const slices = foldSlices(
+    items,
+    maxSlices,
+    keepOrder,
+    CHART_PALETTE_EXTENDED
+  );
   const shown = new Set(slices.map((s) => s.key));
-  const folded = items.filter((i) => i.value > 0 && !shown.has(i.key)).sort((a, b) => b.value - a.value);
-  const pct = (value: number) => `${total ? ((value / total) * 100).toFixed(percentDigits) : (0).toFixed(percentDigits)}%`;
+  const folded = items
+    .filter((i) => i.value > 0 && !shown.has(i.key))
+    .sort((a, b) => b.value - a.value);
+  const ranked =
+    (layout ??
+      (items.filter((i) => i.value > 0).length > CHART_PALETTE_EXTENDED.length
+        ? "ranked"
+        : "donut")) === "ranked";
+  const pct = (value: number) =>
+    `${
+      total
+        ? ((value / total) * 100).toFixed(percentDigits)
+        : (0).toFixed(percentDigits)
+    }%`;
 
   // The donut and the bars count the same records.
   useEffect(() => {
-    if (process.env.NODE_ENV === "production" || !matchKey || state !== "ready") return;
+    if (process.env.NODE_ENV === "production" || !matchKey || state !== "ready")
+      return;
     const key = matchKey.toLowerCase();
-    const sum = groups.flatMap((g) => g.rows).reduce((s, r) => s + (r.parts.find((p) => p.key.toLowerCase() === key || p.label.toLowerCase() === key)?.value ?? 0), 0);
-    if (sum !== total) console.warn(`[CompositionCard] donut total ${total} ≠ ${key} across periods ${sum}`);
+    const sum = groups
+      .flatMap((g) => g.rows)
+      .reduce(
+        (s, r) =>
+          s +
+          (r.parts.find(
+            (p) => p.key.toLowerCase() === key || p.label.toLowerCase() === key
+          )?.value ?? 0),
+        0
+      );
+    if (sum !== total)
+      console.warn(
+        `[CompositionCard] parts total ${total} ≠ ${key} across periods ${sum}`
+      );
   }, [groups, matchKey, total, state]);
 
   const row = (item: DonutStatsItem, color: string | null, sub = false) => {
@@ -118,14 +163,34 @@ export default function CompositionCard({
       <>
         <span
           aria-hidden="true"
-          className={clsx("shrink-0 rounded-full", sub ? "h-1.5 w-1.5 bg-ub-text-tertiary" : "h-2.5 w-2.5")}
+          className={clsx(
+            "shrink-0 rounded-full",
+            sub ? "h-1.5 w-1.5 bg-ub-text-tertiary" : "h-2.5 w-2.5"
+          )}
           style={color ? { background: color } : undefined}
         />
-        <span className={clsx("min-w-0 flex-1 truncate", sub ? "text-ub-body-sm text-ub-text-secondary" : "text-ub-label-md text-ub-text-primary")} title={item.label}>
+        <span
+          className={clsx(
+            "min-w-0 flex-1 truncate",
+            sub
+              ? "text-ub-body-sm text-ub-text-secondary"
+              : "text-ub-label-md text-ub-text-primary"
+          )}
+          title={item.label}
+        >
           {item.label}
         </span>
-        <span className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">{formatValue(item.value)}</span>
-        <span className={clsx("ub-tabular w-14 shrink-0 text-end", sub ? "text-ub-body-sm text-ub-text-secondary" : "text-ub-label-md text-ub-text-primary")}>
+        <span className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">
+          {formatValue(item.value)}
+        </span>
+        <span
+          className={clsx(
+            "ub-tabular w-14 shrink-0 text-end",
+            sub
+              ? "text-ub-body-sm text-ub-text-secondary"
+              : "text-ub-label-md text-ub-text-primary"
+          )}
+        >
           {pct(item.value)}
         </span>
       </>
@@ -136,8 +201,15 @@ export default function CompositionCard({
         {item.href ? (
           <Link
             href={item.href}
-            aria-label={`${item.label}: ${formatValue(item.value)} ${unit}, ${pct(item.value)}`}
-            className={clsx(cls, "-mx-2 rounded-ub-md px-2 hover:bg-ub-surface-subtle", sub && "ps-7", focusRing)}
+            aria-label={`${item.label}: ${formatValue(
+              item.value
+            )} ${unit}, ${pct(item.value)}`}
+            className={clsx(
+              cls,
+              "-mx-2 rounded-ub-md px-2 hover:bg-ub-surface-subtle",
+              sub && "ps-7",
+              focusRing
+            )}
           >
             {body}
           </Link>
@@ -149,6 +221,31 @@ export default function CompositionCard({
   };
 
   const Icon = summary?.icon;
+  const headline = summary ? (
+    <div className="flex items-center gap-4 rounded-ub-md border-s-4 border-ub-action-primary bg-ub-surface-subtle px-4 py-3">
+      {Icon && (
+        <Icon
+          aria-hidden="true"
+          className="h-8 w-8 shrink-0 text-ub-action-primary"
+        />
+      )}
+      <div className="min-w-0">
+        <p className="flex flex-wrap items-baseline gap-x-3">
+          <span className="ub-tabular text-ub-heading-lg text-ub-text-primary">
+            {formatValue(summary.value)}
+          </span>
+          <span className="text-ub-label-md text-ub-text-primary">
+            {summary.label}
+          </span>
+        </p>
+        {summary.detail && (
+          <p className="ub-tabular mt-0.5 text-ub-caption text-ub-text-tertiary">
+            {summary.detail}
+          </p>
+        )}
+      </div>
+    </div>
+  ) : null;
   return (
     <DashboardCard
       title={title}
@@ -162,48 +259,69 @@ export default function CompositionCard({
       skeleton="chart"
       className={className}
     >
-      <div className="grid min-w-0 items-center gap-6 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-10">
-        <DonutChart
-          segments={slices.map((s) => ({ key: s.key, label: s.label, value: s.value, color: s.color }))}
-          centerValue={formatValue(total)}
-          centerLabel={centerLabel}
-          label={`${centerLabel}, ${formatValue(total)} ${unit}`}
-          className="max-w-[15rem]"
-        />
+      {ranked ? (
         <div className="flex min-w-0 flex-col gap-5">
-          {summary && (
-            <div className="flex items-center gap-4 rounded-ub-md border-s-4 border-ub-action-primary bg-ub-surface-subtle px-4 py-3">
-              {Icon && <Icon aria-hidden="true" className="h-8 w-8 shrink-0 text-ub-action-primary" />}
-              <div className="min-w-0">
-                <p className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="ub-tabular text-ub-heading-lg text-ub-text-primary">{formatValue(summary.value)}</span>
-                  <span className="text-ub-label-md text-ub-text-primary">{summary.label}</span>
-                </p>
-                {summary.detail && <p className="ub-tabular mt-0.5 text-ub-caption text-ub-text-tertiary">{summary.detail}</p>}
-              </div>
-            </div>
-          )}
-          <ul aria-label={`${centerLabel}, ${formatValue(total)} ${unit}`} className="gap-x-8 sm:columns-2">
-            {slices.map((s) =>
-              s.key === "__other" ? (
-                <li key={s.key} className="break-inside-avoid">
-                  <ul aria-label={`Other: ${folded.map((f) => f.label).join(", ")}`}>
-                    {row({ ...s, label: "Other" }, s.color)}
-                    {folded.map((f) => row(f, null, true))}
-                  </ul>
-                </li>
-              ) : (
-                row(s, s.color)
-              )
-            )}
-          </ul>
+          {headline}
+          <RankedBars
+            items={items}
+            unit={unit}
+            label={centerLabel}
+            top={Number.POSITIVE_INFINITY}
+            percentDigits={percentDigits}
+            formatValue={formatValue}
+          />
         </div>
-      </div>
+      ) : (
+        <div className="grid min-w-0 items-center gap-6 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-10">
+          <DonutChart
+            segments={slices.map((s) => ({
+              key: s.key,
+              label: s.label,
+              value: s.value,
+              color: s.color,
+            }))}
+            centerValue={formatValue(total)}
+            centerLabel={centerLabel}
+            label={`${centerLabel}, ${formatValue(total)} ${unit}`}
+            className="max-w-[15rem]"
+          />
+          <div className="flex min-w-0 flex-col gap-5">
+            {headline}
+            <ul
+              aria-label={`${centerLabel}, ${formatValue(total)} ${unit}`}
+              className="gap-x-8 sm:columns-2"
+            >
+              {slices.map((s) =>
+                s.key === "__other" ? (
+                  <li key={s.key} className="break-inside-avoid">
+                    <ul
+                      aria-label={`Other: ${folded
+                        .map((f) => f.label)
+                        .join(", ")}`}
+                    >
+                      {row({ ...s, label: "Other" }, s.color)}
+                      {folded.map((f) => row(f, null, true))}
+                    </ul>
+                  </li>
+                ) : (
+                  row(s, s.color)
+                )
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
       {reconciliation && group && (
         <div className="mt-6 border-t border-ub-border pt-5">
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className="text-ub-label-lg text-ub-text-primary">{reconciliation.title}</h3>
-            {reconciliation.note && <p className="text-ub-caption text-ub-text-tertiary">{reconciliation.note}</p>}
+            <h3 className="text-ub-label-lg text-ub-text-primary">
+              {reconciliation.title}
+            </h3>
+            {reconciliation.note && (
+              <p className="text-ub-caption text-ub-text-tertiary">
+                {reconciliation.note}
+              </p>
+            )}
           </div>
           {groups.length > 1 && (
             <Tabs
@@ -212,13 +330,22 @@ export default function CompositionCard({
               variant="segmented"
               size="sm"
               className="mb-4"
-              tabs={groups.map((g) => ({ key: g.id, label: `${g.label} · ${formatValue(g.rows.reduce((s, r) => s + r.total, 0))}` }))}
+              tabs={groups.map((g) => ({
+                key: g.id,
+                label: `${g.label} · ${formatValue(
+                  g.rows.reduce((s, r) => s + r.total, 0)
+                )}`,
+              }))}
               active={group.id}
               onChange={setGroupId}
             />
           )}
           <div {...(groups.length > 1 ? tabPanelProps(prefix, group.id) : {})}>
-            <ReconciliationBars rows={group.rows} unit={unit} formatValue={formatValue} />
+            <ReconciliationBars
+              rows={group.rows}
+              unit={unit}
+              formatValue={formatValue}
+            />
           </div>
         </div>
       )}

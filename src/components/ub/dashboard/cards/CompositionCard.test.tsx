@@ -68,3 +68,11 @@ test("month view: tabs per year open on the latest, one compact row per month", 
   expect(screen.getByRole("listitem", { name: "Jan: 9 students. Classified 8, Not recorded 1" })).toBeInTheDocument();
   screen.getByRole("tab", { name: "2025 · 32" }).click();
 });
+
+test("past seven parts it switches to ranked bars and still lists every part", () => {
+  const many = Array.from({ length: 9 }, (_, i) => ({ key: `f${i}`, label: `Field ${i + 1}`, value: 90 - i * 10 }));
+  render(<CompositionCard title="By field" unit="applications" centerLabel="With a field" items={many} />);
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  expect(screen.getByRole("list", { name: /With a field/ }).querySelectorAll("li")).toHaveLength(9);
+  expect(screen.getByText("1. Field 1: 90 applications, 20.0%")).toBeInTheDocument();
+});

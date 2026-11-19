@@ -331,14 +331,29 @@ export default function DummyDashboard() {
               note="Sample data. Others: every country outside the top seven."
             />
           </Block>
-          <Block show={labels} names={["RankedBarsCard"]}>
-            <RankedBarsCard
+          <Block show={labels} names={["CompositionCard (ranked)", "ReconciliationBars"]}>
+            <CompositionCard
               title="Applications by field of study"
               subtitle="What new applicants want to study · January to September 2026"
               unit="applications"
-              notRecorded={53544}
+              centerLabel="Applications with a field recorded"
+              summary={{ value: 81101, label: "Applications", detail: "27,557 with a field + 53,544 not recorded" }}
               items={SAMPLE_FIELDS.map(([label, value]) => ({ key: label, label, value }))}
-              note="Sample data. Field of study is optional on the application form."
+              reconciliation={{
+                title: "Field of study recorded",
+                note: "Recorded + not recorded = all applications",
+                matchesDonut: "recorded",
+                rows: [
+                  {
+                    label: "January to September 2026",
+                    total: 81101,
+                    parts: [
+                      { key: "recorded", label: "Recorded", value: 27557 },
+                      { key: "missing", label: "Not recorded", value: 53544, color: "var(--ub-neutral-400)" },
+                    ],
+                  },
+                ],
+              }}
             />
           </Block>
         </div>
