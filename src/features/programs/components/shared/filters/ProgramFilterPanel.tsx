@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -265,7 +266,9 @@ export default function ProgramFilterPanel({
                 <FilterChip label={chip.label} onRemove={() => onRemoveFilter(chip.key)} />
               </motion.div>)}
             </AnimatePresence>
-            <Button size="sm" variant="tertiary" text="Clear filters" onClick={onClearAll} className="shrink-0" />
+            <TextButton size="sm" onClick={onClearAll} className="[@media(pointer:coarse)]:min-h-11">
+              Clear filters
+            </TextButton>
           </div>
         </motion.div>}
       </AnimatePresence>

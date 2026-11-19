@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -16,7 +17,6 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import { getStatusVariant } from "utils/getStatusVariant";
-import Button from "components/ub/core/buttons/Button";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -126,13 +126,9 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
             </div>
 
             {activeFiltersCount > 0 && (
-              <Button
-                onClick={clearFilters}
-                icon={<RefreshCw className="h-4 w-4" />}
-                text="Clear"
-                variant="secondary"
-                className="hover:bg-ub-tone-danger-bg sm:w-auto"
-              />
+              <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                Clear filters
+              </TextButton>
             )}
           </div>
         </div>
@@ -187,13 +183,9 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                   icon={<ClipboardList className="h-8 w-8 text-ub-text-tertiary" />}
                   action={
                     activeFiltersCount > 0 ? (
-                      <Button
-                        onClick={clearFilters}
-                        icon={<RefreshCw className="h-3.5 w-3.5" />}
-                        text="Clear filters"
-                        variant="secondary"
-                        className="hover:bg-ub-surface-subtle"
-                      />
+                      <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                        Clear filters
+                      </TextButton>
                     ) : undefined
                   }
                 />

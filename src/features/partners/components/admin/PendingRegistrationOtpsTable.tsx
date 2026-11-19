@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 import DataTable, {
   type DataTableColumn,
@@ -9,7 +10,7 @@ import SelectField from "components/ub/forms/selection/SelectField";
 
 import React, { useState } from "react";
 import {
-  RefreshCw,
+  
   Clock,
   KeyRound,
   Ban,
@@ -302,11 +303,9 @@ export default function PendingRegistrationOtpsTable() {
           actions={
             <div className="flex items-center gap-3">
               {activeFiltersCount > 0 && (
-                <Button
-                  text="Clear"
-                  variant="tertiary"
-                  onClick={clearFilters}
-                />
+                <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                  Clear filters
+                </TextButton>
               )}
               <p
                 role="status"

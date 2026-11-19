@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
@@ -37,7 +38,6 @@ import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import type { StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
-import Button from "components/ub/core/buttons/Button";
 import EntityCell from "components/ub/data/display/EntityCell";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -248,13 +248,9 @@ export default function AgencyInvitationsTable() {
             </div>
 
             {activeFiltersCount > 0 && (
-              <Button
-                onClick={clearFilters}
-                icon={<RefreshCw className="h-4 w-4" />}
-                text="Clear"
-                variant="secondary"
-                className="hover:bg-ub-tone-danger-bg sm:w-auto"
-              />
+              <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                Clear filters
+              </TextButton>
             )}
           </div>
         </div>
@@ -340,13 +336,9 @@ export default function AgencyInvitationsTable() {
                   icon={<UserPlus className="h-8 w-8 text-ub-text-tertiary" />}
                   action={
                     activeFiltersCount > 0 ? (
-                      <Button
-                        onClick={clearFilters}
-                        icon={<RefreshCw className="h-3.5 w-3.5" />}
-                        text="Clear filters"
-                        variant="secondary"
-                        className="hover:bg-ub-surface-subtle"
-                      />
+                      <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                        Clear filters
+                      </TextButton>
                     ) : undefined
                   }
                 />

@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
@@ -407,11 +408,9 @@ export default function FinanceQueuePage() {
           actions={
             <div className="flex items-center gap-3">
               {(search || activeFiltersCount > 0) && (
-                <Button
-                  text="Clear"
-                  variant="tertiary"
-                  onClick={clearFilters}
-                />
+                <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+                  Clear filters
+                </TextButton>
               )}
               <p
                 role="status"

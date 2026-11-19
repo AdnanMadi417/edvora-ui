@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { useState } from "react";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import Button from "components/ub/core/buttons/Button";
@@ -59,7 +60,9 @@ export default function AdvisorDirectoryToolbar({
         // The count is in the table footer; the toolbar doesn't repeat it.
         actions={
           search.trim() || count > 0 ? (
-            <Button variant="tertiary" text="Clear" onClick={onClear} />
+            <TextButton size="sm" onClick={onClear} className="[@media(pointer:coarse)]:min-h-11">
+              Clear filters
+            </TextButton>
           ) : undefined
         }
       />

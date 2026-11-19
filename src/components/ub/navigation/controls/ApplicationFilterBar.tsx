@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 
 import { useEffect, useState } from "react";
 import FilterButton from "components/ub/core/buttons/FilterButton";
@@ -179,13 +180,9 @@ export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
             />
           ))}
         {props.activeFiltersCount > 0 && (
-          <Button
-            variant="tertiary"
-            size="sm"
-            text="Clear filters"
-            onClick={props.onClearFilters}
-            className="shrink-0"
-          />
+          <TextButton size="sm" onClick={props.onClearFilters} className="[@media(pointer:coarse)]:min-h-11">
+            Clear filters
+          </TextButton>
         )}
       </div>
       <Drawer

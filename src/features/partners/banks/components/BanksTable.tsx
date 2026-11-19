@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
@@ -181,15 +182,13 @@ export default function BanksTable({
           actions={
             <div className="flex items-center gap-3">
               {(search || filterCount > 0) && (
-                <Button
-                  variant="tertiary"
-                  text="Clear"
-                  onClick={() => {
+                <TextButton size="sm" onClick={() => {
                     setSearch("");
                     setFilters({ country: "", status: "all" });
                     setPage(1);
-                  }}
-                />
+                  }} className="[@media(pointer:coarse)]:min-h-11">
+                  Clear filters
+                </TextButton>
               )}
               <p
                 role="status"

@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 import TableActions, {
   TableAction,
@@ -428,15 +429,13 @@ export default function StatementPage() {
           actions={
             <div className="flex items-center gap-3">
               {(search || filterCount > 0) && (
-                <Button
-                  text="Clear"
-                  variant="tertiary"
-                  onClick={() => {
+                <TextButton size="sm" onClick={() => {
                     setSearch("");
                     setFilters({ status: "all", member: "" });
                     setPage(1);
-                  }}
-                />
+                  }} className="[@media(pointer:coarse)]:min-h-11">
+                  Clear filters
+                </TextButton>
               )}
               <p
                 role="status"

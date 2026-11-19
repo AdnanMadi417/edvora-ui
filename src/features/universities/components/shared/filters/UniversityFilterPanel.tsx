@@ -1,4 +1,5 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -202,13 +203,9 @@ export default function UniversityFilterPanel({
                   onRemove={() => onRemoveFilter(chip.key)}
                 />
               ))}
-              <Button
-                size="sm"
-                variant="tertiary"
-                text="Clear filters"
-                onClick={onClearAll}
-                className="shrink-0"
-              />
+              <TextButton size="sm" onClick={onClearAll} className="[@media(pointer:coarse)]:min-h-11">
+                Clear filters
+              </TextButton>
             </div>
           </motion.div>
         )}

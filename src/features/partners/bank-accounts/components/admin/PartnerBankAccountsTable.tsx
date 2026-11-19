@@ -1,11 +1,11 @@
 "use client";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { tableSectionPadding } from "components/ub/recipes";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Eye, RefreshCw, Wallet } from "lucide-react";
+import { Eye, Wallet } from "lucide-react";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
-import Button from "components/ub/core/buttons/Button";
 import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
 import TableActions, { TableAction } from "components/ub/data/tables/TableActions";
 import TablePagination from "components/ub/data/tables/TablePagination";
@@ -149,13 +149,9 @@ export default function PartnerBankAccountsTable() {
             />
           </div>
           {activeFiltersCount > 0 && (
-            <Button
-              onClick={clearFilters}
-              icon={<RefreshCw className="h-4 w-4" />}
-              text="Clear"
-              variant="secondary"
-              className="hover:bg-ub-tone-danger-bg"
-            />
+            <TextButton size="sm" onClick={clearFilters} className="[@media(pointer:coarse)]:min-h-11">
+              Clear filters
+            </TextButton>
           )}
         </div>
       </div>
