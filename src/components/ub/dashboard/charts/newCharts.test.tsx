@@ -70,20 +70,3 @@ it("AreaLineChart reads points with the arrow keys", () => {
   expect(screen.getByText("Jul: 0")).toBeInTheDocument();
 });
 
-it("RadialStatsCard shows the total, each count and share, and filters on press", async () => {
-  const { default: RadialStatsCard } = await import("../cards/RadialStatsCard");
-  const onSelect = jest.fn();
-  const user = userEvent.setup();
-  render(
-    <RadialStatsCard
-      title="Advisors"
-      total={20}
-      totalLabel="advisors"
-      onSelect={onSelect}
-      items={[{ id: "active", label: "Active", value: 15 }, { id: "inactive", label: "Suspended", value: 5 }]}
-    />
-  );
-  expect(screen.getByRole("img", { name: /Active 15 of 20, Suspended 5 of 20/ })).toBeInTheDocument();
-  await user.click(screen.getByRole("button", { name: "Suspended: 5, 25% of advisors" }));
-  expect(onSelect).toHaveBeenCalledWith("inactive");
-});

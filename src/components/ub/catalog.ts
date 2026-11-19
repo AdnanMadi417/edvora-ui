@@ -386,13 +386,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["CompositionCard"],
     avoid: "Comparing many series per period (use GroupedBarChart).",
   },
-  RadialStatsCard: {
-    category: "data",
-    imports: ['import { RadialStatsCard } from "components/ub/dashboard";'],
-    useFor: "Several measures of one whole as concentric rings with the total in the hole, and a legend (count, share) whose rows can filter the list below.",
-    usedIn: ["Admin and reviewer Advisors: active, suspended, company, individual"],
-    avoid: "Parts that add up to the whole and nothing else (use DonutStatsCard), or more than five measures.",
-  },
   ListRow: {
     category: "data",
     imports: ['import ListRow from "components/ub/dashboard/lists/ListRow";'],
@@ -776,8 +769,8 @@ export const CATALOG: Record<string, CatalogEntry> = {
   },
   "File uploads": {
     category: "forms",
-    imports: [imp("CompactFileUpload", "forms/uploads/CompactFileUpload"), imp("StatusFileUpload", "forms/uploads/StatusFileUpload"), imp("ImageUploadField", "forms/uploads/ImageUploadField")],
-    useFor: "Existing single-file uploaders (compact row, dropzone, image).",
+    imports: [imp("StatusFileUpload", "forms/uploads/StatusFileUpload"), imp("ImageUploadField", "forms/uploads/ImageUploadField")],
+    useFor: "Existing single-file uploaders (dropzone, image).",
     usedIn: ["Existing application and profile forms"],
     legacyOf: "FileUpload",
   },
@@ -899,12 +892,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "8px progress with a label and value.",
     usedIn: ["Onboarding checklist", "File upload rows", "Quota usage"],
   },
-  EmptyState: {
-    category: "feedback",
-    imports: [imp("EmptyState", "feedback/states/EmptyState")],
-    useFor: "Nothing here yet: icon, title, one sentence, one Primary action.",
-    usedIn: ["Empty tables and lists", "No search results", "First-run screens"],
-  },
   Toast: {
     category: "feedback",
     imports: [named("ToastProvider, useToast", "feedback/notifications/ToastContext")],
@@ -928,9 +915,8 @@ export const CATALOG: Record<string, CatalogEntry> = {
   "Empty states": {
     category: "feedback",
     imports: [imp("EmptyData", "feedback/states/EmptyData"), imp("EmptyTableData", "feedback/states/EmptyTableData")],
-    useFor: "Existing empty-state variants.",
-    usedIn: ["Existing feature screens"],
-    legacyOf: "EmptyState",
+    useFor: "Nothing here yet: icon, title, one sentence and an optional action. EmptyTableData sits inside a table or card.",
+    usedIn: ["Empty tables and lists", "No search results", "First-run screens"],
   },
   Tooltip: {
     category: "feedback",
@@ -1011,13 +997,6 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Existing status badge with success / danger / warning / attention / info / neutral.",
     usedIn: ["Existing tables and detail pages"],
     legacyOf: "Tag",
-  },
-  SolidBadge: {
-    category: "data",
-    imports: [imp("SolidBadge", "data/badges/SolidBadge")],
-    useFor: "Filled status badge for strong emphasis.",
-    usedIn: ["Existing tables"],
-    legacyOf: 'Tag variant="solid"',
   },
   DetailStatusBadge: {
     category: "data",
@@ -1132,10 +1111,10 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Next actions", "Upcoming deadlines", "Recent activity", "Documents list"],
     avoid: "Many columns of comparable data: use DataTable.",
   },
-  "Card, Widget and PresignedImage": {
+  "Card and PresignedImage": {
     category: "data",
-    imports: [imp("Card", "data/cards/Card"), imp("Widget", "data/cards/Widget"), imp("PresignedImage", "data/media/PresignedImage")],
-    useFor: "Bordered card surface, a simple icon + value widget, and images from storage keys.",
+    imports: [imp("Card", "data/cards/Card"), imp("PresignedImage", "data/media/PresignedImage")],
+    useFor: "Bordered card surface and images from storage keys.",
     usedIn: ["Panels on every screen", "Profile photos and logos (PresignedImage)"],
   },
   CourseList: {

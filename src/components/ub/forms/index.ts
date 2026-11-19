@@ -6,7 +6,6 @@ export { default as CheckSimpleBoxGroup } from "./choices/CheckSimpleBoxGroup";
 export { default as Checkbox } from "./choices/Checkbox";
 export { default as Combobox } from "./selection/Combobox";
 export { default as CommissionPercentageField } from "./numeric/CommissionPercentageField";
-export { default as CompactFileUpload } from "./uploads/CompactFileUpload";
 export { default as FileUpload } from "./uploads/FileUpload";
 export { default as FilterSelectField } from "./selection/FilterSelectField";
 export { default as ImageUploadField } from "./uploads/ImageUploadField";

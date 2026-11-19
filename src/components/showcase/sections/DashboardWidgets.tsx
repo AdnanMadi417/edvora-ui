@@ -37,13 +37,14 @@ import {
   DonutStatsCard,
   GroupedBarChart,
   AreaLineChart,
-  RadialStatsCard,
   SegmentedBars,
   TaskList,
   TaskListItem,
   type DashboardPeriod,
   type WidgetState,
+  RadialRingsChart,
 } from "components/ub/dashboard";
+import { CHART_PALETTE } from "config/chartPalette";
 import { Demo, ShowcaseSection, StateSwitch, ThemePreviews } from "../Showcase";
 
 const NOW = new Date("2026-11-03T09:00:00+08:00");
@@ -258,18 +259,29 @@ export default function DashboardWidgets() {
       </Demo>
 
       <Demo
-        name="RadialStatsCard and RadialRingsChart"
-        path="components/ub/dashboard/cards/RadialStatsCard.tsx"
-        description="Several measures of one whole as concentric rings (outermost first), each filled to its share, the total in the hole. The legend gives each count and share; with onSelect each row filters the list below and the other rings dim. Colours are the checked categorical slots in fixed order."
-        code={`<RadialStatsCard title="Advisors" total={21} totalLabel="advisors" items={[{ id: "active", label: "Active", value: 15 }, { id: "inactive", label: "Suspended", value: 6 }]} selectedId={filter} onSelect={setFilter} />`}
+        name="RadialRingsChart"
+        path="components/ub/dashboard/charts/RadialRingsChart.tsx"
+        description="Several measures of one total as concentric rings (outermost first), each filled to its share in rounded segments, the total in the hole. Labels and values belong in a legend next to it (CommissionStatusChart pairs it with rows)."
+        code={`<RadialRingsChart label="Commission" total={18650} centerValue="RM 18,650" rings={[{ key: "expected", label: "With university", value: 7950, color: CHART_PALETTE[0] }]} />`}
         props={[
-          { name: "items", type: "{ id, label, value }[]", description: "Outermost ring first; max five." },
-          { name: "total / totalLabel", type: "number / string", description: "The whole, shown in the hole." },
-          { name: "onSelect / selectedId", type: "(id | null) => void / string | null", description: "Legend rows become filter toggles." },
-          { name: "framed", type: "boolean", default: "true", description: "false inside a section that has its own border." },
+          { name: "rings", type: "{ key, label, value, color }[]", description: "Outermost first." },
+          { name: "total", type: "number", description: "What each ring is a share of." },
+          { name: "centerValue / centerLabel", type: "ReactNode", description: "Text in the hole." },
+          { name: "activeKey", type: "string | null", description: "Dims the other rings." },
         ]}
       >
-        <RadialStatsDemo />
+        <RadialRingsChart
+          className="max-w-52"
+          label="Commission"
+          total={18650}
+          centerValue="RM 18,650"
+          centerLabel="tracked"
+          rings={[
+            { key: "expected", label: "With university", value: 7950, color: CHART_PALETTE[0] },
+            { key: "ready", label: "Ready for payout", value: 2450, color: CHART_PALETTE[1] },
+            { key: "paid", label: "Paid", value: 8250, color: CHART_PALETTE[2] },
+          ]}
+        />
       </Demo>
 
       <Demo
@@ -591,24 +603,3 @@ function PipelineFlowDemo() {
   return <PipelineFlow stages={FLOW_STAGES} selectedId={stage} onSelect={setStage} />;
 }
 
-function RadialStatsDemo() {
-  const [filter, setFilter] = useState<string | null>(null);
-  return (
-    <div className="max-w-3xl">
-      <RadialStatsCard
-        title="Advisors"
-        subtitle="Press a group to show only those advisors."
-        total={21}
-        totalLabel="advisors"
-        selectedId={filter}
-        onSelect={setFilter}
-        items={[
-          { id: "active", label: "Active", value: 15 },
-          { id: "inactive", label: "Suspended", value: 6 },
-          { id: "agency", label: "Company", value: 6 },
-          { id: "individual", label: "Individual", value: 15 },
-        ]}
-      />
-    </div>
-  );
-}

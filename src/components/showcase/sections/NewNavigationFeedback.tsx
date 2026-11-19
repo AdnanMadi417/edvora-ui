@@ -2,7 +2,7 @@
 
 import Combobox from "components/ub/forms/selection/Combobox";
 import { useState } from "react";
-import { Bell, BookOpen, Copy, FilePenLine, FileText, House, MessageCircle, MoreHorizontal, Share2, Trash2, Users, Wallet } from "lucide-react";
+import { Bell, Copy, FilePenLine, FileText, House, MessageCircle, MoreHorizontal, Share2, Trash2, Users, Wallet } from "lucide-react";
 import clsx from "clsx";
 import { buttonBase, buttonSizes, buttonVariants, fieldControl, fieldLabel, iconButtonSizes } from "components/ub/recipes";
 import NavbarBottom, { type NavbarBottomItem } from "components/ub/navigation/layout/NavbarBottom";
@@ -14,7 +14,6 @@ import Modal, { ConfirmDialog } from "components/ub/feedback/dialogs/Modal";
 import Drawer from "components/ub/feedback/dialogs/Drawer";
 import ActionSheet from "components/ub/feedback/dialogs/ActionSheet";
 import ProgressBar from "components/ub/feedback/states/ProgressBar";
-import EmptyState from "components/ub/feedback/states/EmptyState";
 import { Demo, ShowcaseSection, StateSwitch, Variant } from "../Showcase";
 
 const NAV_ITEMS: NavbarBottomItem[] = [
@@ -304,25 +303,6 @@ export default function NewNavigationFeedback() {
         </div>
       </Demo>
 
-      <Demo name="EmptyState" path="components/ub/feedback/states/EmptyState.tsx" description="32px icon in a 64px circle, heading-md title, one sentence and one Primary action." className="grid gap-6 lg:grid-cols-2">
-        <Variant label="Default">
-          <EmptyState
-            icon={FileText}
-            title="No applications yet"
-            description="Add your first student to start tracking every step."
-            action={{ label: "Add student", onClick: () => setLastAction("Add student opened.") }}
-          />
-        </Variant>
-        <Variant label="Compact">
-          <EmptyState
-            size="compact"
-            icon={BookOpen}
-            title="No saved programs"
-            description="Save programs from the Knowledge Hub to compare up to 3."
-            action={{ label: "Browse Knowledge Hub", href: "#c-emptystate" }}
-          />
-        </Variant>
-      </Demo>
     </ShowcaseSection>
   );
 }

@@ -107,7 +107,7 @@ export function FeedbackSection() {
       title="Feedback"
       description="Components that tell people what is happening: confirmations, warnings, progress and empty results. Status updates are announced politely to screen readers."
     >
-      <Pick demos={["Alert", "ProgressBar", "EmptyState"]}>
+      <Pick demos={["Alert", "ProgressBar", "Empty states"]}>
         <NewNavigationFeedback />
       </Pick>
       <Pick demos={["NotificationItem"]}>
@@ -134,7 +134,7 @@ export function ContentSection() {
       <Pick demos={["StageTag"]}>
         <NewScreenParts />
       </Pick>
-      <Pick demos={["StatusBadge", "SolidBadge", "DetailStatusBadge", "SectionIconBadge", "FilterChip"]}>
+      <Pick demos={["StatusBadge", "SectionIconBadge", "FilterChip"]}>
         <Badges />
       </Pick>
       <Pick demos={["VerifiedBadge", "VerificationStamp"]}>
@@ -209,7 +209,7 @@ export function DataDisplaySection() {
       <Pick demos={["SectionCard", "KeyValueGrid", "FileRow", "Timeline"]}>
         <ApplicationKit />
       </Pick>
-      <Pick demos={["Card, Widget and PresignedImage", "CourseList", "Faq"]}>
+      <Pick demos={["Card and PresignedImage", "CourseList", "Faq"]}>
         <DataDisplay />
       </Pick>
       <Pick demos={["GlassPanel", "NotchedCard"]}>

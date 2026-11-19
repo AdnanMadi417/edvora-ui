@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Inbox, RefreshCw, GraduationCap, Wallet, X, FileCheck2 } from "lucide-react";
+import { Inbox, RefreshCw, GraduationCap, X, FileCheck2 } from "lucide-react";
 import TableWrapper from "components/ub/data/tables/TableWrapper";
-import TableLoadingRow from "components/ub/data/tables/TableLoadingRow";
 import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
 import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
 import TableErrorRow from "components/ub/data/tables/TableErrorRow";
@@ -18,7 +17,6 @@ import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
 import CourseList from "components/ub/data/display/CourseList";
 import Faq from "components/ub/data/display/Faq";
 import Card from "components/ub/data/cards/Card";
-import Widget from "components/ub/data/cards/Widget";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import PageContainer from "components/ub/core/layout/PageContainer";
 import FadeIn from "components/ub/core/motion/FadeIn";
@@ -72,8 +70,7 @@ export default function DataDisplay() {
                 </tr>
               </thead>
               <tbody>
-                {state === "loading" && <TableLoadingRow colSpan={4} text="Loading applications…" />}
-                {state === "skeleton" && <TableSkeletonRows columns={4} rows={4} />}
+                {(state === "loading" || state === "skeleton") && <TableSkeletonRows columns={4} rows={4} />}
                 {state === "empty" && <TableEmptyRow colSpan={4} title="No applications yet" subtitle="Add your first student to start tracking every step." icon={<Inbox className="h-6 w-6" />} />}
                 {state === "error" && <TableErrorRow colSpan={4} message="We couldn't load applications. Check your connection and try again." onRetry={() => setState("data")} />}
                 {state === "data" && (
@@ -149,15 +146,12 @@ export default function DataDisplay() {
           />
         </Demo>
 
-        <Demo name="Card, Widget and PresignedImage" path="components/ub/data/cards/Card.tsx" className="grid gap-6 md:grid-cols-3">
+        <Demo name="Card and PresignedImage" path="components/ub/data/cards/Card.tsx" className="grid gap-6 md:grid-cols-2">
           <Variant label="Card">
             <Card extra="p-5">
               <p className="text-ub-label-md text-ub-text-secondary">Commission pending</p>
               <p className="ub-tabular mt-1 text-ub-data-lg text-ub-text-primary">RM12,400</p>
             </Card>
-          </Variant>
-          <Variant label="Widget">
-            <Widget icon={<Wallet className="h-6 w-6" />} title="Placed this year" subtitle="48" />
           </Variant>
           <Variant label="PresignedImage (mock storage)">
             <div className="flex items-center gap-3">

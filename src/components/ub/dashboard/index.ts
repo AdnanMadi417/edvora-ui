@@ -44,5 +44,4 @@ export { default as GroupedBarChart, type GroupedBarChartProps, type GroupedBarS
 export { default as AreaLineChart, type AreaLineChartProps, type AreaLinePoint } from "./charts/AreaLineChart";
 export { niceTicks } from "./charts/chartScale";
 export { default as RadialRingsChart, type RadialRing, type RadialRingsChartProps } from "./charts/RadialRingsChart";
-export { default as RadialStatsCard, type RadialStatsCardProps, type RadialStatsItem } from "./cards/RadialStatsCard";
 export { default as SegmentedBars, type SegmentedBarsProps, type SegmentedBarRow, type SegmentedBarPart, type SegmentTone } from "./lists/SegmentedBars";

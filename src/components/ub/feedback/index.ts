@@ -5,7 +5,6 @@ export { default as Alert } from "./notifications/Alert";
 export { default as AsyncStateView } from "./states/AsyncStateView";
 export { default as Drawer } from "./dialogs/Drawer";
 export { default as EmptyData } from "./states/EmptyData";
-export { default as EmptyState } from "./states/EmptyState";
 export { default as EmptyTableData } from "./states/EmptyTableData";
 export { default as Loading } from "./states/Loading";
 export { default as Modal } from "./dialogs/Modal";
