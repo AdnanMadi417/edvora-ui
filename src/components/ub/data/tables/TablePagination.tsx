@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { focusRing, buttonBase, buttonVariants } from "components/ub/recipes";
+import { getPageRange } from "components/ub/navigation/controls/Pagination";
 
 interface TablePaginationProps {
   currentPage: number;
@@ -12,10 +13,7 @@ interface TablePaginationProps {
   loading?: boolean;
 }
 
-// At most three small lines: the pages around the current one.
-const MAX_LINES = 3;
-// Each line is a 44px-tall tap target around a 4px bar.
-const lineButton = `group inline-flex h-11 shrink-0 items-center px-0.5 md:h-10 disabled:pointer-events-none ${focusRing} rounded-ub-xs`;
+const pageButton = `inline-flex h-10 min-w-10 shrink-0 items-center justify-center rounded-ub-full px-2 text-ub-label-sm transition-colors hover:bg-ub-action-secondary-hover disabled:pointer-events-none disabled:opacity-40 ${focusRing}`;
 // Previous / next: the brand's secondary pill as a circle (blue outline), 44px on phones.
 const navButton = `${buttonBase} ${buttonVariants.secondary} h-11 w-11 shrink-0 p-0 md:h-10 md:w-10 disabled:pointer-events-none disabled:opacity-40`;
 
@@ -52,28 +50,27 @@ export default function TablePagination({
         >
           <ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
         </button>
-        <ul className="flex items-center">
-            {linePages(currentPage, totalPages).map((page) => (
-              <li key={page}>
+        <ul className="hidden items-center gap-1 md:flex">
+          {getPageRange(currentPage, totalPages).map((page) => (
+            <li key={page}>
+              {typeof page === "number" ? (
                 <button
                   type="button"
                   aria-label={`Page ${page}`}
                   aria-current={page === currentPage ? "page" : undefined}
                   disabled={loading}
                   onClick={() => { if (page !== currentPage) onPageChange(page); }}
-                  className={lineButton}
+                  className={`${pageButton} ${page === currentPage ? "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary" : "text-ub-text-secondary"}`}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`block h-1 rounded-ub-full transition-[width,background-color] duration-ub-fast motion-reduce:transition-none ${
-                      page === currentPage ? "w-4 bg-ub-action-primary" : "w-4 bg-ub-chart-track group-hover:bg-ub-text-tertiary"
-                    }`}
-                  />
+                  {page}
                 </button>
-              </li>
-            ))}
+              ) : (
+                <span aria-hidden="true" className="inline-flex h-10 min-w-6 items-center justify-center text-ub-text-tertiary">…</span>
+              )}
+            </li>
+          ))}
         </ul>
-        <span className="sr-only" aria-live="polite">
+        <span className="whitespace-nowrap text-ub-caption md:sr-only" aria-live="polite">
           Page <span className="font-medium text-ub-text-primary">{currentPage}</span> of {totalPages}
         </span>
         <button
@@ -89,11 +86,4 @@ export default function TablePagination({
       )}
     </div>
   );
-}
-
-/** Up to three pages: the current one and its neighbours, kept inside 1…total. */
-export function linePages(current: number, total: number): number[] {
-  const count = Math.min(MAX_LINES, total);
-  const start = Math.min(Math.max(1, current - 1), total - count + 1);
-  return Array.from({ length: count }, (_, i) => start + i);
 }

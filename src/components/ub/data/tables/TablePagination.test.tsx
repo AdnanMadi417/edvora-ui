@@ -1,13 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import TablePagination, { linePages } from "./TablePagination";
+import TablePagination from "./TablePagination";
 
 const props = { currentPage: 1, onPageChange: jest.fn(), itemsPerPage: 20, itemCount: 20, totalCount: 201, itemLabel: "applications" };
 
-it("shows at most three small lines around the current page, with working navigation", () => {
+it("shows the total, current page, and working page navigation", () => {
   const onPageChange = jest.fn();
   render(<TablePagination {...props} onPageChange={onPageChange} />);
   expect(screen.getByRole("status")).toHaveTextContent("201 applications");
-  expect(screen.getAllByRole("button", { name: /^Page \d+$/ })).toHaveLength(3);
   expect(screen.getByRole("button", { name: "Page 1" })).toHaveAttribute("aria-current", "page");
   expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "Page 3" }));
@@ -33,11 +32,4 @@ it("handles an empty result and the last partial page", () => {
   rerender(<TablePagination {...props} currentPage={11} itemCount={1} />);
   expect(screen.getByRole("status")).toHaveTextContent("201 applications");
   expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
-});
-
-it("keeps the three lines inside the page range", () => {
-  expect(linePages(1, 11)).toEqual([1, 2, 3]);
-  expect(linePages(5, 11)).toEqual([4, 5, 6]);
-  expect(linePages(11, 11)).toEqual([9, 10, 11]);
-  expect(linePages(2, 2)).toEqual([1, 2]);
 });
