@@ -245,10 +245,7 @@ export function ApplicationDetailsPreview({
             main={
               <>
                 <ApplicationSummaryCard
-                  programme="Bachelor of Computer Science (Hons)"
-                  institution="Sunway University"
                   qualificationLevel="Bachelor's degree"
-                  intake="2027-01-05"
                   durationMonths={36}
                   tuition={{ amount: 31000, currency: "RM" }}
                   submittedAt="2026-06-14T11:00:00+08:00"

@@ -1,8 +1,17 @@
 import type { ReactNode } from "react";
 import Alert from "components/ub/feedback/notifications/Alert";
-import ApplicationTracker, { TRACKER_COPY, trackerStepsAt, type TrackerStep } from "components/ub/brand/ApplicationTracker";
-import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
-import { APPLICATION_TRACKER_STEPS, type ResolvedStage } from "features/applications/stages";
+import ApplicationTracker, {
+  TRACKER_COPY,
+  trackerStepsAt,
+  type TrackerStep,
+} from "components/ub/brand/ApplicationTracker";
+import SectionCard, {
+  type SectionCardState,
+} from "components/ub/data/cards/SectionCard";
+import {
+  APPLICATION_TRACKER_STEPS,
+  type ResolvedStage,
+} from "features/applications/stages";
 
 /**
  * Pure: tracker steps for a resolved stage. Steps before the current one are
@@ -10,8 +19,17 @@ import { APPLICATION_TRACKER_STEPS, type ResolvedStage } from "features/applicat
  */
 export function trackerStepsFor(resolved: ResolvedStage | null): TrackerStep[] {
   if (!resolved) return trackerStepsAt(APPLICATION_TRACKER_STEPS, null);
-  if (resolved.stepId === "done") return APPLICATION_TRACKER_STEPS.map((s) => ({ id: s.id, label: s.label, state: "complete" }));
-  return trackerStepsAt(APPLICATION_TRACKER_STEPS, resolved.stepId, resolved.attention ? { [resolved.stepId]: { state: "attention" } } : {});
+  if (resolved.stepId === "done")
+    return APPLICATION_TRACKER_STEPS.map((s) => ({
+      id: s.id,
+      label: s.label,
+      state: "complete",
+    }));
+  return trackerStepsAt(
+    APPLICATION_TRACKER_STEPS,
+    resolved.stepId,
+    resolved.attention ? { [resolved.stepId]: { state: "attention" } } : {}
+  );
 }
 
 export interface ApplicationTrackerCardProps {
@@ -25,10 +43,21 @@ export interface ApplicationTrackerCardProps {
   onRetry?: () => void;
   className?: string;
   navigation?: ReactNode;
+  /** false when the page already shows the next step with its action (the Advisor's next-step panel). */
+  showNextStep?: boolean;
 }
 
 /** Progress card (brief §6): horizontal tracker from md, a short summary with "Show all steps" below, and the next step. */
-export default function ApplicationTrackerCard({ stage, nextStep, statusName, state = "ready", onRetry, className, navigation }: ApplicationTrackerCardProps) {
+export default function ApplicationTrackerCard({
+  stage,
+  nextStep,
+  statusName,
+  state = "ready",
+  onRetry,
+  className,
+  navigation,
+  showNextStep = true,
+}: ApplicationTrackerCardProps) {
   return (
     <SectionCard
       title="Application progress"
@@ -43,17 +72,25 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
       footer={navigation}
       footerFlush={!!navigation}
     >
-      <ApplicationTracker steps={trackerStepsFor(stage)} orientation="responsive" />
+      <ApplicationTracker
+        steps={trackerStepsFor(stage)}
+        orientation="responsive"
+      />
       {/* Its own line (not under the current step) so it also shows on attention and completed states. */}
-      <Alert className="mt-6">
-        {nextStep ? (
-          <>
-            <span className="font-medium text-ub-text-primary">{TRACKER_COPY.nextStepPrefix}</span> {nextStep}
-          </>
-        ) : (
-          TRACKER_COPY.allComplete
-        )}
-      </Alert>
+      {showNextStep && (
+        <Alert className="mt-6">
+          {nextStep ? (
+            <>
+              <span className="font-medium text-ub-text-primary">
+                {TRACKER_COPY.nextStepPrefix}
+              </span>{" "}
+              {nextStep}
+            </>
+          ) : (
+            TRACKER_COPY.allComplete
+          )}
+        </Alert>
+      )}
     </SectionCard>
   );
 }

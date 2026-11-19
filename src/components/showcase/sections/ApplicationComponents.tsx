@@ -170,10 +170,10 @@ export default function ApplicationComponents() {
         </div>
       </Demo>
 
-      <Demo name="ApplicationSummaryCard" path="features/applications/components/ApplicationSummaryCard.tsx" description="Programme, Institution, level, intake, duration, tuition (RM, tabular), submitted date and Advisor. Missing values read Not available." code={`<ApplicationSummaryCard programme={view.programme} institution={view.institution} intake={view.intake} tuition={view.tuition} submittedAt={view.submittedAt} advisorName={view.advisorName} />`}>
+      <Demo name="ApplicationSummaryCard" path="features/applications/components/ApplicationSummaryCard.tsx" description="Level, duration, tuition (RM, tabular), submitted date and Advisor; the programme, university and intake live in the header. Missing values read Not available." code={`<ApplicationSummaryCard qualificationLevel={view.qualificationLevel} tuition={view.tuition} submittedAt={view.submittedAt} advisorName={view.advisorName} />`}>
         <StateSwitch<SectionCardState> value={summaryState} options={CARD_STATES} onChange={setSummaryState} label="Card state" />
         <div className="mt-4 max-w-ub-form">
-          <ApplicationSummaryCard state={summaryState} onRetry={() => setSummaryState("ready")} programme="Bachelor of Computer Science (Hons)" institution="Sunway University" qualificationLevel="Bachelor's degree" intake="2027-01-05" durationMonths={36} tuition={{ amount: 31000, currency: "RM" }} submittedAt="2026-06-14T11:00:00+08:00" advisorName={null} />
+          <ApplicationSummaryCard state={summaryState} onRetry={() => setSummaryState("ready")} qualificationLevel="Bachelor's degree" durationMonths={36} tuition={{ amount: 31000, currency: "RM" }} submittedAt="2026-06-14T11:00:00+08:00" advisorName={null} />
         </div>
       </Demo>
 

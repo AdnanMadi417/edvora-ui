@@ -155,6 +155,7 @@ export default function ApplicationDetails({ application, onRefetch }: Applicati
       primaryAction={primaryAction}
       correctionReason={correctionReason}
       actionNeeded={!!key}
+      nextStepInPanel={panelMode === "emgs" || panelMode === "arrival-form" || panelMode === "visa-payment"}
       nextStepPanel={
         <PartnerNextStepPanel
           mode={panelMode}

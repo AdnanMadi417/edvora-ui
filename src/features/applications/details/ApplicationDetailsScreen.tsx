@@ -61,6 +61,8 @@ export interface ApplicationDetailsScreenProps {
   actionNeeded?: boolean;
   /** Top of the Overview main column, e.g. the Advisor's next-step panel. */
   nextStepPanel?: ReactNode;
+  /** The panel names the next step and its action, so the tracker doesn't repeat it. */
+  nextStepInPanel?: boolean;
   /** After the document checklists, e.g. the Advisor's offer-letter forms. */
   documentsExtra?: ReactNode;
   /** After the offer and visa cards. */
@@ -82,6 +84,7 @@ export default function ApplicationDetailsScreen({
   correctionReason,
   actionNeeded,
   nextStepPanel,
+  nextStepInPanel = false,
   documentsExtra,
   offerVisaExtra,
   commissionDetail,
@@ -143,8 +146,9 @@ export default function ApplicationDetailsScreen({
     />
   );
 
-  const offerCard = <OfferCard status={offerStatus} offerLetter={view.offerLetter} visaFee={visaFee} visaFeeNote={visaCase?.notes} onDownload={download} downloadingId={downloadingId} />;
   const commissionCard = <CommissionCard commission={view.commission} />;
+  // Overview shows only what needs doing; each full list lives once, on its tab.
+  const docsToAct = studentDocs.filter((d) => d.state === "missing" || d.state === "needs-replacing");
 
   const panels: Record<ApplicationDetailsTab, ReactNode> = {
     overview: (
@@ -153,17 +157,15 @@ export default function ApplicationDetailsScreen({
           <>
             {nextStepPanel}
             <ApplicationSummaryCard
-              programme={view.programme}
-              institution={view.institution}
               qualificationLevel={view.qualificationLevel}
-              intake={view.intake}
               durationMonths={view.durationMonths}
               tuition={view.tuition}
               submittedAt={view.submittedAt}
               advisorName={view.advisorName}
             />
-            <DocumentChecklist documents={studentDocs} limit={4} onViewAll={() => setTab("documents")} onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
-            {offerCard}
+            {docsToAct.length > 0 && (
+              <DocumentChecklist documents={docsToAct} title="Documents needing action" limit={4} onViewAll={() => setTab("documents")} onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
+            )}
           </>
         }
         aside={
@@ -178,7 +180,6 @@ export default function ApplicationDetailsScreen({
               address={view.student.address}
               whatsappUrl={whatsappLink(view.student.phone)}
             />
-            {commissionCard}
           </>
         }
       />
@@ -195,7 +196,7 @@ export default function ApplicationDetailsScreen({
     "offer-visa": (
       <div className="grid gap-4 md:gap-6">
         <TwoColumn>
-          {/* The visa fee sits with the visa steps here; the Overview keeps it on the Offer card. */}
+          {/* The visa fee sits with the visa steps, not on the Offer card. */}
           <OfferCard status={offerStatus} offerLetter={view.offerLetter} onDownload={download} downloadingId={downloadingId} />
           <VisaStatusCard steps={visaStepInputs} started={!!view.offerLetter || !!visaCase} visaFee={visaFee} visaFeeNote={visaCase?.notes} onDownload={download} downloadingId={downloadingId} />
         </TwoColumn>
@@ -227,7 +228,7 @@ export default function ApplicationDetailsScreen({
     <ApplicationDetailsLayout
       header={header}
       alerts={<ApplicationAlerts alerts={buildApplicationAlerts(view, correctionReason)} />}
-      tracker={(navigation) => <ApplicationTrackerCard stage={resolved} nextStep={view.nextStep} statusName={view.stage.statusName} navigation={navigation} />}
+      tracker={(navigation) => <ApplicationTrackerCard stage={resolved} nextStep={view.nextStep} statusName={view.stage.statusName} navigation={navigation} showNextStep={!nextStepInPanel} />}
       activeTab={tab}
       onTabChange={setTab}
       tabCounts={{ documents: replaceCount }}

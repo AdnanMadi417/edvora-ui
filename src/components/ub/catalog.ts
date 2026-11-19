@@ -197,7 +197,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
   "ApplicationSummaryCard": {
     category: "data",
     imports: ['import { ApplicationSummaryCard } from "features/applications/components";'],
-    useFor: "Programme, Institution, intake, tuition and Advisor at a glance.",
+    useFor: "Level, duration, tuition, submitted date and Advisor at a glance (programme, university and intake are in ApplicationHeader).",
     usedIn: ["Application Details: Overview"],
   },
   "StudentInfoCard and StudentBackgroundCard": {

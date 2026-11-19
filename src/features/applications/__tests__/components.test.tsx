@@ -44,7 +44,7 @@ describe("Application Details components", () => {
   });
 
   it("ApplicationSummaryCard: tuition in RM, missing values say Not available", () => {
-    render(<ApplicationSummaryCard programme="BSc" tuition={{ amount: 4200, currency: "RM" }} advisorName={null} />);
+    render(<ApplicationSummaryCard qualificationLevel="Bachelor" tuition={{ amount: 4200, currency: "RM" }} advisorName={null} />);
     expect(screen.getByText("RM4,200")).toBeInTheDocument();
     expect(screen.getAllByText("Not available").length).toBeGreaterThan(0);
   });

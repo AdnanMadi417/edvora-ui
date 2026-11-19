@@ -155,10 +155,10 @@ describe("toApplicationView", () => {
     expect(view.commission?.state).toBe("expected");
   });
   it("uses the viewer's next action", () => expect(toApplicationView(detail, "3").nextStep).toBe("Wait"));
-  it("raises a correction alert, not a duplicate replace alert", () => {
+  it("raises the correction alert; documents to replace are not repeated as an alert", () => {
     const alerts = buildApplicationAlerts(view, "Upload a certified copy");
     expect(alerts.map((a) => a.id)).toEqual(["action-needed"]);
-    expect(buildApplicationAlerts(view, null).map((a) => a.id)).toEqual(["replace-documents"]);
+    expect(buildApplicationAlerts(view, null)).toEqual([]);
   });
 });
 
