@@ -71,8 +71,8 @@ export default function ApplicationDetailsLayout({
     <div
       className={
         sticky
-          ? "mx-auto grid w-full min-w-0 max-w-7xl gap-4 pb-20 md:gap-6 md:pb-0"
-          : "mx-auto grid w-full min-w-0 max-w-7xl gap-4 md:gap-6"
+          ? "mx-auto grid w-full min-w-0 max-w-ub-dashboard gap-4 pb-20 md:gap-6 md:pb-0"
+          : "mx-auto grid w-full min-w-0 max-w-ub-dashboard gap-4 md:gap-6"
       }
     >
       {header}

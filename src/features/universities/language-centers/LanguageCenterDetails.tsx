@@ -125,7 +125,7 @@ export default function LanguageCenterDetails({
     center.university_id
   )}`;
   return (
-    <div className="mx-auto w-full min-w-0 max-w-7xl space-y-5 break-words pb-6">
+    <div className="mx-auto w-full min-w-0 max-w-ub-dashboard space-y-5 break-words pb-6">
       <header className="relative z-10 rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs">
         <div className="h-1.5 rounded-t-ub-lg bg-ub-action-primary" />
         <div className="space-y-4 p-5 sm:p-7">

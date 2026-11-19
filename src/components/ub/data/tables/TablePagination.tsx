@@ -1,7 +1,6 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { focusRing, buttonBase, buttonVariants } from "components/ub/recipes";
-import { getPageRange } from "components/ub/navigation/controls/Pagination";
+import { focusRing } from "components/ub/recipes";
 
 interface TablePaginationProps {
   currentPage: number;
@@ -13,9 +12,12 @@ interface TablePaginationProps {
   loading?: boolean;
 }
 
-const pageButton = `inline-flex h-10 min-w-10 shrink-0 items-center justify-center rounded-ub-full px-2 text-ub-label-sm transition-colors hover:bg-ub-action-secondary-hover disabled:pointer-events-none disabled:opacity-40 ${focusRing}`;
-// Previous / next: the brand's secondary pill as a circle (blue outline), 44px on phones.
-const navButton = `${buttonBase} ${buttonVariants.secondary} h-11 w-11 shrink-0 p-0 md:h-10 md:w-10 disabled:pointer-events-none disabled:opacity-40`;
+// Up to this many pages show one line per page; more read as "Page x of y".
+const MAX_LINES = 7;
+// Each line is a 44px-tall tap target around a 4px bar.
+const lineButton = `group inline-flex h-11 shrink-0 items-center px-1 md:h-10 disabled:pointer-events-none ${focusRing} rounded-ub-xs`;
+// Previous / next: quiet icon buttons.
+const navButton = `inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-ub-full text-ub-text-link transition-colors hover:bg-ub-action-secondary-hover md:h-10 md:w-10 disabled:pointer-events-none disabled:text-ub-text-disabled ${focusRing}`;
 
 export default function TablePagination({
   currentPage,
@@ -50,27 +52,30 @@ export default function TablePagination({
         >
           <ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
         </button>
-        <ul className="hidden items-center gap-1 md:flex">
-          {getPageRange(currentPage, totalPages).map((page) => (
-            <li key={page}>
-              {typeof page === "number" ? (
+        {totalPages <= MAX_LINES && (
+          <ul className="flex items-center">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <li key={page}>
                 <button
                   type="button"
                   aria-label={`Page ${page}`}
                   aria-current={page === currentPage ? "page" : undefined}
                   disabled={loading}
                   onClick={() => { if (page !== currentPage) onPageChange(page); }}
-                  className={`${pageButton} ${page === currentPage ? "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary" : "text-ub-text-secondary"}`}
+                  className={lineButton}
                 >
-                  {page}
+                  <span
+                    aria-hidden="true"
+                    className={`block h-1 rounded-ub-full transition-[width,background-color] duration-ub-fast motion-reduce:transition-none ${
+                      page === currentPage ? "w-8 bg-ub-action-primary" : "w-5 bg-ub-chart-track group-hover:bg-ub-text-tertiary"
+                    }`}
+                  />
                 </button>
-              ) : (
-                <span aria-hidden="true" className="inline-flex h-10 min-w-6 items-center justify-center text-ub-text-tertiary">…</span>
-              )}
-            </li>
-          ))}
-        </ul>
-        <span className="whitespace-nowrap text-ub-caption md:sr-only" aria-live="polite">
+              </li>
+            ))}
+          </ul>
+        )}
+        <span className={`whitespace-nowrap text-ub-caption ${totalPages <= MAX_LINES ? "sr-only" : ""}`} aria-live="polite">
           Page <span className="font-medium text-ub-text-primary">{currentPage}</span> of {totalPages}
         </span>
         <button

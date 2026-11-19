@@ -3,10 +3,11 @@ import TablePagination from "./TablePagination";
 
 const props = { currentPage: 1, onPageChange: jest.fn(), itemsPerPage: 20, itemCount: 20, totalCount: 201, itemLabel: "applications" };
 
-it("shows the total, current page, and working page navigation", () => {
+it("shows one line per page (up to seven), the current one marked, with working navigation", () => {
   const onPageChange = jest.fn();
-  render(<TablePagination {...props} onPageChange={onPageChange} />);
-  expect(screen.getByRole("status")).toHaveTextContent("201 applications");
+  render(<TablePagination {...props} totalCount={101} onPageChange={onPageChange} />);
+  expect(screen.getByRole("status")).toHaveTextContent("101 applications");
+  expect(screen.getAllByRole("button", { name: /^Page \d+$/ })).toHaveLength(6);
   expect(screen.getByRole("button", { name: "Page 1" })).toHaveAttribute("aria-current", "page");
   expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "Page 3" }));
@@ -32,4 +33,10 @@ it("handles an empty result and the last partial page", () => {
   rerender(<TablePagination {...props} currentPage={11} itemCount={1} />);
   expect(screen.getByRole("status")).toHaveTextContent("201 applications");
   expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+});
+
+it("past seven pages reads Page x of y instead of lines", () => {
+  render(<TablePagination {...props} currentPage={3} />);
+  expect(screen.queryByRole("button", { name: /^Page \d+$/ })).toBeNull();
+  expect(screen.getByText(/Page/)).toHaveTextContent("Page 3 of 11");
 });

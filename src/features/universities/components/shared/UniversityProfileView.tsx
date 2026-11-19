@@ -62,7 +62,7 @@ export default function UniversityProfileView({
       initial={reducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE }}
-      className="mx-auto w-full min-w-0 max-w-7xl space-y-5 break-words pb-6"
+      className="mx-auto w-full min-w-0 max-w-ub-dashboard space-y-5 break-words pb-6"
     >
       <header className="relative z-10 rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs">
         <div className="h-1.5 rounded-t-ub-lg bg-ub-action-primary" />

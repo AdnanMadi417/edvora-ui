@@ -89,11 +89,16 @@ export default function AppShell({ routes, children, bottomNavItems }: AppShellP
         <main id="main" tabIndex={-1} className="w-full flex-1 p-4 pb-24 focus:outline-none md:p-6 lg:p-8">
           {/* Pages that read useSearchParams() need a boundary to prerender (Next.js). */}
           <PageTitleContext.Provider value={setRecordTitle}>
-            <Suspense fallback={<Loading />}>{children}</Suspense>
+            {/* One content width for every page (tables, homes, details): centred on wide screens. */}
+            <div className="mx-auto w-full min-w-0 max-w-ub-dashboard">
+              <Suspense fallback={<Loading />}>{children}</Suspense>
+            </div>
           </PageTitleContext.Provider>
         </main>
         <div className="px-4 pb-20 md:px-6 md:pb-0 lg:px-8">
-          <Footer />
+          <div className="mx-auto w-full max-w-ub-dashboard">
+            <Footer />
+          </div>
         </div>
       </div>
 
