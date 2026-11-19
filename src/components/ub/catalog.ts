@@ -44,7 +44,7 @@ export const CATALOG: Record<string, CatalogEntry> = {
   },
   "Application pipeline & statistics": {
     category: "data",
-    imports: ['import PipelineCard from "features/applications/partner/components/PipelineCard";', 'import ApplicationStatistics from "features/applications/components/ApplicationStatistics";'],
+    imports: ['import PipelineCard from "features/applications/partner/components/PipelineCard";'],
     useFor: "Show role-scoped application totals and filter the list by stage.",
     usedIn: ["Advisor applications", "Admin applications", "Account-manager applications"],
     avoid: "Showing a single student’s progress: use ApplicationTrackerCard.",
