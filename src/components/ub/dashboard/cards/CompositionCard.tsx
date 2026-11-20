@@ -65,6 +65,8 @@ export interface CompositionCardProps {
   legendColumns?: 1 | 2;
   formatValue?: (value: number) => string;
   actions?: ReactNode;
+  /** Under the title, e.g. tabs that switch what the card shows. */
+  controls?: ReactNode;
   state?: WidgetState;
   emptyMessage?: string;
   errorMessage?: string;
@@ -97,6 +99,7 @@ export default function CompositionCard({
   legendColumns = 2,
   formatValue = num,
   actions,
+  controls,
   state = "ready",
   emptyMessage = "Nothing to show yet.",
   errorMessage,
@@ -254,6 +257,7 @@ export default function CompositionCard({
       title={title}
       subtitle={subtitle}
       actions={actions}
+      controls={controls}
       as={as}
       state={state === "ready" && total === 0 ? "empty" : state}
       emptyMessage={emptyMessage}

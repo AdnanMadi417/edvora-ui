@@ -65,6 +65,27 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
         };
       return shared.rows;
     };
+    // Top Advisors: active applications counted per Advisor (staff homes only).
+    if (context.role !== "partner")
+      plans.push({
+        id: "topAdvisors",
+        title: "Top Advisors",
+        subtitle: "Advisors with the most active applications.",
+        href: `${base}/advisors`,
+        emptyMessage: "No active applications yet.",
+        load: async () => {
+          const rows = await activeRows();
+          const counts = new Map<string, { label: string; value: number }>();
+          for (const row of rows) {
+            if (!row.partner_id) continue;
+            const entry = counts.get(row.partner_id) ?? { label: row.partner_name || "Advisor", value: 0 };
+            entry.value += 1;
+            counts.set(row.partner_id, entry);
+          }
+          const byAdvisor = [...counts].map(([key, { label, value }]) => ({ key, label, value })).sort((a, b) => b.value - a.value);
+          return { total: rows.length, items: [], byAdvisor };
+        },
+      });
     // Study level isn't on the application list: it comes from the program list,
     // matched by program and university. Unmatched applications are "not recorded".
     plans.push({
