@@ -52,7 +52,7 @@ test.each([
   ],
   [
     "account_manager",
-    ["active", "hold", "pipeline", "advisorsAttention", "unread", "updates", "monthly", "topCountries", "topAdvisors", "studyLevels", "actionRequired", "waitingOnAdvisors"],
+    ["active", "hold", "pipeline", "advisorsAttention", "unread", "updates", "overTime", "topCountries", "topAdvisors", "studyLevels", "actionRequired", "waitingOnAdvisors"],
   ],
   [
     "admin",
@@ -64,7 +64,7 @@ test.each([
       "commission",
       "unread",
       "updates",
-      "monthly",
+      "overTime",
       "topCountries",
       "topAdvisors",
       "studyLevels",

@@ -9,20 +9,27 @@ import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import { CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
 import type { OverviewResource, OverviewRole } from "../model/types";
 
-type InsightTab = "level" | "stage" | "monthly" | "countries" | "advisors";
+type InsightTab = "stage" | "level" | "trend" | "countries" | "advisors";
+type Period = "daily" | "weekly" | "monthly";
+
+const PERIODS: { key: Period; label: string; range: string }[] = [
+  { key: "daily", label: "Daily", range: "last 14 days" },
+  { key: "weekly", label: "Weekly", range: "last 12 weeks" },
+  { key: "monthly", label: "Monthly", range: "last 12 months" },
+];
 
 // One quiet line under the tabs saying what the numbers count.
 const CAPTIONS: Record<InsightTab, string> = {
   level: "Active applications by the program's study level.",
   stage: "Active applications by their current stage, in workflow order.",
-  monthly: "Active applications by the month they were submitted, last 12 months.",
+  trend: "Active applications by the date they were submitted.",
   countries: "Where active applicants come from.",
   advisors: "Advisors with the most active applications.",
 };
 
 // Shown when the API doesn't send the field a chart needs (the mock API does, for testing).
 const NOT_YET: Partial<Record<InsightTab, string>> = {
-  monthly: "This chart needs the date each application was submitted, which the applications list doesn't include yet.",
+  trend: "This chart needs the date each application was submitted, which the applications list doesn't include yet.",
   countries: "This chart needs each student's country, which the applications list doesn't include yet.",
 };
 
@@ -46,13 +53,14 @@ export default function InsightsCard({
 }) {
   const id = useId();
   const tabs = [
-    { key: "level" as const, label: "Study level", icon: GraduationCap },
     { key: "stage" as const, label: "Stage", icon: Layers },
-    { key: "monthly" as const, label: "Monthly", icon: CalendarDays },
+    { key: "level" as const, label: "Study level", icon: GraduationCap },
+    { key: "trend" as const, label: "Over time", icon: CalendarDays },
     { key: "countries" as const, label: "Top countries", icon: Globe2 },
     ...(role === "partner" ? [] : [{ key: "advisors" as const, label: "Top Advisors", icon: Users }]),
   ];
-  const [tab, setTab] = useState<InsightTab>("level");
+  const [tab, setTab] = useState<InsightTab>("stage");
+  const [period, setPeriod] = useState<Period>("monthly");
   // Each view is its own card, so the tab bar re-renders: keep focus on the chosen tab.
   const switched = useRef(false);
   useEffect(() => {
@@ -108,19 +116,28 @@ export default function InsightsCard({
     );
   }
 
-  if (tab === "monthly") {
-    const res = resources.monthly;
-    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.monthly} />);
-    const months = res?.data?.byMonth ?? [];
+  if (tab === "trend") {
+    const res = resources.overTime;
+    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.trend} />);
+    const series = res?.data?.overTime?.[period] ?? [];
+    const current = PERIODS.find((p) => p.key === period)!;
     return panel(
-      <DashboardCard
-        {...common}
-        state={res?.state === "ready" && !months.some((m) => m.value) ? "empty" : res?.state ?? "loading"}
-        errorMessage={res?.error}
-        emptyMessage="No applications submitted in the last 12 months."
-        skeleton="chart"
-      >
-        <CategoryColumnChart data={months} unit="applications" label="Active applications by month submitted, last 12 months" highlightKey={months[months.length - 1]?.key} />
+      <DashboardCard {...common} state={res?.state ?? "loading"} errorMessage={res?.error} skeleton="chart">
+        <div className="mb-4 flex justify-end">
+          <Tabs<Period> aria-label="Period" variant="segmented" size="sm" tabs={PERIODS} active={period} onChange={setPeriod} />
+        </div>
+        {series.some((b) => b.value) ? (
+          <CategoryColumnChart
+            data={series}
+            unit="applications"
+            label={`Active applications by date submitted, ${current.range}`}
+            // The latest period that has applications, so the highlighted value is never a bare 0.
+            highlightKey={[...series].reverse().find((b) => b.value > 0)?.key}
+            compact={series.length > 12}
+          />
+        ) : (
+          <p className="py-10 text-center text-ub-body-sm text-ub-text-secondary">No applications submitted in the {current.range}.</p>
+        )}
       </DashboardCard>
     );
   }

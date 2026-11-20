@@ -54,6 +54,8 @@ const stageOf = (app: AppRecord) => STAGES[currentStatus(app).stageIndex];
 function mockSubmittedAt(app: AppRecord) {
   const seed = [...app.id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const now = new Date();
+  // A third land in the last two weeks so the daily and weekly views have data too.
+  if (seed % 3 === 0) return new Date(now.getTime() - (seed % 14) * 86_400_000).toISOString();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (seed % 12), 1 + (seed % 27))).toISOString();
 }
 

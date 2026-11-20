@@ -68,30 +68,46 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
     // Monthly and Top countries need submitted_at and student_nationality on the
     // list. The real API doesn't send them yet: the view says so instead of guessing.
     plans.push({
-      id: "monthly",
-      title: "Monthly applications",
-      subtitle: "Active applications by the month they were submitted.",
+      id: "overTime",
+      title: "Applications over time",
+      subtitle: "Active applications by the date they were submitted.",
       href: `${base}/applications`,
       emptyMessage: "No active applications yet.",
       load: async () => {
         const rows = await activeRows();
         if (!rows.some((row) => row.submitted_at)) return { total: rows.length, items: [], unavailable: true };
+        const day = 86_400_000;
         const now = new Date();
-        const months = Array.from({ length: 12 }, (_, i) => {
-          const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11 + i, 1));
-          return {
-            key: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
-            label: d.toLocaleString("en-GB", { month: "short", timeZone: "UTC" }),
-            value: 0,
-          };
-        });
-        const index = new Map(months.map((m, i) => [m.key, i]));
+        const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+        // Weeks start on Monday.
+        const thisWeek = today - ((new Date(today).getUTCDay() + 6) % 7) * day;
+        const bucket = (count: number, startOf: (i: number) => number, label: (t: number) => string) =>
+          Array.from({ length: count }, (_, i) => {
+            const t = startOf(i);
+            return { key: new Date(t).toISOString().slice(0, 10), label: label(t), value: 0, t };
+          });
+        const daily = bucket(14, (i) => today - (13 - i) * day, (t) => String(new Date(t).getUTCDate()));
+        const weekly = bucket(12, (i) => thisWeek - (11 - i) * 7 * day, (t) => `${new Date(t).getUTCDate()}/${new Date(t).getUTCMonth() + 1}`);
+        const monthly = bucket(12, (i) => Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11 + i, 1), (t) =>
+          new Date(t).toLocaleString("en-GB", { month: "short", timeZone: "UTC" })
+        );
+        // Each date counts in the last bucket that starts on or before it.
+        const place = (series: { t: number; value: number }[], at: number) => {
+          let hit = -1;
+          series.forEach((b, i) => {
+            if (at >= b.t) hit = i;
+          });
+          if (hit >= 0) series[hit].value += 1;
+        };
         for (const row of rows) {
           if (!row.submitted_at) continue;
-          const i = index.get(String(row.submitted_at).slice(0, 7));
-          if (i !== undefined) months[i].value += 1;
+          const at = new Date(row.submitted_at).getTime();
+          place(daily, at);
+          place(weekly, at);
+          place(monthly, at);
         }
-        return { total: rows.length, items: [], byMonth: months };
+        const strip = (series: { key: string; label: string; value: number }[]) => series.map(({ key, label, value }) => ({ key, label, value }));
+        return { total: rows.length, items: [], overTime: { daily: strip(daily), weekly: strip(weekly), monthly: strip(monthly) } };
       },
     });
     plans.push({

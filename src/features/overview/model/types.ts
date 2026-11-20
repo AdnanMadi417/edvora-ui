@@ -41,8 +41,8 @@ export interface OverviewData {
   items: OverviewItem[];
   /** Active applications per university (same rows as the stage totals). */
   byUniversity?: { key: string; label: string; value: number }[];
-  /** Active applications per month submitted, oldest month first (last 12 months). */
-  byMonth?: { key: string; label: string; value: number }[];
+  /** Active applications by date submitted, oldest first: last 14 days, 12 weeks and 12 months. */
+  overTime?: Record<"daily" | "weekly" | "monthly", { key: string; label: string; value: number }[]>;
   /** Active applications per student country, most first. */
   byCountry?: { key: string; label: string; value: number }[];
   /** The API doesn't send the field this view needs yet. */
