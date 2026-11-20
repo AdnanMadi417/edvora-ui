@@ -141,7 +141,7 @@ export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
     onToggleFilters();
   };
   return (
-    <div className="min-w-0 space-y-4">
+    <div className="min-w-0">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Search and filters share one row at every width. */}
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:min-w-[280px] sm:gap-3">
@@ -159,7 +159,7 @@ export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+      <div className="mt-3 flex flex-nowrap gap-2 overflow-x-auto pb-1 empty:hidden sm:flex-wrap">
         {fields
           .filter(
             ({ key }) =>
