@@ -41,6 +41,12 @@ export interface OverviewData {
   items: OverviewItem[];
   /** Active applications per university (same rows as the stage totals). */
   byUniversity?: { key: string; label: string; value: number }[];
+  /** Active applications per month submitted, oldest month first (last 12 months). */
+  byMonth?: { key: string; label: string; value: number }[];
+  /** Active applications per student country, most first. */
+  byCountry?: { key: string; label: string; value: number }[];
+  /** The API doesn't send the field this view needs yet. */
+  unavailable?: boolean;
   /** Active applications per Advisor, most first (staff homes). */
   byAdvisor?: { key: string; label: string; value: number }[];
   /** Active applications by the program's study level; the rest have no level on record. */

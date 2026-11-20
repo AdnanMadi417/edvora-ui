@@ -48,6 +48,15 @@ const stageOf = (app: AppRecord) => STAGES[currentStatus(app).stageIndex];
 
 // --- list rows ---------------------------------------------------------------
 
+// TEST DATA ONLY: the real list doesn't send these yet (backend gap). The home's
+// Monthly and Top countries tabs draw from them when present; submitted dates
+// are spread over the last 12 months so the monthly chart has a shape.
+function mockSubmittedAt(app: AppRecord) {
+  const seed = [...app.id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (seed % 12), 1 + (seed % 27))).toISOString();
+}
+
 function listRow(app: AppRecord) {
   const st = currentStatus(app);
   const program = programDetail(app.programId);
@@ -69,6 +78,8 @@ function listRow(app: AppRecord) {
     next_action: st.manager,
     lifecycle_status: app.lifecycle,
     new_notifications_count: app.new_notifications_count,
+    submitted_at: mockSubmittedAt(app),
+    student_nationality: app.student.nationality ?? null,
   };
 }
 

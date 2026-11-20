@@ -65,6 +65,53 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
         };
       return shared.rows;
     };
+    // Monthly and Top countries need submitted_at and student_nationality on the
+    // list. The real API doesn't send them yet: the view says so instead of guessing.
+    plans.push({
+      id: "monthly",
+      title: "Monthly applications",
+      subtitle: "Active applications by the month they were submitted.",
+      href: `${base}/applications`,
+      emptyMessage: "No active applications yet.",
+      load: async () => {
+        const rows = await activeRows();
+        if (!rows.some((row) => row.submitted_at)) return { total: rows.length, items: [], unavailable: true };
+        const now = new Date();
+        const months = Array.from({ length: 12 }, (_, i) => {
+          const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11 + i, 1));
+          return {
+            key: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
+            label: d.toLocaleString("en-GB", { month: "short", timeZone: "UTC" }),
+            value: 0,
+          };
+        });
+        const index = new Map(months.map((m, i) => [m.key, i]));
+        for (const row of rows) {
+          if (!row.submitted_at) continue;
+          const i = index.get(String(row.submitted_at).slice(0, 7));
+          if (i !== undefined) months[i].value += 1;
+        }
+        return { total: rows.length, items: [], byMonth: months };
+      },
+    });
+    plans.push({
+      id: "topCountries",
+      title: "Top countries",
+      subtitle: "Where active applicants come from.",
+      href: `${base}/applications`,
+      emptyMessage: "No active applications yet.",
+      load: async () => {
+        const rows = await activeRows();
+        if (!rows.some((row) => row.student_nationality)) return { total: rows.length, items: [], unavailable: true };
+        const counts = new Map<string, number>();
+        for (const row of rows) {
+          const country = row.student_nationality || "Not recorded";
+          counts.set(country, (counts.get(country) ?? 0) + 1);
+        }
+        const byCountry = [...counts].map(([label, value]) => ({ key: label, label, value })).sort((a, b) => b.value - a.value);
+        return { total: rows.length, items: [], byCountry };
+      },
+    });
     // Top Advisors: active applications counted per Advisor (staff homes only).
     if (context.role !== "partner")
       plans.push({

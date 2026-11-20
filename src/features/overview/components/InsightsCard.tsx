@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import CompositionCard from "components/ub/dashboard/cards/CompositionCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import RankedBars from "components/ub/dashboard/charts/RankedBars";
+import CategoryColumnChart from "components/ub/dashboard/charts/CategoryColumnChart";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { OverviewResource, OverviewRole } from "../model/types";
 
@@ -12,12 +13,12 @@ type InsightTab = "level" | "stage" | "monthly" | "countries" | "advisors";
 const SUBTITLES: Record<InsightTab, string> = {
   level: "Active applications by the program's study level.",
   stage: "Active applications by their current stage, in workflow order.",
-  monthly: "New applications per month.",
+  monthly: "Active applications by the month they were submitted, last 12 months.",
   countries: "Where active applicants come from.",
   advisors: "Advisors with the most active applications.",
 };
 
-// Charts the API can't feed yet: the tab is there, with an honest note instead of numbers.
+// Shown when the API doesn't send the field a chart needs (the mock API does, for testing).
 const NOT_YET: Partial<Record<InsightTab, string>> = {
   monthly: "This chart needs the date each application was submitted, which the applications list doesn't include yet.",
   countries: "This chart needs each student's country, which the applications list doesn't include yet.",
@@ -98,6 +99,40 @@ export default function InsightsCard({
         errorMessage={res?.error}
         emptyMessage="No active applications yet."
       />
+    );
+  }
+
+  if (tab === "monthly") {
+    const res = resources.monthly;
+    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.monthly} />);
+    const months = res?.data?.byMonth ?? [];
+    return panel(
+      <DashboardCard
+        {...common}
+        state={res?.state === "ready" && !months.some((m) => m.value) ? "empty" : res?.state ?? "loading"}
+        errorMessage={res?.error}
+        emptyMessage="No applications submitted in the last 12 months."
+        skeleton="chart"
+      >
+        <CategoryColumnChart data={months} unit="applications" label="Active applications by month submitted, last 12 months" highlightKey={months[months.length - 1]?.key} />
+      </DashboardCard>
+    );
+  }
+
+  if (tab === "countries") {
+    const res = resources.topCountries;
+    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.countries} />);
+    const countries = res?.data?.byCountry ?? [];
+    return panel(
+      <DashboardCard
+        {...common}
+        state={res?.state === "ready" && !countries.length ? "empty" : res?.state ?? "loading"}
+        errorMessage={res?.error}
+        emptyMessage="No active applications yet."
+        skeleton="list"
+      >
+        <RankedBars items={countries} unit="applications" label="Top countries" top={10} restLabel={(n) => `Other countries (${n})`} />
+      </DashboardCard>
     );
   }
 
