@@ -5,7 +5,7 @@ import TableActions, {
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   CopyPlus,
   Eye,
@@ -121,37 +121,22 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
               status={programStatus(program)}
               subtitle={programSubtitle(program)}
             />
-            {/* Cards (below 1024px): the facts in two short lines under the name, no label column. */}
-            <span className="mt-3 flex flex-col gap-2 text-ub-body-sm lg:hidden">
-              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                {program.qualification_level && (
-                  <Tag hue="indigo" size="sm">
-                    {program.qualification_level}
-                  </Tag>
-                )}
-                {program.duration ? (
-                  <span className="text-ub-text-secondary">
-                    {program.duration} {program.duration === 1 ? "year" : "years"}
+            {/* Cards (below 1024px): one short line under the name; fees are on the details page. */}
+            <span className="mt-2 flex flex-wrap gap-x-1 text-ub-body-sm text-ub-text-secondary lg:hidden">
+              {[
+                // "Bachelor's Degree" → "Bachelor's": the card line stays short.
+                program.qualification_level?.replace(/\s+Degree\b/i, ""),
+                program.duration ? `${program.duration} ${program.duration === 1 ? "year" : "years"}` : null,
+                ielts ? `IELTS ${ielts.replace(/^Band\s*/i, "")}` : null,
+              ]
+                .filter(Boolean)
+                .map((part, i, parts) => (
+                  // Each part stays whole; the dot ends a part, so a wrapped line never starts with one.
+                  <span key={i} className="whitespace-nowrap">
+                    {part}
+                    {i < parts.length - 1 && " ·"}
                   </span>
-                ) : null}
-                {program.has_scholarship && (
-                  <Tag hue="amber" size="sm">
-                    Scholarship
-                  </Tag>
-                )}
-              </span>
-              <span className="ub-tabular grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1">
-                {[
-                  ["Tuition", money(program.first_year_tuition, program.yearly_fee_currency), "text-ub-text-primary"],
-                  ["Commission", money(program.commission_amount, program.commission_currency), "text-ub-label-md text-ub-tone-success-text"],
-                  ["English", ielts ? `IELTS ${ielts.replace(/^Band\s*/i, "")}` : "Not set", "text-ub-text-primary"],
-                ].map(([label, value, tone]) => (
-                  <Fragment key={label}>
-                    <span className="text-ub-caption leading-5 text-ub-text-tertiary">{label}</span>
-                    <span className={`whitespace-nowrap ${tone}`}>{value}</span>
-                  </Fragment>
                 ))}
-              </span>
             </span>
           </span>
         );
