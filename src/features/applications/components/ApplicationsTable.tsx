@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, type ReactNode } from "react";
-import { ArrowUpRight, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DataTable, {
   type DataTableColumn,
@@ -74,12 +74,12 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
           </span>
         )}
       </span>
-      <span
-        aria-hidden="true"
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-ub-full bg-ub-tone-brand-bg text-ub-tone-brand-text md:hidden"
-      >
-        <ArrowUpRight className="h-4 w-4" />
-      </span>
+      {/* Phones: the card itself opens the application (no open button); the time sits up here. */}
+      <AppDate
+        value={row.updated_at}
+        format="relative"
+        className="shrink-0 self-start text-ub-caption text-ub-text-tertiary md:hidden"
+      />
     </span>
   );
 }
@@ -191,6 +191,8 @@ export default function ApplicationsTable({
       },
       {
         key: "updated",
+        // Phones show the time in the card header instead.
+        mobileSecondary: true,
         width: ownership === "none" ? "14%" : "12%",
         header: "Updated",
         cell: (r) => (

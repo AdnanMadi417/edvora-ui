@@ -26,31 +26,11 @@
     display: none;
   }
 
+  /* The time is in the card header on phones (StudentCell), not a footer. */
   .ub-data-table.ub-applications-table
     table[data-layout="table"][data-mobile-layout="stacked"]
     td[data-column="updated"] {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 4px;
-    padding-top: 8px;
-    border-top: 1px solid var(--ub-border-default);
-    font-size: 11px;
-    line-height: 16px;
-  }
-
-  .ub-applications-table td[data-column="updated"] > span[aria-hidden="true"] {
-    display: inline;
-    margin: 0;
-    font-size: inherit;
-  }
-
-  .ub-applications-table
-    table[data-mobile-layout="stacked"]
-    td[data-column="updated"]
-    > span:last-child {
-    flex: 0 1 auto;
-    width: auto;
+    display: none;
   }
 
   .ub-applications-table .ub-application-student {
