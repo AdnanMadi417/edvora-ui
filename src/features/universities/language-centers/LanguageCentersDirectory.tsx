@@ -354,13 +354,6 @@ export default function LanguageCentersDirectory({
                   />
                 ))}
               </div>
-              <CardGridPagination
-                currentPage={currentPage}
-                onPageChange={setPage}
-                itemsPerPage={perPage}
-                totalCount={matching.length}
-                itemLabel="language centres"
-              />
             </div>
           )
         ) : (
@@ -393,6 +386,16 @@ export default function LanguageCentersDirectory({
           />
         )}
       </div>
+      {/* Outside the padded section, so its top line runs edge to edge like Programs. */}
+      {readOnly && !loading && !universitiesLoading && !error && !universitiesError && rows.length > 0 && (
+        <CardGridPagination
+          currentPage={currentPage}
+          onPageChange={setPage}
+          itemsPerPage={perPage}
+          totalCount={matching.length}
+          itemLabel="language centres"
+        />
+      )}
       {!readOnly && form && (
         <LanguageCenterForm
           key={form === "new" ? "new" : form.id}

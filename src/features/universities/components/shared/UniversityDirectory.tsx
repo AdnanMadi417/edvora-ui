@@ -241,18 +241,19 @@ export default function UniversityDirectory({
                   ))}
               </div>
             )}
-            {!loading && !error && sorted.length > 0 && (
-              <CardGridPagination
-                currentPage={currentPage}
-                onPageChange={setPage}
-                itemsPerPage={perPage}
-                totalCount={sorted.length}
-                itemLabel="universities"
-              />
-            )}
           </>
         )}
       </div>
+      {/* Outside the padded section, so its top line runs edge to edge like Programs. */}
+      {!canManage && !loading && !error && sorted.length > 0 && (
+        <CardGridPagination
+          currentPage={currentPage}
+          onPageChange={setPage}
+          itemsPerPage={perPage}
+          totalCount={sorted.length}
+          itemLabel="universities"
+        />
+      )}
       {role === "admin" && (
         <DeleteUniversityConfirmation
           isOpen={!!deleteTarget}
