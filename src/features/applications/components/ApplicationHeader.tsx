@@ -100,11 +100,13 @@ export default function ApplicationHeader({
   }
 
   const meta = [institution, programme].filter(Boolean);
+  // Phones: the Primary action is in the sticky bar, so only the ⋮ menu is left; it sits top right.
+  const menuCorner = overflowActions.length > 0;
 
   return (
-    <header className={clsx(card, "p-4 md:p-6", className)}>
-      {breadcrumbs && <div className="mb-4">{breadcrumbs}</div>}
-      <div className="flex flex-col gap-4 md:flex-row md:items-start">
+    <header className={clsx(card, "relative p-4 md:p-6", className)}>
+      {breadcrumbs && <div className={clsx("mb-4", menuCorner && "max-md:pe-12")}>{breadcrumbs}</div>}
+      <div className={clsx("flex flex-col gap-4 md:flex-row md:items-start", menuCorner && !breadcrumbs && "max-md:pe-12")}>
         <div className="flex min-w-0 flex-1 items-start gap-4">
           <Avatar
             name={studentName}
@@ -161,7 +163,7 @@ export default function ApplicationHeader({
         </div>
 
         {(primaryAction || overflowActions.length > 0) && (
-          <div className="flex shrink-0 items-center gap-2 md:justify-end">
+          <div className="flex shrink-0 items-center gap-2 max-md:absolute max-md:end-3 max-md:top-3 md:justify-end">
             {primaryAction && (
               <Button
                 variant="primary"
