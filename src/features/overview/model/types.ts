@@ -47,6 +47,8 @@ export interface OverviewData {
   byCountry?: { key: string; label: string; value: number }[];
   /** The API doesn't send the field this view needs yet. */
   unavailable?: boolean;
+  /** Active applications per field of study, most first (from the program list). */
+  byField?: { key: string; label: string; value: number }[];
   /** Active applications per Advisor, most first (staff homes). */
   byAdvisor?: { key: string; label: string; value: number }[];
   /** Active applications by the program's study level; the rest have no level on record. */

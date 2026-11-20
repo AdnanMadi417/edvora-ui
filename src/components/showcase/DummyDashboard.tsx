@@ -297,6 +297,7 @@ export default function DummyDashboard() {
               subtitle="What new applicants want to study · January to September 2026"
               unit="applications"
               // The top five fields, then the rest in one row.
+              layout="ranked"
               top={5}
               restLabel={(n) => `Others (${n} fields)`}
               centerLabel="Applications with a field recorded"

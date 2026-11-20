@@ -79,7 +79,7 @@ test("past seven parts it switches to ranked bars and still lists every part", (
 
 test("ranked layout with top shows that many parts, then one Others row", () => {
   const many = Array.from({ length: 9 }, (_, i) => ({ key: `f${i}`, label: `Field ${i + 1}`, value: 90 - i * 10 }));
-  render(<CompositionCard title="By field" unit="applications" centerLabel="With a field" items={many} top={5} restLabel={(n) => `Others (${n} fields)`} />);
+  render(<CompositionCard title="By field" unit="applications" centerLabel="With a field" items={many} layout="ranked" top={5} restLabel={(n) => `Others (${n} fields)`} />);
   const rows = screen.getByRole("list", { name: /With a field/ }).querySelectorAll("li");
   expect(rows).toHaveLength(6);
   expect(screen.getByText("Others (4 fields): 100 applications, 22.2%")).toBeInTheDocument();

@@ -7,10 +7,10 @@ import RankedBars from "components/ub/dashboard/charts/RankedBars";
 import AreaLineChart from "components/ub/dashboard/charts/AreaLineChart";
 import DeltaPill from "components/ub/dashboard/shared/DeltaPill";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
-import { CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
+import { BookOpen, CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
 import type { OverviewResource, OverviewRole } from "../model/types";
 
-type InsightTab = "stage" | "level" | "trend" | "countries" | "advisors";
+type InsightTab = "stage" | "level" | "field" | "trend" | "countries" | "advisors";
 type Period = "daily" | "weekly" | "monthly";
 
 const PERIODS: { key: Period; label: string; range: string; previous: string }[] = [
@@ -22,6 +22,7 @@ const PERIODS: { key: Period; label: string; range: string; previous: string }[]
 // One quiet line under the tabs saying what the numbers count.
 const CAPTIONS: Record<InsightTab, string> = {
   level: "Active applications by the program's study level.",
+  field: "Active applications by the program's field of study: the top five, then the rest.",
   stage: "Active applications by their current stage, in workflow order.",
   trend: "Active applications by the date they were submitted.",
   countries: "Where active applicants come from.",
@@ -56,6 +57,7 @@ export default function InsightsCard({
   const tabs = [
     { key: "stage" as const, label: "Stage", icon: Layers },
     { key: "level" as const, label: "Study level", icon: GraduationCap },
+    { key: "field" as const, label: "Field of study", icon: BookOpen },
     { key: "trend" as const, label: "Over time", icon: CalendarDays },
     { key: "countries" as const, label: "Top countries", icon: Globe2 },
     ...(role === "partner" ? [] : [{ key: "advisors" as const, label: "Top Advisors", icon: Users }]),
@@ -92,6 +94,26 @@ export default function InsightsCard({
         unit="applications"
         centerLabel="With a study level"
         items={res?.data?.studyLevels?.levels ?? []}
+        state={res?.state ?? "loading"}
+        errorMessage={res?.error}
+        emptyMessage="No active applications yet."
+      />
+    );
+  }
+
+  if (tab === "field") {
+    // Same data request as Study level: the program list gives both.
+    const res = resources.studyLevels;
+    return panel(
+      <CompositionCard
+        {...common}
+        bodyClassName={body.className}
+        // The same donut as Stage: the top five fields, then Others.
+        top={5}
+        restLabel={(n) => `Others (${n} ${n === 1 ? "field" : "fields"})`}
+        unit="applications"
+        centerLabel="With a field"
+        items={res?.data?.byField ?? []}
         state={res?.state ?? "loading"}
         errorMessage={res?.error}
         emptyMessage="No active applications yet."

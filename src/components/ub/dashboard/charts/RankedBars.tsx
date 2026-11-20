@@ -21,6 +21,8 @@ export interface RankedBarsProps {
   label: string;
   /** Rows shown before the rest fold into one "Others" row (default 10). */
   top?: number;
+  /** Show exactly this many parts, then everything else (even one) in the Others row. Wins over `top`. */
+  fold?: number;
   /** Label for the folded row; default "Others (N)". */
   restLabel?: (count: number) => string;
   /**
@@ -50,6 +52,7 @@ export default function RankedBars({
   unit,
   label,
   top = 10,
+  fold,
   restLabel = (n) => `Others (${n})`,
   notRecorded = 0,
   color = "var(--ub-chart-cat-1)",
@@ -58,7 +61,8 @@ export default function RankedBars({
   className,
 }: RankedBarsProps) {
   const sorted = items.filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
-  const head = sorted.length > top ? sorted.slice(0, top - 1) : sorted;
+  const head =
+    fold !== undefined ? (sorted.length > fold ? sorted.slice(0, fold) : sorted) : sorted.length > top ? sorted.slice(0, top - 1) : sorted;
   const rest = sorted.slice(head.length);
   const rows = rest.length
     ? [...head, { key: "__others", label: restLabel(rest.length), value: rest.reduce((s, i) => s + i.value, 0), rest: true }]

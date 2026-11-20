@@ -166,15 +166,25 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
         ]);
         const key = (program?: string | null, university?: string | null) =>
           `${(program ?? "").trim().toLowerCase()}|${(university ?? "").trim().toLowerCase()}`;
+        // One pass over the program list gives each application's level and field of study.
         const levelOf = new Map<string, string>();
-        for (const p of programs as any[])
-          if (p.qualification_level) levelOf.set(key(p.name, p.university?.name ?? p.university_name), p.qualification_level);
+        const fieldOf = new Map<string, string>();
+        for (const p of programs as any[]) {
+          const k = key(p.name, p.university?.name ?? p.university_name);
+          if (p.qualification_level) levelOf.set(k, p.qualification_level);
+          const field = p.field_of_study?.name ?? p.field_of_study_name;
+          if (field) fieldOf.set(k, field);
+        }
         const counts = new Map<string, number>();
+        const fields = new Map<string, number>();
         let notRecorded = 0;
         for (const row of rows) {
-          const level = levelOf.get(key(row.program_name, row.university_name));
+          const k = key(row.program_name, row.university_name);
+          const level = levelOf.get(k);
           if (level) counts.set(level, (counts.get(level) ?? 0) + 1);
           else notRecorded += 1;
+          const field = fieldOf.get(k);
+          if (field) fields.set(field, (fields.get(field) ?? 0) + 1);
         }
         return {
           total: rows.length,
@@ -183,6 +193,7 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
             levels: [...counts].map(([label, value]) => ({ key: label, label, value })),
             notRecorded,
           },
+          byField: [...fields].map(([label, value]) => ({ key: label, label, value })).sort((a, b) => b.value - a.value),
         };
       },
     });

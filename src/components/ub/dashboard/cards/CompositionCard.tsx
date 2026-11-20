@@ -14,7 +14,7 @@ import ReconciliationBars, {
 import RankedBars from "../charts/RankedBars";
 import { foldSlices, type DonutStatsItem } from "./DonutStatsCard";
 import type { WidgetState } from "../types";
-import { CHART_PALETTE_EXTENDED } from "config/chartPalette";
+import { CHART_OTHER, CHART_PALETTE_EXTENDED } from "config/chartPalette";
 
 export interface CompositionSummary {
   /** The headline number, e.g. 2426. */
@@ -63,7 +63,7 @@ export interface CompositionCardProps {
   percentDigits?: number;
   /** Legend columns beside the donut: 2 for full-width pages, 1 in narrower columns (e.g. home). */
   legendColumns?: 1 | 2;
-  /** Ranked layout: the top N parts, then the rest in one "Others" row (default: every part). */
+  /** Ranked layout: exactly the top N parts, then the rest in one "Others" row (default: every part). */
   top?: number;
   /** Label for that row, e.g. (n) => `Other fields (${n})`. */
   restLabel?: (count: number) => string;
@@ -130,19 +130,33 @@ export default function CompositionCard({
   const group =
     groups.find((g) => g.id === groupId) ?? groups[groups.length - 1];
   const total = items.reduce((sum, i) => sum + Math.max(0, i.value), 0);
+  // With `top`: exactly the top N parts, then one grey Others part (no sub-list under it).
+  const positive = items.filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
+  const topFold = top !== undefined && positive.length > top;
+  const rest = topFold ? positive.slice(top) : [];
+  const chartItems = topFold
+    ? [
+        ...positive.slice(0, top),
+        {
+          key: "__rest",
+          label: restLabel?.(rest.length) ?? `Others (${rest.length})`,
+          value: rest.reduce((sum, i) => sum + i.value, 0),
+        },
+      ]
+    : items;
   const slices = foldSlices(
-    items,
+    chartItems,
     maxSlices,
-    keepOrder,
+    keepOrder || topFold,
     CHART_PALETTE_EXTENDED
-  );
+  ).map((s) => (s.key === "__rest" ? { ...s, color: CHART_OTHER } : s));
   const shown = new Set(slices.map((s) => s.key));
-  const folded = items
+  const folded = chartItems
     .filter((i) => i.value > 0 && !shown.has(i.key))
     .sort((a, b) => b.value - a.value);
   const ranked =
     (layout ??
-      (items.filter((i) => i.value > 0).length > CHART_PALETTE_EXTENDED.length
+      (chartItems.filter((i) => i.value > 0).length > CHART_PALETTE_EXTENDED.length
         ? "ranked"
         : "donut")) === "ranked";
   const pct = (value: number) =>
@@ -283,7 +297,8 @@ export default function CompositionCard({
             items={items}
             unit={unit}
             label={centerLabel}
-            top={top ? top + 1 : Number.POSITIVE_INFINITY}
+            top={Number.POSITIVE_INFINITY}
+            fold={top}
             restLabel={restLabel}
             percentDigits={percentDigits}
             formatValue={formatValue}

@@ -5,7 +5,10 @@ import type { OverviewResource } from "../model/types";
 
 const ready = (data: Partial<NonNullable<OverviewResource["data"]>>): OverviewResource => ({ state: "ready", data: { total: 10, items: [], ...data } });
 const resources = {
-  studyLevels: ready({ studyLevels: { levels: [{ key: "Bachelor", label: "Bachelor", value: 6 }, { key: "Master", label: "Master", value: 4 }], notRecorded: 0 } }),
+  studyLevels: ready({
+    studyLevels: { levels: [{ key: "Bachelor", label: "Bachelor", value: 6 }, { key: "Master", label: "Master", value: 4 }], notRecorded: 0 },
+    byField: ["Business", "Engineering", "Computing", "Health", "Law", "Arts", "Education"].map((label, i) => ({ key: label, label, value: 7 - i })),
+  }),
   pipeline: ready({ distribution: [{ key: "review", label: "Unibexs review", value: 3 }, { key: "visa", label: "Visa", value: 7 }] }),
   topAdvisors: ready({ byAdvisor: [{ key: "p1", label: "Global Pathways", value: 7 }, { key: "p2", label: "Bright Future", value: 3 }] }),
   overTime: ready({
@@ -64,4 +67,30 @@ it("says plainly when a chart has no data yet, and Advisors don't see Top Adviso
   expect(screen.queryByRole("tab", { name: "Top Advisors" })).not.toBeInTheDocument();
   await user.click(screen.getByRole("tab", { name: "Over time" }));
   expect(screen.getByText(/needs the date each application was submitted/)).toBeInTheDocument();
+});
+
+it("Field of study shows the top five fields and one Others row", async () => {
+  const user = userEvent.setup();
+  render(<InsightsCard role="admin" base="/admin" resources={resources} onRetry={jest.fn()} />);
+  await user.click(screen.getByRole("tab", { name: "Field of study" }));
+  // The Stage donut: five field slices and one Others slice.
+  expect(screen.getByRole("img", { name: /^With a field/ })).toBeInTheDocument();
+  expect(screen.getByRole("list", { name: /With a field/ }).querySelectorAll("li")).toHaveLength(6);
+  expect(screen.getByText("Others (2 fields)")).toBeInTheDocument();
+});
+
+it("Field of study stays a donut even with many fields", async () => {
+  const user = userEvent.setup();
+  const many = Array.from({ length: 12 }, (_, i) => ({ key: `f${i}`, label: `Field ${i + 1}`, value: 20 - i }));
+  render(
+    <InsightsCard
+      role="admin"
+      base="/admin"
+      resources={{ ...resources, studyLevels: ready({ studyLevels: { levels: [], notRecorded: 0 }, byField: many }) }}
+      onRetry={jest.fn()}
+    />
+  );
+  await user.click(screen.getByRole("tab", { name: "Field of study" }));
+  expect(screen.getByRole("img", { name: /^With a field/ })).toBeInTheDocument();
+  expect(screen.getByText("Others (7 fields)")).toBeInTheDocument();
 });
