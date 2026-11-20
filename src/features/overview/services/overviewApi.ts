@@ -7,11 +7,9 @@ import { relabelText, stageLabel, statusLabel, nextActionLabel } from "config/st
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
 import { byOldest, completeCollection, daysSince } from "../model/dashboardData";
-import { getSenderName } from "features/notifications/utils/notificationIcons";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
 import { programApi } from "features/programs/services/programApi";
 import { universityApi } from "features/universities/services/universityApi";
-import { notificationsApi } from "features/notifications/services/notificationsApi";
 import { commissionsApi } from "features/applications/payouts/services/commissionsApi";
 import { statementApi } from "features/partners/statement/services/statementApi";
 import type {
@@ -494,56 +492,5 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
       },
     });
   }
-  add({
-    id: "unread",
-    title: "Unread updates",
-    subtitle: "Your notifications",
-    href: `${base}/notifications`,
-    emptyMessage: "No unread updates.",
-    load: async () => {
-      const response = await notificationsApi.unreadCount();
-      if (
-        typeof response.data.count !== "number" ||
-        !Number.isFinite(response.data.count) ||
-        response.data.count < 0
-      )
-        throw new Error("Unread updates couldn't be loaded.");
-      return { total: response.data.count, items: [] };
-    },
-  });
-  add({
-    id: "updates",
-    title: "Recent activity",
-    subtitle: "The latest notifications for your account.",
-    href: `${base}/notifications`,
-    emptyMessage: "No updates yet. New activity will appear here.",
-    load: async () => {
-      const response = await notificationsApi.list({
-        page: 1,
-        page_size: 6,
-        read_status: "all",
-      });
-      const data = collection(response.data);
-      return {
-        total: data.total,
-        items: data.items
-          .map((item) => ({
-            id: item.id,
-            // Every item names who did it ("Unibexs moved…"), the same sender as the Notifications page.
-            title: say(`${getSenderName(item, { forAdvisor: role === "partner" })} ${item.title}`),
-            description: say(item.body),
-            at: item.created_at,
-            // The application the update is about, where the role has application pages.
-            href:
-              item.application_id && ["admin", "account_manager", "partner"].includes(role)
-                ? idPath(`${base}/applications`, item.application_id)
-                : item.type === "partner_signed_up" && item.data?.partner_id && (role === "admin" || role === "reviewer")
-                ? idPath(`${base}/advisors`, String(item.data.partner_id))
-                : `${base}/notifications`,
-          }))
-          .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()),
-      };
-    },
-  });
   return [...plans, ...createDashboardPlans(context)];
 }

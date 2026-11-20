@@ -4,7 +4,6 @@ import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import StatTile from "components/ub/dashboard/cards/StatTile";
-import QuickActions from "components/ub/dashboard/lists/QuickActions";
 import ListFooter from "components/ub/dashboard/lists/ListFooter";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import Alert from "components/ub/feedback/notifications/Alert";
@@ -249,7 +248,8 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
       {role === "reviewer" && <AdvisorBreakdownCard resource={resources.reviews} href={`${base}/advisors`} onRetry={refresh} />}
     </>
   );
-  const quick = config.actions.slice(1).map(({ label, href, icon }) => ({ label, href, icon }));
+  // The side column holds charts only; without any, the work lists take the full width.
+  const hasAside = showCommission || role === "reviewer" || (!insights && role === "data_entry");
 
   return (
     <div className="mx-auto flex w-full min-w-0 flex-col gap-5 pb-24 md:pb-8">
@@ -271,19 +271,15 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
       <div className={`grid grid-cols-2 gap-3 ${KPI_COLS[metrics.length] ?? "lg:grid-cols-4"}`}>{kpis}</div>
       {/* Insights: one full-width card under the KPIs (study level, stage, month, country, Advisor). */}
       {insights && <InsightsCard role={role} base={base} resources={resources} onRetry={refresh} />}
-      <div className="grid min-w-0 items-start gap-5 lg:grid-cols-3">
-        <section aria-label="Work" className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+      <div className={hasAside ? "grid min-w-0 items-start gap-5 lg:grid-cols-3" : "grid min-w-0 gap-5"}>
+        <section aria-label="Work" className={hasAside ? "flex min-w-0 flex-col gap-5 lg:col-span-2" : "flex min-w-0 flex-col gap-5"}>
           {config.panels.map(panel)}
         </section>
-        <aside aria-label="Context" className="flex min-w-0 flex-col gap-5">
-          {charts}
-          {quick.length > 0 && (
-            <DashboardCard title="Quick actions" as="h2">
-              <QuickActions actions={quick} />
-            </DashboardCard>
-          )}
-          {panel("updates")}
-        </aside>
+        {hasAside && (
+          <aside aria-label="Context" className="flex min-w-0 flex-col gap-5">
+            {charts}
+          </aside>
+        )}
       </div>
       {primary && (
         <StickyActionBar aria-label="Primary action">

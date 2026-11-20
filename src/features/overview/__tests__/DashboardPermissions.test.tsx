@@ -47,7 +47,7 @@ it("hides university commission and team shortcuts from restricted advisor membe
   expect(screen.getAllByRole("link", { name: "New application" }).length).toBeGreaterThan(0);
 });
 
-it("gives agency owners a Manage your team quick action alongside their financial overview", () => {
+it("shows agency owners their financial overview, with no quick actions or activity on the home", () => {
   mockContext = {
     role: "partner",
     partnerId: "p1",
@@ -56,8 +56,9 @@ it("gives agency owners a Manage your team quick action alongside their financia
     canCreateApplication: true,
   };
   render(<RoleOverview role="partner" />);
-  expect(screen.getByRole("navigation", { name: "Quick actions" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: /manage your team/i })).toHaveAttribute("href", "/partner/team-members");
+  // Quick actions and Recent activity are not on the home (the sidebar and Notifications cover them).
+  expect(screen.queryByRole("heading", { name: "Quick actions" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Recent activity" })).not.toBeInTheDocument();
   expect(
     screen.getByRole("heading", { name: "Commission overview" })
   ).toBeInTheDocument();

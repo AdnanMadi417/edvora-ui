@@ -41,5 +41,5 @@ test("keeps the On hold KPI at zero but hides its empty list, and has no refresh
   expect(screen.getByRole("heading", { name: "On hold" })).toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Applications on hold" })).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /refresh/i })).not.toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: "Quick actions" })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Quick actions" })).not.toBeInTheDocument();
 });

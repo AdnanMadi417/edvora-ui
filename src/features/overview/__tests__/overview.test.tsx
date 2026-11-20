@@ -42,17 +42,15 @@ test.each([
       "registrations",
       "advisors",
       "managers",
-      "unread",
-      "updates",
     ],
   ],
   [
     "data_entry",
-    ["programs", "hiddenPrograms", "institutions", "unread", "updates", "catalogueQuality", "intakesNotSet", "providerIssues", "languageCenters"],
+    ["programs", "hiddenPrograms", "institutions", "catalogueQuality", "intakesNotSet", "providerIssues", "languageCenters"],
   ],
   [
     "account_manager",
-    ["active", "hold", "pipeline", "advisorsAttention", "unread", "updates", "overTime", "topCountries", "topAdvisors", "studyLevels", "actionRequired", "waitingOnAdvisors"],
+    ["active", "hold", "pipeline", "advisorsAttention", "overTime", "topCountries", "topAdvisors", "studyLevels", "actionRequired", "waitingOnAdvisors"],
   ],
   [
     "admin",
@@ -62,8 +60,6 @@ test.each([
       "pipeline",
       "reviews",
       "commission",
-      "unread",
-      "updates",
       "overTime",
       "topCountries",
       "topAdvisors",
@@ -129,7 +125,7 @@ test("does not request data for a mismatched session", async () => {
 });
 test("independent failures preserve other sections and refresh retries", async () => {
   get.mockImplementation((url: string) =>
-    url.includes("unread-count")
+    url.includes("/universities")
       ? Promise.reject({ response: { status: 403 } })
       : Promise.resolve({ data: { total: 0, items: [] } })
   );
@@ -142,13 +138,13 @@ test("independent failures preserve other sections and refresh retries", async (
     wrapper,
   });
   await waitFor(() =>
-    expect(result.current.resources.unread?.state).toBe("error")
+    expect(result.current.resources.institutions?.state).toBe("error")
   );
   expect(result.current.resources.programs.state).toBe("ready");
   get.mockResolvedValue({ data: { total: 0, items: [], count: 0 } });
   act(() => result.current.refresh());
   await waitFor(() =>
-    expect(result.current.resources.unread?.state).toBe("ready")
+    expect(result.current.resources.institutions?.state).toBe("ready")
   );
 });
 test("never requests a partner overview before its profile is loaded", () => {
