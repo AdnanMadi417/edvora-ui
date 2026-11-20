@@ -114,21 +114,22 @@ export default function PipelineFlow({
         centerValue={total.toLocaleString()}
         segments={rows.map(({ s }, index) => ({ key: s.id, label: s.label, value: s.count, color: colorOf(index) }))}
       />
-      <ol aria-label={label} className="mt-4 grid grid-cols-2 gap-x-3">
+      <ol aria-label={label} className="mt-4 grid">
         {rows.map(({ s, share, selected, empty, name }, index) => {
           const body: ReactNode = (
             <>
               <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: colorOf(index) }} />
-              <span title={s.label} className="line-clamp-2 min-w-0 flex-1 text-ub-body-sm text-ub-text-primary">
+              <span title={s.label} className="min-w-0 flex-1 truncate text-ub-body-sm text-ub-text-primary">
                 {s.label}
               </span>
               <span className={clsx("ub-tabular shrink-0 text-ub-label-md", empty ? "text-ub-text-tertiary" : "text-ub-text-primary")}>
                 {s.count.toLocaleString()}
               </span>
+              <span className="ub-tabular w-10 shrink-0 text-end text-ub-caption text-ub-text-tertiary">{share}%</span>
             </>
           );
           const cell = clsx(
-            "flex min-h-11 w-full min-w-0 items-center gap-2 rounded-ub-md px-2 py-1 text-start",
+            "-mx-2 flex min-h-11 w-[calc(100%+1rem)] min-w-0 items-center gap-3 rounded-ub-md px-2 text-start",
             "transition-colors duration-ub-fast motion-reduce:transition-none",
             selected && "bg-ub-selected",
             interactive && !selected && "hover:bg-ub-surface-subtle",
