@@ -39,7 +39,8 @@ it("preserves off-page selection and keeps business amounts and management actio
       onDeleteClick={jest.fn()}
     />
   );
-  expect(screen.getByText("MYR 4,200")).toBeInTheDocument();
+  // Desktop column (title="Commission"); the card summary repeats it for phones.
+  expect(screen.getByTitle("Commission")).toHaveTextContent("MYR 4,200");
   await user.click(
     screen.getByRole("checkbox", { name: `Select ${sampleProgram.name}` })
   );
