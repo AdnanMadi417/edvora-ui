@@ -274,7 +274,8 @@ export default function ApplicationComponents() {
           tabCounts={{ documents: 1 }}
           stickyAction={false}
           panels={{
-            overview: <p className="text-ub-body-sm text-ub-text-secondary">Overview panel: OverviewGrid with the summary, documents and offer on the left; student, commission and notes on the right.</p>,
+            overview: <p className="text-ub-body-sm text-ub-text-secondary">Summary panel: the next step and documents needing action.</p>,
+            details: <p className="text-ub-body-sm text-ub-text-secondary">Details panel: the application, the student, education, English tests and emergency contacts.</p>,
             documents: <p className="text-ub-body-sm text-ub-text-secondary">Documents panel.</p>,
             "offer-visa": <p className="text-ub-body-sm text-ub-text-secondary">Offer and visa panel.</p>,
             commission: <p className="text-ub-body-sm text-ub-text-secondary">Commission panel.</p>,

@@ -9,6 +9,8 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Headset } from "lucide-react";
 import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import { TextButton } from "components/ub/core/buttons/TextButton";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useVisaCase } from "hooks/useVisaCase";
@@ -147,40 +149,54 @@ export default function ApplicationDetailsScreen({
   );
 
   const commissionCard = <CommissionCard commission={view.commission} />;
-  // Overview shows only what needs doing; each full list lives once, on its tab.
+  // Summary shows only what needs doing; each full list lives once, on its tab.
   const docsToAct = studentDocs.filter((d) => d.state === "missing" || d.state === "needs-replacing");
 
   const panels: Record<ApplicationDetailsTab, ReactNode> = {
+    // Summary: only what needs doing now.
     overview: (
+      <div className="grid gap-4 md:gap-6">
+        {nextStepPanel}
+        {docsToAct.length > 0 && (
+          <DocumentChecklist documents={docsToAct} title="Documents needing action" limit={4} onViewAll={() => setTab("documents")} onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
+        )}
+        {!nextStepPanel && docsToAct.length === 0 && (
+          <SectionCard title="Nothing needs action right now" description="The application details, student and background are on the Details tab.">
+            <TextButton onClick={() => setTab("details")} trailingIcon="arrow-right">
+              View details
+            </TextButton>
+          </SectionCard>
+        )}
+      </div>
+    ),
+    // Details: every fact about the application and the student, in one place.
+    details: (
       <OverviewGrid
         main={
           <>
-            {nextStepPanel}
             <ApplicationSummaryCard
               qualificationLevel={view.qualificationLevel}
               durationMonths={view.durationMonths}
               tuition={view.tuition}
               submittedAt={view.submittedAt}
+              updatedAt={view.updatedAt}
+              arrivalDate={view.arrivalDate}
               advisorName={view.advisorName}
             />
-            {docsToAct.length > 0 && (
-              <DocumentChecklist documents={docsToAct} title="Documents needing action" limit={4} onViewAll={() => setTab("documents")} onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
-            )}
+            <StudentBackgroundCard education={view.student.education} englishTests={view.student.englishTests} emergencyContacts={view.student.emergencyContacts} />
           </>
         }
         aside={
-          <>
-            <StudentInfoCard
-              email={view.student.email}
-              phone={view.student.phone}
-              nationality={view.student.nationality}
-              passportNumber={view.student.passportNumber}
-              birthday={view.student.birthday}
-              gender={view.student.gender}
-              address={view.student.address}
-              whatsappUrl={whatsappLink(view.student.phone)}
-            />
-          </>
+          <StudentInfoCard
+            email={view.student.email}
+            phone={view.student.phone}
+            nationality={view.student.nationality}
+            passportNumber={view.student.passportNumber}
+            birthday={view.student.birthday}
+            gender={view.student.gender}
+            address={view.student.address}
+            whatsappUrl={whatsappLink(view.student.phone)}
+          />
         }
       />
     ),
@@ -189,7 +205,6 @@ export default function ApplicationDetailsScreen({
         <DocumentChecklist documents={studentDocs} title="Student documents" onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />
         {offerVisaDocs.length > 0 && <DocumentChecklist documents={offerVisaDocs} title="Offer & visa" onDownload={download} onReplace={onReplaceDocument} downloadingId={downloadingId} />}
         {templates.length > 0 && <DocumentChecklist documents={templates} title="From the Unibexs system" description="Templates and invoices to download." onDownload={download} downloadingId={downloadingId} readOnly />}
-        <StudentBackgroundCard education={view.student.education} englishTests={view.student.englishTests} emergencyContacts={view.student.emergencyContacts} />
         {documentsExtra}
       </div>
     ),

@@ -9,6 +9,10 @@ export interface ApplicationSummaryCardProps {
   tuition?: { amount: number; currency: string } | null;
   /** ISO date the application was submitted. */
   submittedAt?: string | null;
+  /** ISO date of the last change. */
+  updatedAt?: string | null;
+  /** ISO date the student arrives, once confirmed. */
+  arrivalDate?: string | null;
   /** The Advisor who owns the application. */
   advisorName?: string | null;
   state?: SectionCardState;
@@ -20,9 +24,9 @@ export interface ApplicationSummaryCardProps {
  * Level, duration, tuition (tabular RM), submitted date and Advisor. The
  * programme, university and intake are in the page header, so not repeated here.
  */
-export default function ApplicationSummaryCard({ qualificationLevel, durationMonths, tuition, submittedAt, advisorName, state = "ready", onRetry, className }: ApplicationSummaryCardProps) {
+export default function ApplicationSummaryCard({ qualificationLevel, durationMonths, tuition, submittedAt, updatedAt, arrivalDate, advisorName, state = "ready", onRetry, className }: ApplicationSummaryCardProps) {
   return (
-    <SectionCard title="Application summary" state={state} loadingRows={5} errorMessage="The summary couldn't load." onRetry={onRetry} className={className}>
+    <SectionCard title="Application" state={state} loadingRows={5} errorMessage="The summary couldn't load." onRetry={onRetry} className={className}>
       <DescriptionList
         columns={2}
         fallback="Not available"
@@ -31,6 +35,8 @@ export default function ApplicationSummaryCard({ qualificationLevel, durationMon
           { label: "Duration", value: durationMonths ? <span dir="auto" className="ub-tabular">{durationMonths} months</span> : null },
           { label: "Tuition", value: tuition && <Amount value={tuition.amount} currency={tuition.currency} /> },
           { label: "Submitted", value: submittedAt && <AppDate value={submittedAt} className="ub-tabular" /> },
+          ...(updatedAt ? [{ label: "Last updated", value: <AppDate value={updatedAt} className="ub-tabular" /> }] : []),
+          ...(arrivalDate ? [{ label: "Arrival date", value: <AppDate value={arrivalDate} className="ub-tabular" /> }] : []),
           { label: "Advisor", value: advisorName },
         ]}
       />

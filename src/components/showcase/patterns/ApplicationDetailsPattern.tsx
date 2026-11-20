@@ -240,7 +240,8 @@ export function ApplicationDetailsPreview({
       primaryAction={primaryAction}
       stickyAction={!embedded}
       panels={{
-        overview: (
+        overview: <p className="text-ub-body-sm text-ub-text-secondary">Summary: the next step and documents needing action.</p>,
+        details: (
           <OverviewGrid
             main={
               <>
