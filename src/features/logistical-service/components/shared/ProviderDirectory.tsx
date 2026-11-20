@@ -99,14 +99,20 @@ export default function ProviderDirectory({
       key: "services",
       header: "Services",
       cell: (provider) => (
-        <div className="flex max-w-xs flex-wrap gap-2">
-          {provider.services_offered?.slice(0, 2).map((service) => (
-            <Tag key={service.id} hue="sky">
-              {service.name}
-            </Tag>
+        // One service on one line; the rest are counted, and listed in the tooltip.
+        <div className="flex min-w-0 max-w-xs items-center gap-2">
+          {provider.services_offered?.slice(0, 1).map((service) => (
+            <span key={service.id} className="min-w-0">
+              <Tag hue="sky">{service.name}</Tag>
+            </span>
           ))}
-          {provider.services_offered?.length > 2 && (
-            <Tag hue="grey">+{provider.services_offered.length - 2} more</Tag>
+          {provider.services_offered?.length > 1 && (
+            <span
+              className="shrink-0"
+              title={provider.services_offered.slice(1).map((service) => service.name).join(", ")}
+            >
+              <Tag hue="grey">+{provider.services_offered.length - 1} more</Tag>
+            </span>
           )}
           {!provider.services_offered?.length && (
             <span>No services listed</span>
