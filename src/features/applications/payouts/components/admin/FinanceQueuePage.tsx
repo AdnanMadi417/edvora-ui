@@ -10,7 +10,7 @@ import {
   Wallet,
   SlidersHorizontal,
   Receipt,
-  Eye,
+  PanelRightOpen,
   ArrowUpRight,
 } from "lucide-react";
 
@@ -201,15 +201,16 @@ export default function FinanceQueuePage() {
 
   const columns: DataTableColumn<CommissionQueueItem>[] = [
     {
-      key: "reference",
-      header: "Reference",
+      key: "student",
+      header: "Student / reference",
+      mobileLabel: "Student",
       cell: (item) => (
-        <span className="ub-ref whitespace-nowrap text-ub-label-md text-ub-text-primary">
-          {item.reference}
+        <span className="flex min-w-0 flex-col">
+          <span className="break-words text-ub-label-md text-ub-text-primary">{item.student_name}</span>
+          <span className="ub-ref whitespace-nowrap text-ub-caption text-ub-text-tertiary">{item.reference}</span>
         </span>
       ),
     },
-    { key: "student", header: "Student", cell: (item) => item.student_name },
     {
       key: "advisor",
       mobileSecondary: true,
@@ -220,9 +221,8 @@ export default function FinanceQueuePage() {
       key: "programme",
       mobileSecondary: true,
       header: "University / Program",
-      width: "260px",
       cell: (item) => (
-        <span className="flex min-w-0 flex-col gap-1.5 md:w-[240px]">
+        <span className="flex min-w-0 flex-col gap-1.5">
           <span
             className="line-clamp-2 break-words font-medium leading-relaxed text-ub-text-primary"
             title={item.university_name}
@@ -276,46 +276,39 @@ export default function FinanceQueuePage() {
     {
       key: "waiting",
       header: "Waiting On",
-      cell: (item) => (
-        <StatusTag
-          status={item.waiting_on}
-          label={WAITING_ON_LABEL[item.waiting_on]}
-          tone={STATUS_BADGE_TONE[WAITING_ON_VARIANT[item.waiting_on]]}
-          size="sm"
-        />
-      ),
-    },
-    {
-      key: "days",
-      mobileSecondary: true,
-      header: "Days Waiting",
+      // The stage, how long it has waited (amber past the usual time) and the last fact, in one cell.
       cell: (item) => {
         const overdue =
           item.days_waiting != null &&
           item.typical_days_to != null &&
           item.days_waiting > item.typical_days_to;
         return (
-          <span className="block">
-            {item.days_waiting != null ? (
+          <span className="flex flex-col items-start gap-1">
+            <StatusTag
+              status={item.waiting_on}
+              label={WAITING_ON_LABEL[item.waiting_on]}
+              tone={STATUS_BADGE_TONE[WAITING_ON_VARIANT[item.waiting_on]]}
+              size="sm"
+            />
+            {item.days_waiting != null && (
               <span
                 className={
                   overdue
-                    ? "block whitespace-nowrap font-medium text-ub-tone-warning-text"
-                    : "block whitespace-nowrap"
+                    ? "whitespace-nowrap text-ub-caption font-medium text-ub-tone-warning-text"
+                    : "whitespace-nowrap text-ub-caption text-ub-text-secondary"
                 }
               >
                 {item.days_waiting} day{item.days_waiting === 1 ? "" : "s"}
+                {item.last_fact_date && (
+                  <span className="font-normal text-ub-text-tertiary">
+                    {" · "}
+                    <AppDate value={item.last_fact_date} format="short" />
+                  </span>
+                )}
               </span>
-            ) : (
-              <span className="block text-ub-text-tertiary">—</span>
             )}
-            {item.last_fact_date && (
-              <span className="block whitespace-nowrap text-ub-caption text-ub-text-tertiary">
-                <AppDate value={item.last_fact_date} format="short" />
-                {item.last_fact_reference
-                  ? ` · ${item.last_fact_reference}`
-                  : ""}
-              </span>
+            {item.last_fact_reference && (
+              <span className="ub-ref whitespace-nowrap text-ub-caption text-ub-text-tertiary">{item.last_fact_reference}</span>
             )}
           </span>
         );
@@ -326,9 +319,10 @@ export default function FinanceQueuePage() {
       header: "Actions",
       cell: (item) => (
         <TableActions>
+          {/* "View" (the row's link) opens the application; this opens the commission panel. */}
           <TableAction
-            label={`View commission ${item.reference}`}
-            icon={<Eye className="h-4 w-4" />}
+            label={`Commission details ${item.reference}, ${item.student_name}`}
+            icon={<PanelRightOpen className="h-4 w-4" aria-hidden="true" />}
             onSelect={() => setPreview(item)}
           />
           {item.waiting_on === "university" ? (
@@ -544,7 +538,7 @@ export default function FinanceQueuePage() {
           getRowLabel={(item) => `${item.reference}, ${item.student_name}`}
           getRowHref={(item) => `/admin/applications/${item.application_id}`}
           manualSort
-          getRowClassName={() => "md:[&>td]:py-4"}
+          getRowClassName={() => "lg:[&>td]:py-4"}
           scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           loading={status === "loading"}
           error={

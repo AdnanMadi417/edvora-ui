@@ -25,7 +25,6 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import Tag from "components/ub/data/badges/Tag";
 import { courseTypeLabel } from "features/programs/utils/courseType";
 import { getIeltsLabel } from "constants/lists";
-import IntakeMonthsChips from "../IntakeMonthsChips";
 import type { Program } from "features/programs/types";
 
 /** Visible to Advisors, or hidden from the catalogue: the circle on the program's logo. */
@@ -102,8 +101,8 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
   const columns: DataTableColumn<Program>[] = [
     {
       key: "name",
+      width: "34%",
       header: "Program",
-      width: "240px",
       cell: (program) => (
         <EntityCell
           name={program.name}
@@ -121,7 +120,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "level",
-      width: "150px",
+      width: "22%",
       header: "Level",
       cell: (program) => {
         const details = [
@@ -150,11 +149,11 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "fees",
-      width: "150px",
+      width: "18%",
       header: "Tuition / commission",
       align: "end",
       cell: (program) => (
-        <span className="ub-tabular flex flex-col items-start gap-0.5 md:items-end">
+        <span className="ub-tabular flex flex-col items-start gap-0.5 lg:items-end">
           <span
             className="text-ub-body-sm text-ub-text-primary"
             title="First-year tuition"
@@ -172,7 +171,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "english",
-      width: "120px",
+      width: "18%",
       header: "English",
       cell: (program) => {
         const ielts = program.english_required_score
@@ -193,24 +192,8 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       },
     },
     {
-      key: "intakes",
-      width: "170px",
-      header: "Intakes",
-      cell: (program) =>
-        program.intake_months?.length ? (
-          <IntakeMonthsChips
-            months={program.intake_months}
-            size="sm"
-            className="!gap-1.5 md:flex-nowrap [&>*]:shrink-0 [&>*]:whitespace-nowrap"
-            maxVisible={2}
-          />
-        ) : (
-          "To be confirmed"
-        ),
-    },
-    {
       key: "actions",
-      width: "104px",
+      width: "8%",
       header: "Actions",
       align: "end",
       cell: (program) => {

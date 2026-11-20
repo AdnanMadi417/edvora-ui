@@ -14,8 +14,10 @@ table [data-ub-badge-label] {
 }
 
 /* Shared layout for directory, workflow, and detail tables. */
+/* Long text wraps between words; a single word longer than its column still
+   breaks. "anywhere" would split short words ("Pathw-ays") to squeeze columns. */
 .ub-data-table td[data-column] {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .ub-data-table td[data-column] > span:last-child,
@@ -25,10 +27,18 @@ table [data-ub-badge-label] {
   max-width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
+  /* Columns size to their content inside the card (long text wraps), so every
+     column shows without scrolling; the table scrolls only below its minimum. */
   .ub-data-table table[data-layout="table"] {
-    table-layout: fixed;
+    table-layout: auto;
     min-width: var(--ub-table-min-width, 640px);
+  }
+
+  /* Knowledge Hub: percentage columns, so one-line programme names truncate
+     (full name in the tooltip) instead of widening the table. */
+  .ub-data-table.ub-knowledge-hub-table table[data-layout="table"] {
+    table-layout: fixed;
   }
 
   .ub-data-table td[data-column] {
@@ -62,7 +72,7 @@ table [data-ub-badge-label] {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .ub-table-container:has(
       table[data-mobile-layout="stacked"],
       table.ub-legacy-table
@@ -331,9 +341,9 @@ table [data-ub-badge-label] {
   }
 }
 
-/* Phone cards: one label column for every table, so values line up from row
+/* Cards below 1024px (phones and tablets): one label column for every table, so values line up from row
    to row and from table to table. Applications keeps its own card layout. */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .ub-data-table:not(.ub-applications-table)
     table[data-layout="table"][data-mobile-layout="stacked"]
     td[data-column]:where(:not([data-primary]):not([data-column="actions"]):not([data-mobile-secondary]):not(:has([data-row-action]))) {
@@ -371,7 +381,7 @@ table [data-ub-badge-label] {
 /* Knowledge Hub phone cards: the University and Language centres links sit in
    one compact row under the programme name instead of a labelled, wrapping
    column of full-size buttons. */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .ub-data-table.ub-knowledge-hub-table
     table[data-layout="table"][data-mobile-layout="stacked"]
     td[data-column="related"] {
@@ -399,7 +409,7 @@ table [data-ub-badge-label] {
 
 /* Actions: the last column, right-aligned (left in RTL), header included.
    On phones TableActions already sits at the card's top-right. */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .ub-data-table td:has([data-row-action]),
   .ub-legacy-table td:has([data-row-action]),
   .ub-data-table table:has(tbody td:last-child [data-row-action]) thead th:last-child,
@@ -411,5 +421,20 @@ table [data-ub-badge-label] {
   .ub-data-table td:has([data-row-action]) > span > span {
     text-align: end;
     justify-content: flex-end;
+  }
+}
+
+/* Tablets: the cards sit two to a row instead of one wide card. Rows that
+   aren't cards (empty, loading, error) still span the full width. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .ub-data-table table[data-mobile-layout="stacked"] tbody,
+  .ub-table-container .ub-legacy-table tbody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .ub-data-table table[data-mobile-layout="stacked"] tbody > tr:not(:has(td[data-column])),
+  .ub-table-container .ub-legacy-table tbody > tr:not(:has(td[data-label])) {
+    grid-column: 1 / -1;
   }
 }

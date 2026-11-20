@@ -257,7 +257,6 @@ export default function StatementPage() {
       key: "payout_reference",
       mobileSecondary: true,
       header: "Payout reference",
-      width: "180px",
       cell: (item) => (
         <span className="break-all">
           {item.payout_reference || "Not available"}
@@ -469,7 +468,7 @@ export default function StatementPage() {
             loading={expected.loading}
             error={expected.error}
             onRetry={expected.retry}
-            getRowClassName={() => "md:[&>td]:py-4"}
+            getRowClassName={() => "lg:[&>td]:py-4"}
             scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
             empty={emptyState}
             footer={
@@ -497,7 +496,7 @@ export default function StatementPage() {
             loading={loading}
             error={error}
             onRetry={refetch}
-            getRowClassName={() => "md:[&>td]:py-4"}
+            getRowClassName={() => "lg:[&>td]:py-4"}
             scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
             empty={emptyState}
             footer={

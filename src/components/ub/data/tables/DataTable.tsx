@@ -86,7 +86,7 @@ export interface DataTableProps<T> {
   /** Footer slot, typically <TablePagination />. */
   footer?: ReactNode;
 
-  /** table (default; compact summaries below 768px) · cards: stacked at every width. */
+  /** table (default; cards below 1024px, so tablets never scroll sideways) · cards: stacked at every width. */
   layout?: DataTableLayout;
   /** Mobile presentation. Compact stacked summaries by default. */
   mobileLayout?: "stacked" | "scroll";
@@ -106,7 +106,7 @@ export interface DataTableProps<T> {
   rowLinkTarget?: "_self" | "_blank";
   /** Keys of columns to hide (DataTableToolbar's Columns menu). */
   hiddenColumns?: string[];
-  /** Pin the first column while the table scrolls sideways (wide tables, from 768px). */
+  /** Pin the first column while the table scrolls sideways (wide tables, from 1024px). */
   stickyFirstColumn?: boolean;
   /** Extra classes for one row, e.g. "opacity-60" for a voided entry. Keep to tokens and opacity; selection and hover colours still apply. */
   getRowClassName?: (row: T, index: number) => string | undefined;
@@ -241,7 +241,7 @@ export function DataTablePrimaryCell({ name, reference, avatarSrc }: DataTablePr
 // ── DataTable ────────────────────────────────────────────────────────────
 
 // Compact summaries on phones; desktop columns scroll inside the table container.
-const rowHeight: Record<DataTableDensity, string> = { comfortable: "md:h-14", compact: "md:h-11" };
+const rowHeight: Record<DataTableDensity, string> = { comfortable: "lg:h-14", compact: "lg:h-11" };
 
 export default function DataTable<T>({
   columns: allColumns,
@@ -303,9 +303,15 @@ export default function DataTable<T>({
   const pageState = pageSelectionState(selected, selectableIds);
   const showData = !loading && !error && sortedRows.length > 0;
   const colCount = columns.length + (selectable ? 1 : 0);
+  // The width below which the table scrolls sideways. Columns without a set
+  // width count as 96px (Actions 64px), so desktop tables fit their card and
+  // only narrow tablets scroll; the browser shares out the real widths.
   const minTableWidth = Math.max(
     640,
-    columns.reduce((width, col) => width + (col.width?.endsWith("px") ? parseFloat(col.width) : 160), 0) + (selectable ? 48 : 0)
+    columns.reduce(
+      (width, col) => width + (col.width?.endsWith("px") ? parseFloat(col.width) : col.key === "actions" ? 64 : 96),
+      0
+    ) + (selectable ? 48 : 0)
   );
   const cards = layout === "cards";
   const count = allMatchingSelected && totalCount ? totalCount : selected.length;
@@ -354,17 +360,17 @@ export default function DataTable<T>({
 
   // Stacked-card vs table classes for each element.
   const t = {
-    table: cards ? "block w-full" : "block w-full border-collapse text-start md:table",
-    thead: cards ? "block" : "block md:table-header-group",
-    headRow: (show: boolean) => clsx(show ? "flex items-center" : "hidden", !cards && "md:table-row"),
-    tbody: cards ? "block" : "block md:table-row-group",
-    row: cards ? "block border-t border-ub-border py-3" : clsx("block border-t border-ub-border py-3 md:table-row md:py-0", rowHeight[density]),
+    table: cards ? "block w-full" : "block w-full border-collapse text-start lg:table",
+    thead: cards ? "block" : "block lg:table-header-group",
+    headRow: (show: boolean) => clsx(show ? "flex items-center" : "hidden", !cards && "lg:table-row"),
+    tbody: cards ? "block" : "block lg:table-row-group",
+    row: cards ? "block border-t border-ub-border py-3" : clsx("block border-t border-ub-border py-3 lg:table-row lg:py-0", rowHeight[density]),
     cell: cards
       ? "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary"
-      : "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary md:table-cell md:py-0 md:align-middle",
-    headCell: cards ? "hidden" : "hidden h-11 px-4 font-medium md:table-cell",
-    label: cards ? "shrink-0 text-ub-label-sm text-ub-text-tertiary" : "shrink-0 text-ub-label-sm text-ub-text-tertiary md:hidden",
-    checkCell: cards ? "flex px-4 py-1" : "flex px-4 py-1 md:table-cell md:w-12 md:py-0 md:align-middle",
+      : "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary lg:table-cell lg:py-0 lg:align-middle",
+    headCell: cards ? "hidden" : "hidden h-11 px-4 font-medium lg:table-cell",
+    label: cards ? "shrink-0 text-ub-label-sm text-ub-text-tertiary" : "shrink-0 text-ub-label-sm text-ub-text-tertiary lg:hidden",
+    checkCell: cards ? "flex px-4 py-1" : "flex px-4 py-1 lg:table-cell lg:w-12 lg:py-0 lg:align-middle",
   };
   const mobileScroll = !cards && mobileLayout === "scroll";
   if (mobileScroll) Object.assign(t, {
@@ -379,7 +385,7 @@ export default function DataTable<T>({
     checkCell: "table-cell w-12 px-4 py-2 align-middle",
   });
   const pin = (first: boolean, head = false) =>
-    stickyFirstColumn && first && !cards ? clsx("md:sticky md:z-10", selectable ? "md:start-12" : "md:start-0", head ? "md:bg-ub-table-head" : "md:bg-inherit") : "";
+    stickyFirstColumn && first && !cards ? clsx("lg:sticky lg:z-10", selectable ? "lg:start-12" : "lg:start-0", head ? "lg:bg-ub-table-head" : "lg:bg-inherit") : "";
 
   return (
     <div
@@ -438,9 +444,9 @@ export default function DataTable<T>({
             {/* On mobile (and in cards) only the select-all cell of the header row is shown. */}
             <tr className={t.headRow(!!selectable && showData)}>
               {selectable && (
-                <th scope="col" className={clsx(mobileScroll ? "table-cell h-11 w-12 px-4 align-middle" : "flex h-11 w-auto items-center gap-3 px-4", !cards && "md:table-cell md:w-12 md:align-middle", stickyFirstColumn && !cards && "md:sticky md:start-0 md:z-10 md:bg-ub-table-head")}>
+                <th scope="col" className={clsx(mobileScroll ? "table-cell h-11 w-12 px-4 align-middle" : "flex h-11 w-auto items-center gap-3 px-4", !cards && "lg:table-cell lg:w-12 lg:align-middle", stickyFirstColumn && !cards && "lg:sticky lg:start-0 lg:z-10 lg:bg-ub-table-head")}>
                   <TableCheckbox checked={pageState === "all"} indeterminate={pageState === "some"} onChange={toggleAll} label="Select all rows" />
-                  <span aria-hidden="true" className={mobileScroll ? "hidden" : cards ? "" : "md:hidden"}>
+                  <span aria-hidden="true" className={mobileScroll ? "hidden" : cards ? "" : "lg:hidden"}>
                     Select all
                   </span>
                 </th>
@@ -498,10 +504,10 @@ export default function DataTable<T>({
                         link?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: event.ctrlKey, metaKey: event.metaKey, shiftKey: event.shiftKey, altKey: event.altKey }));
                       } : undefined}
                       data-selected={isSelected || undefined}
-                      className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "md:hover:bg-ub-row-hover"), getRowClassName?.(row, index))}
+                      className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "lg:hover:bg-ub-row-hover"), getRowClassName?.(row, index))}
                     >
                       {selectable && (
-                        <td className={clsx(t.checkCell, "relative z-10", stickyFirstColumn && !cards && "md:sticky md:start-0 md:bg-inherit")}>
+                        <td className={clsx(t.checkCell, "relative z-10", stickyFirstColumn && !cards && "lg:sticky lg:start-0 lg:bg-inherit")}>
                           <TableCheckbox
                             checked={isSelected}
                             onChange={(e) => toggleRow(id, e.shiftKey)}
@@ -520,12 +526,12 @@ export default function DataTable<T>({
                             data-column={col.key}
                             data-primary={ci === 0 || undefined}
                             data-mobile-secondary={col.mobileSecondary || undefined}
-                            className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "md:text-end") : !cards && "md:text-start", pin(ci === 0))}
+                            className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "lg:text-end") : !cards && "lg:text-start", pin(ci === 0))}
                           >
                             <span aria-hidden="true" className={t.label}>
                               {mobileLabel}
                             </span>
-                            <span className={clsx(mobileScroll ? "block min-w-0 text-start" : "min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
+                            <span className={clsx(mobileScroll ? "block min-w-0 text-start" : "min-w-0 text-end", !cards && "lg:block", !cards && (end ? "lg:text-end" : "lg:text-start"))}>
                               {/* Keep links in normal flow so touch scrolling has no stretched overlay. */}
                               {href && ci === 0 ? (
                                 <Link

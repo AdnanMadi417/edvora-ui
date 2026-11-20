@@ -44,7 +44,7 @@ export default function LanguageCenterIdentity({
         place ? (
           <>
             {subtitle && <span className="block truncate">{subtitle}</span>}
-            <span className="mt-0.5 flex items-center gap-1 md:hidden">
+            <span className="mt-0.5 flex items-center gap-1 lg:hidden">
               <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-ub-icon" />
               <span className="truncate">{place}</span>
             </span>

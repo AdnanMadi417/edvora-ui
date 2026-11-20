@@ -97,7 +97,7 @@ export default function TableActions({
   const button = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (typeof window.matchMedia !== "function") return;
-    const media = window.matchMedia("(max-width: 767px)");
+    const media = window.matchMedia("(max-width: 1023px)");
     const update = () => {
       setMobile(media.matches);
       setOpen(false);
@@ -264,10 +264,10 @@ export default function TableActions({
                   button.current?.focus();
                 }}
               >
-                <span className="shrink-0">{action.icon}</span>
-                <span className="min-w-0 break-words">
+                <span className="min-w-0 flex-1 break-words">
                   {actionText(action, label)}
                 </span>
+                <span className="shrink-0">{action.icon}</span>
               </button>
             ))}
           </div>,

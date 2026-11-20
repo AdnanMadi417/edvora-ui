@@ -78,7 +78,7 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
       <AppDate
         value={row.updated_at}
         format="relative"
-        className="shrink-0 self-start text-ub-caption text-ub-text-tertiary md:hidden"
+        className="shrink-0 self-start text-ub-caption text-ub-text-tertiary lg:hidden"
       />
     </span>
   );
@@ -215,7 +215,7 @@ export default function ApplicationsTable({
         className="ub-applications-table"
         // Phones use separate cards with student identity, programme, status and recency.
         mobileLayout="stacked"
-        scrollClassName="max-h-none overflow-y-visible md:max-h-[65dvh] md:overflow-y-auto md:overscroll-contain"
+        scrollClassName="max-h-none overflow-y-visible lg:max-h-[65dvh] lg:overflow-y-auto lg:overscroll-contain"
         caption="Applications"
         columns={columns}
         rows={rows}

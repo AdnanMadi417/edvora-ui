@@ -133,10 +133,10 @@ export default function ActionSheet({
                           : "text-ub-text-primary hover:bg-ub-item-hover"
                       )}
                     >
+                      <span className="min-w-0 flex-1 truncate text-start">{action.label}</span>
                       {Icon && (
                         <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                       )}
-                      <span className="truncate">{action.label}</span>
                     </button>
                   </li>
                 );

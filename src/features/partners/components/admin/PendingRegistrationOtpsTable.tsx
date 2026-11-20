@@ -386,7 +386,7 @@ export default function PendingRegistrationOtpsTable() {
           loading={loading}
           error={error}
           onRetry={refetch}
-          getRowClassName={() => "md:[&>td]:py-4"}
+          getRowClassName={() => "lg:[&>td]:py-4"}
           empty={{
             title: "No registrations found",
             description: "Try another search or adjust your filters.",

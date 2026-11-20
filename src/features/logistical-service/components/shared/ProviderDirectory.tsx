@@ -207,7 +207,7 @@ export default function ProviderDirectory({
           getRowLabel={(provider) => provider.name}
           getRowHref={(provider) => `${basePath}/${provider.id}`}
           caption="Logistics providers"
-          getRowClassName={() => "md:[&>td]:py-4"}
+          getRowClassName={() => "lg:[&>td]:py-4"}
           loading={loading}
           error={error}
           onRetry={refetch}

@@ -1,4 +1,4 @@
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .ub-data-table.ub-applications-table
     table[data-layout="table"][data-mobile-layout="stacked"]
     td[data-column] {
@@ -103,16 +103,19 @@
   }
 }
 
-@media (min-width: 768px) {
-  .ub-applications-table table {
+@media (min-width: 1024px) {
+  /* Percentage columns share the card, so the table fits without scrolling
+     down to the shared minimum (DataTable's --ub-table-min-width). */
+  /* As specific as the shared auto-layout rule, so the percentages win. */
+  .ub-data-table.ub-applications-table table[data-layout="table"] {
     table-layout: fixed;
-    min-width: 1000px;
+    min-width: var(--ub-table-min-width, 640px);
   }
 
   .ub-applications-table td[data-column] {
     padding-top: 8px;
     padding-bottom: 8px;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .ub-applications-table td[data-column="student"] a > span {

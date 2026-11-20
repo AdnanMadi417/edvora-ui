@@ -217,7 +217,7 @@ export default function BanksTable({
             setPage(1);
           }}
           manualSort
-          getRowClassName={() => "md:[&>td]:py-4"}
+          getRowClassName={() => "lg:[&>td]:py-4"}
           scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No banks found",

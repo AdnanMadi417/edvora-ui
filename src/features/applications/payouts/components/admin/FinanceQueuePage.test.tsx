@@ -164,7 +164,7 @@ it("shows commission amounts and application navigation in the preview", async (
   const user = userEvent.setup();
   render(<FinanceQueuePage />);
   // Its only action, so it shows directly (no menu).
-  await user.click(screen.getByRole("button", { name: "View commission A" }));
+  await user.click(screen.getByRole("button", { name: "Commission details A, Student A" }));
   const drawer = screen.getByRole("dialog", { name: "Commission details" });
   expect(
     within(drawer).getByRole("link", { name: "Open application" })

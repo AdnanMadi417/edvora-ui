@@ -122,7 +122,7 @@ export default function AccountManagerPartnersList() {
           loading={isInitialLoad}
           error={error}
           onRetry={refetch}
-          getRowClassName={() => "md:[&>td]:py-4"}
+          getRowClassName={() => "lg:[&>td]:py-4"}
           scrollClassName="max-h-[60dvh] overflow-y-auto overscroll-contain md:max-h-[65dvh]"
           empty={{
             title: "No advisors found",
