@@ -6,11 +6,13 @@ import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import RankedBars from "components/ub/dashboard/charts/RankedBars";
 import CategoryColumnChart from "components/ub/dashboard/charts/CategoryColumnChart";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
+import { CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
 import type { OverviewResource, OverviewRole } from "../model/types";
 
 type InsightTab = "level" | "stage" | "monthly" | "countries" | "advisors";
 
-const SUBTITLES: Record<InsightTab, string> = {
+// One quiet line under the tabs saying what the numbers count.
+const CAPTIONS: Record<InsightTab, string> = {
   level: "Active applications by the program's study level.",
   stage: "Active applications by their current stage, in workflow order.",
   monthly: "Active applications by the month they were submitted, last 12 months.",
@@ -43,12 +45,12 @@ export default function InsightsCard({
   onRetry: () => void;
 }) {
   const id = useId();
-  const tabs: { key: InsightTab; label: string }[] = [
-    { key: "level", label: "Study level" },
-    { key: "stage", label: "Stage" },
-    { key: "monthly", label: "Monthly" },
-    { key: "countries", label: "Top countries" },
-    ...(role === "partner" ? [] : [{ key: "advisors" as const, label: "Top Advisors" }]),
+  const tabs = [
+    { key: "level" as const, label: "Study level", icon: GraduationCap },
+    { key: "stage" as const, label: "Stage", icon: Layers },
+    { key: "monthly" as const, label: "Monthly", icon: CalendarDays },
+    { key: "countries" as const, label: "Top countries", icon: Globe2 },
+    ...(role === "partner" ? [] : [{ key: "advisors" as const, label: "Top Advisors", icon: Users }]),
   ];
   const [tab, setTab] = useState<InsightTab>("level");
   // Each view is its own card, so the tab bar re-renders: keep focus on the chosen tab.
@@ -60,10 +62,14 @@ export default function InsightsCard({
     switched.current = true;
     setTab(next);
   };
+  // Title, then an underlined tab strip (as on the application page), then one caption line.
   const controls = (
-    <Tabs<InsightTab> aria-label="Insights" idPrefix={id} variant="segmented" size="sm" tabs={tabs} active={tab} onChange={choose} />
+    <>
+      <Tabs<InsightTab> aria-label="Insights" idPrefix={id} variant="underline" inset={false} tabs={tabs} active={tab} onChange={choose} />
+      <p className="mt-3 text-ub-caption text-ub-text-tertiary">{CAPTIONS[tab]}</p>
+    </>
   );
-  const common = { title: "Insights", subtitle: SUBTITLES[tab], controls, onRetry, as: "h2" as const };
+  const common = { title: "Insights", controls, onRetry, as: "h2" as const };
   const panel = (node: React.ReactNode) => <div {...tabPanelProps(id, tab)}>{node}</div>;
 
   if (tab === "level") {
