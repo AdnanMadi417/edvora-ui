@@ -39,8 +39,8 @@ export function overviewConfig(context: OverviewContext) {
         title: "Operations overview",
         subtitle: "Keep applications, advisor reviews and payouts moving.",
         // Active and payouts live in the pipeline and commission cards; KPIs carry only numbers shown nowhere else.
-        metrics: ["actionRequired", "stuck", "reviews", "disputes"],
-        panels: ["actionRequired", "stuck", "reviews", "disputes", "commission", "amWorkload"],
+        metrics: ["actionRequired", "reviews", "disputes"],
+        panels: ["actionRequired", "reviews", "disputes", "commission"],
         actions: [
           action(
             "Review applications",

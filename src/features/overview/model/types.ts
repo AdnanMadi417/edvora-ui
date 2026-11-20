@@ -41,6 +41,8 @@ export interface OverviewData {
   items: OverviewItem[];
   /** Active applications per university (same rows as the stage totals). */
   byUniversity?: { key: string; label: string; value: number }[];
+  /** Active applications by the program's study level; the rest have no level on record. */
+  studyLevels?: { levels: { key: string; label: string; value: number }[]; notRecorded: number };
   distribution?: {
     key: string;
     label: string;

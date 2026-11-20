@@ -77,8 +77,10 @@ it.each(["admin", "partner"] as const)(
     expect(
       screen.queryByRole("heading", { name: "Commission by university" })
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Commission overview" })
-    ).toBeInTheDocument();
+    // Advisors keep the commission chart; the admin home no longer shows it.
+    if (role === "partner")
+      expect(screen.getByRole("heading", { name: "Commission overview" })).toBeInTheDocument();
+    else
+      expect(screen.queryByRole("heading", { name: "Commission overview" })).not.toBeInTheDocument();
   }
 );

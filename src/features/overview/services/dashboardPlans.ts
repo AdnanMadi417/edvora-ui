@@ -1,12 +1,10 @@
 import Cookies from "js-cookie";
 import api from "lib/useApi";
-import { isAdvisorAction, stageCodeOf } from "features/applications/stages";
-import { isStuck } from "config/sla";
+import { isAdvisorAction } from "features/applications/stages";
 import { programApi } from "features/programs/services/programApi";
 import { universityApi } from "features/universities/services/universityApi";
 import { languageCentersApi } from "features/universities/language-centers/api";
 import { commissionsApi } from "features/applications/payouts/services/commissionsApi";
-import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
 import { logisticServiceApi } from "features/logistical-service/services";
 import { statementApi } from "features/partners/statement/services/statementApi";
 import {
@@ -67,6 +65,43 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
         };
       return shared.rows;
     };
+    // Study level isn't on the application list: it comes from the program list,
+    // matched by program and university. Unmatched applications are "not recorded".
+    plans.push({
+      id: "studyLevels",
+      title: "Study level mix",
+      subtitle: "Active applications by the program's study level.",
+      href: `${base}/applications`,
+      emptyMessage: "No active applications yet.",
+      load: async () => {
+        const [rows, programs] = await Promise.all([
+          activeRows(),
+          completeCollection((page) =>
+            programApi.programs.list({ page, page_size: 100, ...(context.role === "partner" ? {} : { include_inactive_universities: true }) })
+          ),
+        ]);
+        const key = (program?: string | null, university?: string | null) =>
+          `${(program ?? "").trim().toLowerCase()}|${(university ?? "").trim().toLowerCase()}`;
+        const levelOf = new Map<string, string>();
+        for (const p of programs as any[])
+          if (p.qualification_level) levelOf.set(key(p.name, p.university?.name ?? p.university_name), p.qualification_level);
+        const counts = new Map<string, number>();
+        let notRecorded = 0;
+        for (const row of rows) {
+          const level = levelOf.get(key(row.program_name, row.university_name));
+          if (level) counts.set(level, (counts.get(level) ?? 0) + 1);
+          else notRecorded += 1;
+        }
+        return {
+          total: rows.length,
+          items: [],
+          studyLevels: {
+            levels: [...counts].map(([label, value]) => ({ key: label, label, value })),
+            notRecorded,
+          },
+        };
+      },
+    });
     // One row per application: student, University · Advisor (staff), status, days waiting.
     const appItem = (item: any, actionLabel: string): OverviewItem => ({
       id: item.id,
@@ -133,23 +168,9 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
           return { total: rows.length, items: rows.map((item) => appItem(item, "Follow up")).sort(byOldest) };
         },
       });
-    if (context.role === "admin")
-      plans.push({
-        id: "stuck",
-        title: "Stuck applications",
-        subtitle: "No update for longer than the stage allows.",
-        href: `${base}/applications`,
-        emptyMessage: "Nothing is stuck. Every application moved within its stage's time limit.",
-        load: async () => {
-          const rows = (await activeRows()).filter((item) =>
-            isStuck(stageCodeOf({ name: typeof item.stage === "string" ? item.stage : item.stage?.name, code: item.stage?.code }), daysSince(item.updated_at))
-          );
-          return { total: rows.length, items: rows.map((item) => appItem(item, "Open application")).sort(byOldest) };
-        },
-      });
   }
   if (
-    context.role === "admin" ||
+    // Admins see commission on the finance queue; the home no longer charts it.
     (context.role === "partner" &&
       context.partnerId &&
       context.canViewCommission)
@@ -159,34 +180,24 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
       title: "Commission by university",
       subtitle:
         "University processing, ready for payout and settled commissions. Currencies stay separate.",
-      href:
-        context.role === "admin"
-          ? "/admin/finance-queue"
-          : "/partner/commission-tracker",
+      href: "/partner/commission-tracker",
       emptyMessage:
         "University commission will appear when applications reach the commission stage.",
       load: async () => {
-        const admin = context.role === "admin";
         const [rows, universities] = await Promise.all([
-          completeCollection((page) =>
-            admin
-              ? commissionsApi.list({ page, page_size: 100 })
-              : statementApi.list({ page, page_size: 100 })
-          ),
+          completeCollection((page) => statementApi.list({ page, page_size: 100 })),
           completeCollection((page) =>
             universityApi.universities.list({
               page,
               page_size: 100,
-              ...(admin
-                ? { include_inactive_universities: true }
-                : { is_hidden: false }),
+              is_hidden: false,
             })
           ).catch(() => []),
         ]);
         return {
           total: rows.length,
           items: [],
-          universityCommission: groupUniversityCommission(rows, admin),
+          universityCommission: groupUniversityCommission(rows, false),
           universities: universities.map((item) => ({
             id: item.id,
             name: item.name,
@@ -347,35 +358,6 @@ export function createDashboardPlans(context: OverviewContext): ResourcePlan[] {
             }))
             .sort(byOldest),
         };
-      },
-    });
-    plans.push({
-      id: "amWorkload",
-      title: "Account manager workload",
-      subtitle: "Advisors each account manager looks after.",
-      href: "/admin/account-managers",
-      emptyMessage: "No account managers yet.",
-      load: async () => {
-        const { data } = await accountManagersApi.list({ page: 1, page_size: 100 });
-        const items = (data.items ?? [])
-          .map((m) => {
-            const assigned = Number(m.assigned_partners_count) || 0;
-            const shared = m.shared_partners_count ?? 0;
-            return {
-              id: m.id,
-              title: m.name,
-              description: `${assigned} assigned${shared ? ` · ${shared} shared` : ""}`,
-              href: `/admin/account-managers/profile/${encodeURIComponent(m.id)}`,
-              avatar: { name: m.name },
-              status: m.is_active === false ? "Inactive" : undefined,
-              actionLabel: "Open manager",
-              load: assigned + shared,
-            };
-          })
-          // Busiest first.
-          .sort((a, b) => b.load - a.load)
-          .map(({ load: _load, ...item }) => item);
-        return { total: data.total ?? items.length, items };
       },
     });
   }

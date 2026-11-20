@@ -13,6 +13,7 @@ import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
 import CommissionStatusChart from "./CommissionStatusChart";
 import AdvisorBreakdownCard from "./AdvisorBreakdownCard";
+import StudyLevelCard from "./StudyLevelCard";
 import { useRoleOverview } from "../hooks/useRoleOverview";
 import { useExpectedCommissions } from "features/partners/statement/hooks/useExpectedCommissions";
 import { metricCaptions, metricIcons, metricLabels, overviewConfig } from "../model/overviewConfig";
@@ -231,7 +232,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
   };
 
   // 1–2 charts per role, one dimension each.
-  const showCommission = role === "admin" || (role === "partner" && context.canViewCommission);
+  const showCommission = role === "partner" && !!context.canViewCommission;
   const charts = (
     <>
       <OverviewVisual role={role} plans={plans} resources={resources} onRetry={refresh} />
@@ -268,6 +269,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
       <div className={`grid grid-cols-2 gap-3 ${KPI_COLS[metrics.length] ?? "lg:grid-cols-4"}`}>{kpis}</div>
       <div className="grid min-w-0 items-start gap-5 lg:grid-cols-3">
         <section aria-label="Work" className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+          {plans.some((plan) => plan.id === "studyLevels") && <StudyLevelCard resource={resources.studyLevels} onRetry={refresh} />}
           {config.panels.map(panel)}
         </section>
         <aside aria-label="Context" className="flex min-w-0 flex-col gap-5">

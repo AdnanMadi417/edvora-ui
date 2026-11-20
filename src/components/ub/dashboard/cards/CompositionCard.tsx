@@ -61,6 +61,8 @@ export interface CompositionCardProps {
   layout?: "donut" | "ranked";
   /** Decimals on shares (default 1: 55.3%). */
   percentDigits?: number;
+  /** Legend columns beside the donut: 2 for full-width pages, 1 in narrower columns (e.g. home). */
+  legendColumns?: 1 | 2;
   formatValue?: (value: number) => string;
   actions?: ReactNode;
   state?: WidgetState;
@@ -92,6 +94,7 @@ export default function CompositionCard({
   maxSlices = CHART_PALETTE_EXTENDED.length,
   layout,
   percentDigits = 1,
+  legendColumns = 2,
   formatValue = num,
   actions,
   state = "ready",
@@ -289,7 +292,7 @@ export default function CompositionCard({
             {headline}
             <ul
               aria-label={`${centerLabel}, ${formatValue(total)} ${unit}`}
-              className="gap-x-8 sm:columns-2"
+              className={legendColumns === 2 ? "gap-x-8 sm:columns-2" : undefined}
             >
               {slices.map((s) =>
                 s.key === "__other" ? (

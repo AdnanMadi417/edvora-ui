@@ -52,7 +52,7 @@ test.each([
   ],
   [
     "account_manager",
-    ["active", "hold", "pipeline", "advisorsAttention", "unread", "updates", "actionRequired", "waitingOnAdvisors"],
+    ["active", "hold", "pipeline", "advisorsAttention", "unread", "updates", "studyLevels", "actionRequired", "waitingOnAdvisors"],
   ],
   [
     "admin",
@@ -64,11 +64,9 @@ test.each([
       "commission",
       "unread",
       "updates",
+      "studyLevels",
       "actionRequired",
-      "stuck",
-      "universityCommission",
       "disputes",
-      "amWorkload",
     ],
   ],
 ] as const)("%s requests only its role resources", (role, ids) => {
