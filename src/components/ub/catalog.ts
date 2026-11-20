@@ -392,6 +392,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["Every role home list (tasks, advisors, registrations, payouts, catalogue)"],
     avoid: "Description sentences in rows, or more than one action: open the item for more.",
   },
+  SplitDonuts: {
+    category: "data",
+    imports: ['import { SplitDonuts } from "components/ub/dashboard";'],
+    useFor: "One whole split two or more ways, one small donut per split, each over a legend whose rows can filter a list. The phone and tablet form of a row of filter tiles (e.g. Advisors: account, type).",
+    usedIn: ["Advisors page (admin, reviewer) on phones and tablets"],
+    avoid: "Putting two splits in one ring (it counts everything twice), or more than four parts per split.",
+  },
   SegmentedBars: {
     category: "data",
     imports: ['import { SegmentedBars } from "components/ub/dashboard";'],

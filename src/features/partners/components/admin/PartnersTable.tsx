@@ -52,6 +52,8 @@ import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
 import PendingRegistrationOtpsTable from "./PendingRegistrationOtpsTable";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import DeletePartner from "./DeletePartner";
+import { useMediaQuery } from "hooks/useMediaQuery";
+import SplitDonuts from "components/ub/dashboard/charts/SplitDonuts";
 import StatsFilterCards, {
   type FilterCardItem,
 } from "components/ub/navigation/controls/StatsFilterCards";
@@ -192,6 +194,7 @@ export default function PartnersTable() {
   // card's share is of the same whole.
   const advisorTotal = (stats?.active ?? 0) + (stats?.inactive ?? 0);
   const shareOf = (n: number | undefined) => (advisorTotal > 0 ? ((n ?? 0) / advisorTotal) * 100 : undefined);
+  const wide = useMediaQuery("(min-width: 1024px)");
   const statsCards = useMemo<FilterCardItem[]>(
     () => [
       {
@@ -234,6 +237,23 @@ export default function PartnersTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stats]
   );
+  const count = (id: string) => Number(statsCards.find((c) => c.id === id)?.count ?? 0);
+  const advisorSplits = [
+    {
+      label: "Account",
+      parts: [
+        { id: "active", label: "Active", value: count("active"), color: "var(--ub-tone-success-dot)" },
+        { id: "inactive", label: "Suspended", value: count("inactive"), color: "var(--ub-tone-danger-dot)" },
+      ],
+    },
+    {
+      label: "Type",
+      parts: [
+        { id: "individual", label: "Individual", value: count("individual"), color: "var(--ub-chart-cat-1)" },
+        { id: "agency", label: "Company", value: count("agency"), color: "var(--ub-chart-cat-2)" },
+      ],
+    },
+  ];
 
   const displayTotal =
     partners.length < ITEMS_PER_PAGE
@@ -466,12 +486,22 @@ export default function PartnersTable() {
               <>
                 {/* Stats Cards */}
                 <div className="border-b border-ub-border p-4 sm:p-6">
-                  <StatsFilterCards
-                    className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&_button]:gap-2 [&_button]:p-3"
-                    cards={statsCards}
-                    selectedId={selectedStatus}
-                    onSelect={handleCardSelect}
-                  />
+                  {wide ? (
+                    <StatsFilterCards
+                      className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&_button]:gap-2 [&_button]:p-3"
+                      cards={statsCards}
+                      selectedId={selectedStatus}
+                      onSelect={handleCardSelect}
+                    />
+                  ) : (
+                    // Phones and tablets: one donut per split (as on Applications); rows still filter.
+                    <SplitDonuts
+                      unit="Advisors"
+                      groups={advisorSplits}
+                      selectedId={selectedStatus}
+                      onSelect={(id) => handleCardSelect(id)}
+                    />
+                  )}
                 </div>
 
                 <div className="border-b border-ub-border p-4 sm:p-6">

@@ -35,6 +35,7 @@ export { default as ActivityFeed, activityTime, type ActivityFeedItem, type Acti
 export { default as BarChartCard, type BarChartCardProps } from "./cards/BarChartCard";
 export { default as GaugeCard, type GaugeCardProps } from "./cards/GaugeCard";
 export { default as DonutStatsCard, foldSlices, type DonutStatsCardProps, type DonutStatsView, type DonutStatsItem } from "./cards/DonutStatsCard";
+export { default as SplitDonuts, type SplitDonutsProps, type SplitDonutGroup, type SplitDonutPart } from "./charts/SplitDonuts";
 export { default as RankedBars, type RankedBarsProps, type RankedBarItem } from "./charts/RankedBars";
 export { default as CompositionCard, type CompositionCardProps, type CompositionSummary } from "./cards/CompositionCard";
 export { default as ReconciliationBars, type ReconciliationBarsProps, type ReconciliationRow, type ReconciliationPart } from "./charts/ReconciliationBars";

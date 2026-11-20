@@ -37,6 +37,7 @@ import {
   GroupedBarChart,
   AreaLineChart,
   SegmentedBars,
+  SplitDonuts,
   TaskList,
   TaskListItem,
   type DashboardPeriod,
@@ -271,6 +272,28 @@ export default function DashboardWidgets() {
             { key: "paid", label: "Paid", value: 8250, color: CHART_PALETTE[2] },
           ]}
         />
+      </Demo>
+
+      <Demo
+        name="SplitDonuts"
+        path="components/ub/dashboard/charts/SplitDonuts.tsx"
+        description="One whole split two ways, one donut per split (never both in one ring), each over legend rows that filter a list. Used under 1024px in place of a row of filter tiles."
+        code={`<SplitDonuts unit="Advisors" selectedId={filter} onSelect={setFilter} groups={[{ label: "Account", parts: [{ id: "active", label: "Active", value: 15, color: "var(--ub-tone-success-dot)" }, { id: "inactive", label: "Suspended", value: 6, color: "var(--ub-tone-danger-dot)" }] }]} />`}
+        props={[
+          { name: "groups", type: "{ label, parts: { id, label, value, color }[] }[]", description: "One split per group; parts add up to the same whole." },
+          { name: "selectedId / onSelect", type: "string | null / (id | null) => void", description: "Legend rows become filter toggles." },
+          { name: "unit", type: "string", description: "Noun in the hole and in row names." },
+        ]}
+      >
+        <div className="max-w-sm">
+          <SplitDonuts
+            unit="Advisors"
+            groups={[
+              { label: "Account", parts: [{ id: "active", label: "Active", value: 15, color: "var(--ub-tone-success-dot)" }, { id: "inactive", label: "Suspended", value: 6, color: "var(--ub-tone-danger-dot)" }] },
+              { label: "Type", parts: [{ id: "individual", label: "Individual", value: 15, color: "var(--ub-chart-cat-1)" }, { id: "agency", label: "Company", value: 6, color: "var(--ub-chart-cat-2)" }] },
+            ]}
+          />
+        </div>
       </Demo>
 
       <Demo
