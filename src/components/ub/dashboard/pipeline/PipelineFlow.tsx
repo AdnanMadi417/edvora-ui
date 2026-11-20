@@ -7,7 +7,7 @@ import { focusRing } from "components/ub/recipes";
 import StatTile from "components/ub/dashboard/cards/StatTile";
 import { useMediaQuery } from "hooks/useMediaQuery";
 import { CHART_PALETTE, CHART_OTHER } from "config/chartPalette";
-import { SEGMENT_CLASS, SEGMENT_ROW_CLASS } from "../charts/segments";
+import DonutChart from "../charts/DonutChart";
 
 export interface PipelineFlowStage {
   /** Your id for the stage, returned by onSelect. */
@@ -49,9 +49,9 @@ const COLS: Record<number, string> = {
 /**
  * Applications by stage, in workflow order. From 1024px each stage is a
  * StatTile (the same card as the home KPIs): stage name, count and a footer
- * with its share. On tablets, phones and narrow cards: one simple chart, a
- * single bar split by stage (the same stage colours as the home pipeline
- * donut) over a compact legend of name, count and share.
+ * with its share. On tablets, phones and narrow cards: the home pipeline
+ * donut (stage colours, total in the hole) over a compact legend of name,
+ * count and share.
  * With onSelect each stage toggles a filter; with getHref it opens a link.
  */
 export default function PipelineFlow({
@@ -106,22 +106,15 @@ export default function PipelineFlow({
   const interactive = Boolean(onSelect || getHref);
   return (
     <div data-layout="list" className={clsx("min-w-0", className)}>
-      <p className="ub-tabular text-ub-caption text-ub-text-secondary">
-        <span className="text-ub-label-md text-ub-text-primary">{total.toLocaleString()}</span> {unit}
-      </p>
-      {/* One bar for the whole pipeline: each stage a segment, in workflow order. */}
-      <div aria-hidden="true" className={clsx("mt-2 h-2.5", SEGMENT_ROW_CLASS, total === 0 && "rounded-ub-xs bg-ub-chart-track")}>
-        {rows.map(({ s, selected }, index) =>
-          s.count > 0 ? (
-            <span
-              key={s.id}
-              className={clsx(SEGMENT_CLASS, selectedId && !selected && "opacity-40")}
-              style={{ flexGrow: s.count, flexBasis: 0, background: colorOf(index) }}
-            />
-          ) : null
-        )}
-      </div>
-      <ol aria-label={label} className="mt-2 grid">
+      {/* The same donut as the home pipeline: one slice per stage, total in the hole. */}
+      <DonutChart
+        className="max-w-[11rem]"
+        label={label}
+        centerLabel={unit.charAt(0).toUpperCase() + unit.slice(1)}
+        centerValue={total.toLocaleString()}
+        segments={rows.map(({ s }, index) => ({ key: s.id, label: s.label, value: s.count, color: colorOf(index) }))}
+      />
+      <ol aria-label={label} className="mt-4 grid">
         {rows.map(({ s, share, selected, empty, name }, index) => {
           const body: ReactNode = (
             <>
