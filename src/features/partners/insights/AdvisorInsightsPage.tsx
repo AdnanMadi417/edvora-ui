@@ -33,7 +33,6 @@ type PerformanceTab = "applications" | "enrolled";
 const BASE = "/admin/advisors";
 const FOLLOW_UP_ROWS = 5;
 const GRAINS: { key: GrowthGrain; label: string; previous: string; range: string }[] = [
-  { key: "daily", label: "Daily", previous: "vs the day before", range: "last 14 days" },
   { key: "weekly", label: "Weekly", previous: "vs the week before", range: "last 12 weeks" },
   { key: "monthly", label: "Monthly", previous: "vs the month before", range: "last 12 months" },
   { key: "quarterly", label: "Quarterly", previous: "vs the quarter before", range: "last 8 quarters" },
@@ -77,6 +76,7 @@ export default function AdvisorInsightsPage() {
     }
   }, [advisors, distribution]);
   const manyParts = distribution === "nationality" || distribution === "country";
+  const partNoun = distribution === "nationality" ? "nationalities" : "countries";
 
   const last = series[series.length - 1]?.value ?? 0;
   const before = series[series.length - 2]?.value ?? 0;
@@ -150,10 +150,10 @@ export default function AdvisorInsightsPage() {
         unit="Advisors"
         centerLabel={distribution === "type" ? "By type" : distribution === "region" ? "By region" : distribution === "country" ? "By country of residence" : "By nationality"}
         items={slices}
-        // Nationality and country: the top 10, then Others. Region and type: the donut.
-        layout={manyParts ? "ranked" : "donut"}
-        top={manyParts ? 10 : undefined}
-        restLabel={(n) => `Others (${n})`}
+        // Every tab is the donut; nationality and country show the top five and one Others slice.
+        layout="donut"
+        top={manyParts ? 5 : undefined}
+        restLabel={(n) => `Others (${n} ${partNoun})`}
         state={state}
         onRetry={retry}
         emptyMessage="No Advisors yet."

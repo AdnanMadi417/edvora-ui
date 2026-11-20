@@ -29,7 +29,7 @@ export const INSIGHT_PERIODS: { key: InsightPeriod; label: string; days: number 
   { key: "all", label: "All time", days: null },
 ];
 
-export type GrowthGrain = "daily" | "weekly" | "monthly" | "quarterly";
+export type GrowthGrain = "weekly" | "monthly" | "quarterly";
 
 export interface Slice {
   key: string;
@@ -91,18 +91,13 @@ export function regionOf(country: string | null | undefined): string {
 
 export const TYPE_LABEL: Record<string, string> = { agency: "Company", individual: "Individual" };
 
-/** New Advisors per day (14), week (12, from Monday), month (12) or quarter (8), oldest first. */
+/** New Advisors per week (12, from Monday), month (12) or quarter (8), oldest first. */
 export function growth(advisors: InsightAdvisor[], grain: GrowthGrain, now = new Date()): Slice[] {
   const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   const y = now.getUTCFullYear();
   const m = now.getUTCMonth();
   const starts: { t: number; label: string }[] =
-    grain === "daily"
-      ? Array.from({ length: 14 }, (_, i) => {
-          const t = today - (13 - i) * DAY;
-          return { t, label: String(new Date(t).getUTCDate()) };
-        })
-      : grain === "weekly"
+    grain === "weekly"
       ? Array.from({ length: 12 }, (_, i) => {
           const monday = today - ((new Date(today).getUTCDay() + 6) % 7) * DAY;
           const t = monday - (11 - i) * 7 * DAY;
