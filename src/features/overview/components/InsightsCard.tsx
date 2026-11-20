@@ -3,7 +3,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import CompositionCard from "components/ub/dashboard/cards/CompositionCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
-import RankedBars from "components/ub/dashboard/charts/RankedBars";
 import AreaLineChart from "components/ub/dashboard/charts/AreaLineChart";
 import DeltaPill from "components/ub/dashboard/shared/DeltaPill";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
@@ -59,7 +58,7 @@ export default function InsightsCard({
     { key: "level" as const, label: "Study level", icon: GraduationCap },
     { key: "field" as const, label: "Field of study", icon: BookOpen },
     { key: "trend" as const, label: "Over time", icon: CalendarDays },
-    { key: "countries" as const, label: "Top countries", icon: Globe2 },
+    { key: "countries" as const, label: "Countries", icon: Globe2 },
   ];
   const [tab, setTab] = useState<InsightTab>("stage");
   const [period, setPeriod] = useState<Period>("monthly");
@@ -179,18 +178,21 @@ export default function InsightsCard({
   if (tab === "countries") {
     const res = resources.topCountries;
     if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} bodyProps={body} state="empty" emptyMessage={NOT_YET.countries} />);
-    const countries = res?.data?.byCountry ?? [];
     return panel(
-      <DashboardCard
+      <CompositionCard
         {...common}
-        bodyProps={body}
-        state={res?.state === "ready" && !countries.length ? "empty" : res?.state ?? "loading"}
+        bodyClassName={body.className}
+        // The same donut as Field of study: the top five countries, then Others.
+        layout="donut"
+        top={5}
+        restLabel={(n) => `Others (${n} ${n === 1 ? "country" : "countries"})`}
+        unit="applications"
+        centerLabel="By country"
+        items={res?.data?.byCountry ?? []}
+        state={res?.state ?? "loading"}
         errorMessage={res?.error}
         emptyMessage="No active applications yet."
-        skeleton="list"
-      >
-        <RankedBars items={countries} unit="applications" label="Top countries" top={10} restLabel={(n) => `Other countries (${n})`} />
-      </DashboardCard>
+      />
     );
   }
 

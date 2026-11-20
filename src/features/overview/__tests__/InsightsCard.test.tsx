@@ -50,8 +50,10 @@ it("draws the monthly and country views when the list sends the data", async () 
   expect(screen.getByRole("table", { name: /last 12 weeks/ })).toHaveTextContent("17/11");
   await user.click(screen.getByRole("tab", { name: "Daily" }));
   expect(screen.getByRole("group", { name: /last 14 days/ })).toBeInTheDocument();
-  await user.click(screen.getByRole("tab", { name: "Top countries" }));
-  expect(screen.getByText("1. Nigeria: 6 applications, 60.0%")).toBeInTheDocument();
+  await user.click(screen.getByRole("tab", { name: "Countries" }));
+  // The Field of study donut: a slice per country.
+  expect(screen.getByRole("img", { name: /^By country/ })).toBeInTheDocument();
+  expect(screen.getByText("Nigeria")).toBeInTheDocument();
 });
 
 it("says plainly when a chart has no data yet, and Advisors get no Advisor insights link", async () => {
