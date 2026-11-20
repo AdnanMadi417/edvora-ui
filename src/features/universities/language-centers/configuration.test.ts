@@ -96,3 +96,11 @@ it("hides disabled configuration and reports corrupt or unavailable storage", ()
   );
   storage.mockRestore();
 });
+
+import { cityState } from "./types";
+
+it("lists show the city and state, the last two parts of the address", () => {
+  expect(cityState("Level 3, Learning Centre, Bukit Jalil, Kuala Lumpur")).toBe("Bukit Jalil, Kuala Lumpur");
+  expect(cityState("Kuala Lumpur")).toBe("Kuala Lumpur");
+  expect(cityState(" , ")).toBe("");
+});

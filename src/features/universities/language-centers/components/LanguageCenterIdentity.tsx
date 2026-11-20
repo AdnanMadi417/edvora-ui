@@ -1,9 +1,10 @@
 "use client";
 
+import { MapPin } from "lucide-react";
 import EntityCell from "components/ub/data/display/EntityCell";
 import UniversityLogo from "features/universities/components/shared/UniversityLogo";
 import type { University } from "features/universities/types";
-import type { LanguageCenter } from "../types";
+import { cityState, type LanguageCenter } from "../types";
 
 /**
  * The language centre's name cell, shared by the table and the Advisor card:
@@ -14,11 +15,15 @@ export default function LanguageCenterIdentity({
   center,
   university,
   showUniversity = true,
+  showPlace = false,
 }: {
   center: LanguageCenter;
   university?: University;
   showUniversity?: boolean;
+  /** Phones only: the city and state under the name, where the table has no Location column. */
+  showPlace?: boolean;
 }) {
+  const place = showPlace ? cityState(center.location) : "";
   const subtitle =
     center.centre_type === "independent"
       ? "Independent language center"
@@ -35,7 +40,19 @@ export default function LanguageCenterIdentity({
         )
       }
       status={{ status: center.is_active }}
-      subtitle={subtitle}
+      subtitle={
+        place ? (
+          <>
+            {subtitle && <span className="block truncate">{subtitle}</span>}
+            <span className="mt-0.5 flex items-center gap-1 md:hidden">
+              <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-ub-icon" />
+              <span className="truncate">{place}</span>
+            </span>
+          </>
+        ) : (
+          subtitle
+        )
+      }
     />
   );
 }

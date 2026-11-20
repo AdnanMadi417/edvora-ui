@@ -316,7 +316,7 @@ it("opens the detail page from row space and keeps row actions separate", async 
   expect(link.querySelector("a, button")).toBeNull();
   const navigate = jest.fn((event: Event) => event.preventDefault());
   link.addEventListener("click", navigate);
-  await user.click(within(link.closest("tr")!).getByText("Kuala Lumpur"));
+  await user.click(within(link.closest("tr")!).getAllByText("Kuala Lumpur")[0]);
   expect(navigate).toHaveBeenCalledTimes(1);
   navigate.mockClear();
   await user.click(rowAction("Edit English Center"));

@@ -28,3 +28,13 @@ export function validateLanguageCenter(
     errors.email = "Enter a valid email address.";
   return errors;
 }
+
+/**
+ * The short place a list shows: the last two parts of the address, usually the
+ * city and state ("Level 3, Learning Centre, Bukit Jalil, Kuala Lumpur" →
+ * "Bukit Jalil, Kuala Lumpur"). Details pages show the full address.
+ */
+export function cityState(location: string | null | undefined): string {
+  const parts = (location ?? "").split(",").map((p) => p.trim()).filter(Boolean);
+  return parts.slice(-2).join(", ");
+}

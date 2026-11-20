@@ -34,7 +34,7 @@ import { useUniversities } from "features/universities/hooks/institutions/useUni
 import { parseApiError } from "utils/parseApiError";
 import LanguageCenterForm from "./LanguageCenterForm";
 import { languageCentersApi } from "./api";
-import type { LanguageCenter, LanguageCenterInput } from "./types";
+import { cityState, type LanguageCenter, type LanguageCenterInput } from "./types";
 import FilterButton from "components/ub/core/buttons/FilterButton";
 
 export default function LanguageCentersDirectory({
@@ -160,19 +160,22 @@ export default function LanguageCentersDirectory({
           center={center}
           university={universityFor(center.university_id)}
           showUniversity={!fixedUniversityId}
+          showPlace
         />
       ),
     },
     {
       key: "location",
       header: "Location",
+      // Phones show the city and state under the name instead.
+      mobileSecondary: true,
       cell: (center) => (
-        <span className="flex items-start gap-1.5 text-ub-text-secondary">
+        <span className="flex items-start gap-1.5 text-ub-text-secondary" title={center.location}>
           <MapPin
             aria-hidden="true"
             className="mt-0.5 h-4 w-4 shrink-0 text-ub-icon"
           />
-          <span className="min-w-0 break-words">{center.location}</span>
+          <span className="min-w-0 break-words">{cityState(center.location)}</span>
         </span>
       ),
     },
