@@ -5,7 +5,7 @@ import TableActions, {
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import {
   CopyPlus,
   Eye,
@@ -103,23 +103,63 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       key: "name",
       width: "34%",
       header: "Program",
-      cell: (program) => (
-        <EntityCell
-          name={program.name}
-          avatar={
-            <UniversityLogo
-              name={program.university?.name || program.name}
-              fileKey={program.university?.logo_file_key}
-              src={program.university?.logo_file_url}
+      cell: (program) => {
+        const ielts = program.english_required_score
+          ? getIeltsLabel(program.english_required_score)
+          : null;
+        return (
+          <span className="block min-w-0">
+            <EntityCell
+              name={program.name}
+              avatar={
+                <UniversityLogo
+                  name={program.university?.name || program.name}
+                  fileKey={program.university?.logo_file_key}
+                  src={program.university?.logo_file_url}
+                />
+              }
+              status={programStatus(program)}
+              subtitle={programSubtitle(program)}
             />
-          }
-          status={programStatus(program)}
-          subtitle={programSubtitle(program)}
-        />
-      ),
+            {/* Cards (below 1024px): the facts in two short lines under the name, no label column. */}
+            <span className="mt-2 flex flex-col gap-2 ps-[52px] text-ub-body-sm lg:hidden">
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                {program.qualification_level && (
+                  <Tag hue="indigo" size="sm">
+                    {program.qualification_level}
+                  </Tag>
+                )}
+                {program.duration ? (
+                  <span className="text-ub-text-secondary">
+                    {program.duration} {program.duration === 1 ? "year" : "years"}
+                  </span>
+                ) : null}
+                {program.has_scholarship && (
+                  <Tag hue="amber" size="sm">
+                    Scholarship
+                  </Tag>
+                )}
+              </span>
+              <span className="ub-tabular grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1">
+                {[
+                  ["Tuition", money(program.first_year_tuition, program.yearly_fee_currency), "text-ub-text-primary"],
+                  ["Commission", money(program.commission_amount, program.commission_currency), "text-ub-label-md text-ub-tone-success-text"],
+                  ["English", ielts ? `IELTS ${ielts.replace(/^Band\s*/i, "")}` : "Not set", "text-ub-text-primary"],
+                ].map(([label, value, tone]) => (
+                  <Fragment key={label}>
+                    <span className="text-ub-caption leading-5 text-ub-text-tertiary">{label}</span>
+                    <span className={`whitespace-nowrap ${tone}`}>{value}</span>
+                  </Fragment>
+                ))}
+              </span>
+            </span>
+          </span>
+        );
+      },
     },
     {
       key: "level",
+      mobileSecondary: true,
       width: "22%",
       header: "Level",
       cell: (program) => {
@@ -149,6 +189,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "fees",
+      mobileSecondary: true,
       width: "18%",
       header: "Tuition / commission",
       align: "end",
@@ -171,6 +212,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     },
     {
       key: "english",
+      mobileSecondary: true,
       width: "18%",
       header: "English",
       cell: (program) => {

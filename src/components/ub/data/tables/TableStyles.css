@@ -161,7 +161,9 @@ table [data-ub-badge-label] {
     > td:first-child {
     grid-column: 1;
     grid-row: 1;
-    align-self: center;
+    /* Level with the 40px avatar, even when the card's first cell is tall. */
+    align-self: start;
+    margin-top: 8px;
     padding: 0;
   }
 
