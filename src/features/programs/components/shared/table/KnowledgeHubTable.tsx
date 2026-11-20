@@ -122,7 +122,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
               subtitle={programSubtitle(program)}
             />
             {/* Cards (below 1024px): the facts in two short lines under the name, no label column. */}
-            <span className="mt-2 flex flex-col gap-2 ps-[52px] text-ub-body-sm lg:hidden">
+            <span className="mt-3 flex flex-col gap-2 text-ub-body-sm lg:hidden">
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 {program.qualification_level && (
                   <Tag hue="indigo" size="sm">

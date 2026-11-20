@@ -565,20 +565,24 @@ export default function DataTable<T>({
         <div
           role="group"
           aria-label="Bulk actions"
-          className="sticky bottom-20 z-20 mt-3 flex flex-wrap items-center gap-3 rounded-ub-lg border border-ub-border-overlay bg-ub-surface-raised px-4 py-2 shadow-ub-lg md:bottom-4"
+          // Phones: the count and Clear on one line, the actions in a row under them. From 640px: one line.
+          className="sticky bottom-20 z-20 mt-3 flex flex-col gap-2 rounded-ub-lg border border-ub-border-overlay bg-ub-surface-raised px-4 py-2 shadow-ub-lg sm:flex-row sm:items-center sm:gap-3 md:bottom-4"
         >
-          <span aria-hidden="true" className="ub-tabular text-ub-label-md text-ub-text-primary">
-            {count} selected
-          </span>
-          <div className="flex flex-1 flex-wrap items-center gap-2">{bulkActions?.(selected, clearSelection, { allMatching: allMatchingSelected, count })}</div>
-          <button
-            type="button"
-            onClick={clearSelection}
-            className={`inline-flex h-8 items-center gap-1.5 rounded-ub-full px-3 text-ub-label-md text-ub-text-link hover:bg-ub-action-secondary-hover ${focusRing}`}
-          >
-            Clear selection
-            <X aria-hidden="true" className="h-4 w-4" />
-          </button>
+          <div className="flex items-center justify-between gap-3 sm:contents">
+            <span aria-hidden="true" className="ub-tabular text-ub-label-md text-ub-text-primary">
+              {count} selected
+            </span>
+            <button
+              type="button"
+              onClick={clearSelection}
+              aria-label="Clear selection"
+              className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-ub-full px-2 text-ub-label-md text-ub-text-link hover:bg-ub-action-secondary-hover sm:order-last sm:px-3 ${focusRing}`}
+            >
+              <span className="hidden sm:inline">Clear selection</span>
+              <X aria-hidden="true" className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:flex-1">{bulkActions?.(selected, clearSelection, { allMatching: allMatchingSelected, count })}</div>
         </div>
       )}
     </div>
