@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, GraduationCap, AlertCircle } from 'lucide-react';
+import { GraduationCap, AlertCircle } from 'lucide-react';
 import ProgramCard from "components/ub/data/cards/ProgramCard";
 
 import Loading from "components/ub/feedback/states/Loading";
@@ -17,8 +17,7 @@ import { useUniversities } from "features/universities/hooks";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
 import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
-import NextButton from "components/ub/core/buttons/NextButton";
-import PrevButton from "components/ub/core/buttons/PrevButton";
+import CardGridPagination from "components/ub/data/cards/CardGridPagination";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -240,55 +239,13 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 items-center gap-4 border-t border-ub-border p-4 sm:p-6 md:flex md:justify-between">
-                {total > 0 && (
-                  <div className="flex flex-wrap items-center gap-1 text-sm font-medium text-ub-text-secondary">
-                    Showing
-                    <span className="font-medium">
-                      {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-                    </span>
-                    to
-                    <span className="font-medium">
-                      {Math.min(currentPage * ITEMS_PER_PAGE, total)}
-                    </span>
-                    of
-                    <span className="font-medium">{total}</span>
-                    programs
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
-                  <PrevButton
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    text="Prev"
-                    icon={<ArrowLeft className="h-4 w-4" />}
-                  />
-
-                  <span className="px-3 py-1 font-medium text-ub-text-secondary">
-                    Page {currentPage} of{" "}
-                    {Math.ceil(total / ITEMS_PER_PAGE)}
-                  </span>
-
-                  <NextButton
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(
-                          prev + 1,
-                          Math.ceil(total / ITEMS_PER_PAGE)
-                        )
-                      )
-                    }
-                    disabled={
-                      currentPage === Math.ceil(total / ITEMS_PER_PAGE)
-                    }
-                    text="Next"
-                    icon={<ArrowRight className="h-4 w-4" />}
-                  />
-                </div>
-              </div>
+              <CardGridPagination
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalCount={total}
+                itemLabel="programs"
+              />
             </div>
           )}
         </div>

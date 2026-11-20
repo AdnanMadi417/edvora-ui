@@ -15,7 +15,7 @@ import {
   type DataTableSort,
 } from "components/ub/data/tables/DataTable";
 import UniversityCard from "components/ub/data/cards/UniversityCard";
-import TablePagination from "components/ub/data/tables/TablePagination";
+import CardGridPagination from "components/ub/data/cards/CardGridPagination";
 import EmptyData from "components/ub/feedback/states/EmptyData";
 import Button from "components/ub/core/buttons/Button";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
@@ -95,9 +95,11 @@ export default function UniversityDirectory({
         sort
       )
     : filtered;
+  // Advisor cards: 9 per page (three rows of three), like Programs; the staff table keeps 10.
+  const perPage = canManage ? 10 : 9;
   const currentPage = Math.min(
     page,
-    Math.max(1, Math.ceil(sorted.length / 10))
+    Math.max(1, Math.ceil(sorted.length / perPage))
   );
   const toggleHidden = async (university: University) => {
     setTogglingId(university.id);
@@ -176,8 +178,8 @@ export default function UniversityDirectory({
         {canManage ? (
           <UniversitiesDataTable
             universities={sorted.slice(
-              (currentPage - 1) * 10,
-              currentPage * 10
+              (currentPage - 1) * perPage,
+              currentPage * perPage
             )}
             basePath={basePath}
             loading={loading}
@@ -226,7 +228,7 @@ export default function UniversityDirectory({
             ) : (
               <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {sorted
-                  .slice((currentPage - 1) * 10, currentPage * 10)
+                  .slice((currentPage - 1) * perPage, currentPage * perPage)
                   .map((university) => (
                     <UniversityCard
                       key={university.id}
@@ -240,11 +242,10 @@ export default function UniversityDirectory({
               </div>
             )}
             {!loading && !error && sorted.length > 0 && (
-              <TablePagination
+              <CardGridPagination
                 currentPage={currentPage}
                 onPageChange={setPage}
-                itemsPerPage={10}
-                itemCount={Math.min(10, sorted.length - (currentPage - 1) * 10)}
+                itemsPerPage={perPage}
                 totalCount={sorted.length}
                 itemLabel="universities"
               />

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FileText, CheckCircle2, Clock, AlertTriangle, LayoutGrid, Layers, User, FolderOpen, Wallet, Activity, List as ListIcon, Columns3, Bell, Settings, ShieldCheck, Users } from "lucide-react";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
+import CardGridPagination from "components/ub/data/cards/CardGridPagination";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import StatsFilterCards, { type FilterCardItem } from "components/ub/navigation/controls/StatsFilterCards";
 import ApplicationFilterBar from "components/ub/navigation/controls/ApplicationFilterBar";
@@ -78,6 +79,7 @@ export default function Navigation() {
   const [filter, setFilter] = useState<FilterTab>("all");
   const [settings, setSettings] = useState<SettingsTab>("profile");
   const [page, setPage] = useState(1);
+  const [cardPage, setCardPage] = useState(1);
   const [card, setCard] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("");
@@ -133,6 +135,14 @@ export default function Navigation() {
 
       <Demo name="TablePagination" path="components/ub/data/tables/TablePagination.tsx">
         <TablePagination currentPage={page} onPageChange={setPage} itemsPerPage={10} itemCount={page === 3 ? 4 : 10} totalCount={24} itemLabel="applications" />
+      </Demo>
+
+      <Demo
+        name="CardGridPagination"
+        path="components/ub/data/cards/CardGridPagination.tsx"
+        description="The footer under every Advisor card grid (Programs, Universities, Language centres): the range on the start, Prev · Page x of y · Next on the end. Card grids show 9 per page. Tables use TablePagination."
+      >
+        <CardGridPagination currentPage={cardPage} onPageChange={setCardPage} itemsPerPage={9} totalCount={21} itemLabel="programs" />
       </Demo>
 
       <Demo name="StatsFilterCards" path="components/ub/navigation/controls/StatsFilterCards.tsx">

@@ -20,6 +20,7 @@ import DataTable, {
 } from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
 import TablePagination from "components/ub/data/tables/TablePagination";
+import CardGridPagination from "components/ub/data/cards/CardGridPagination";
 import TableActions, {
   TableAction,
 } from "components/ub/data/tables/TableActions";
@@ -139,9 +140,11 @@ export default function LanguageCentersDirectory({
         .toLowerCase()
         .includes(search.trim().toLowerCase())
   );
+  // Advisor cards: 9 per page (three rows of three), like Programs; the staff table keeps 10.
+  const perPage = readOnly ? 9 : 10;
   const currentPage = Math.min(
     page,
-    Math.max(1, Math.ceil(matching.length / 10))
+    Math.max(1, Math.ceil(matching.length / perPage))
   );
   const allColumns: DataTableColumn<LanguageCenter>[] = [
     {
@@ -215,8 +218,8 @@ export default function LanguageCentersDirectory({
   ];
   const columns = allColumns;
   const rows = sortRows(matching, columns, sort).slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
+    (currentPage - 1) * perPage,
+    currentPage * perPage
   );
   const initial: LanguageCenterInput =
     form && form !== "new"
@@ -251,7 +254,7 @@ export default function LanguageCentersDirectory({
     <TablePagination
       currentPage={currentPage}
       onPageChange={setPage}
-      itemsPerPage={10}
+      itemsPerPage={perPage}
       itemCount={rows.length}
       totalCount={matching.length}
       itemLabel="centers"
@@ -337,7 +340,7 @@ export default function LanguageCentersDirectory({
               subtitle="Try another search or university."
             />
           ) : (
-            <div className="space-y-5">
+            <div>
               <div
                 className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3"
                 aria-label="Language centres"
@@ -351,7 +354,13 @@ export default function LanguageCentersDirectory({
                   />
                 ))}
               </div>
-              {pagination}
+              <CardGridPagination
+                currentPage={currentPage}
+                onPageChange={setPage}
+                itemsPerPage={perPage}
+                totalCount={matching.length}
+                itemLabel="language centres"
+              />
             </div>
           )
         ) : (

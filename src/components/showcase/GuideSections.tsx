@@ -238,7 +238,7 @@ export function TablesSection() {
       <Pick demos={["Table kit"]}>
         <DataDisplay />
       </Pick>
-      <Pick demos={["TablePagination"]}>
+      <Pick demos={["TablePagination", "CardGridPagination"]}>
         <Navigation />
       </Pick>
     </ShowcaseSection>

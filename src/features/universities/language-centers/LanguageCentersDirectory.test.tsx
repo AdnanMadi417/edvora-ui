@@ -364,9 +364,11 @@ it("retries failed advisor card loads and paginates cards", async () => {
   );
   await user.click(screen.getByRole("button", { name: "Try again" }));
   await screen.findByRole("article", { name: "Language Centre 1" });
-  expect(screen.getAllByRole("article")).toHaveLength(10);
-  await user.click(screen.getByRole("button", { name: "Next page" }));
-  expect(screen.getAllByRole("article")).toHaveLength(1);
+  // Advisor cards: 9 per page, like Programs.
+  expect(screen.getAllByRole("article")).toHaveLength(9);
+  expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Next" }));
+  expect(screen.getAllByRole("article")).toHaveLength(2);
   expect(
     screen.getByRole("article", { name: "Language Centre 11" })
   ).toBeVisible();
