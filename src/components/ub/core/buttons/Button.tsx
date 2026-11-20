@@ -6,6 +6,8 @@ type ButtonProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   icon?: ReactNode;
+  /** Icons sit after the text; "start" only for Back / Previous, where the arrow points the way you go. */
+  iconPosition?: "start" | "end";
   text?: string;
   /** Design-system variant (brief §4.1). Defaults to "secondary" when no legacy colour props are passed. */
   variant?: ButtonVariant;
@@ -72,6 +74,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled,
   icon,
+  iconPosition = "end",
   text,
   variant,
   size = "md",
@@ -87,6 +90,11 @@ const Button: React.FC<ButtonProps> = ({
   loading = false,
 }) => {
   const colors = resolveButtonColors(variant, { bgColor, textColor, borderColor, hoverTextColor, hoverBorderColor });
+  const iconNode = loading ? (
+    <Loader2 className="h-4 w-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+  ) : (
+    icon && <span className="flex shrink-0 items-center">{icon}</span>
+  );
   return (
     <button
       type={type}
@@ -96,12 +104,9 @@ const Button: React.FC<ButtonProps> = ({
       title={title}
       className={`${buttonBase} ${buttonSizes[size]} ${colors} ${className || ""}`}
     >
-      {loading ? (
-        <Loader2 className="h-4 w-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-      ) : (
-        icon && <span className="flex shrink-0 items-center">{icon}</span>
-      )}
+      {iconPosition === "start" && iconNode}
       {text && <span className={`truncate ${textClassName || ""}`}>{text}</span>}
+      {iconPosition === "end" && iconNode}
     </button>
   );
 };

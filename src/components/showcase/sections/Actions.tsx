@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Download, Pencil, Trash2, Send, Eye, CheckCircle2, Clock, AlertTriangle, Info, XCircle, FileText, GraduationCap, Wallet, Bell, Users, Building2 } from "lucide-react";
+import { ArrowLeft, Plus, Download, Pencil, Trash2, Send, Eye, CheckCircle2, Clock, AlertTriangle, Info, XCircle, FileText, GraduationCap, Wallet, Bell, Users, Building2 } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import PillButton from "components/ub/core/buttons/PillButton";
@@ -73,6 +73,9 @@ export function Buttons() {
           </Variant>
           <Variant label="disabled">
             <Button text="Export CSV" icon={<Download className="h-4 w-4" />} disabled />
+          </Variant>
+          <Variant label='iconPosition="start" (Back only)'>
+            <Button text="Back" iconPosition="start" icon={<ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />} onClick={clicked("Back")} />
           </Variant>
         </div>
       </Demo>

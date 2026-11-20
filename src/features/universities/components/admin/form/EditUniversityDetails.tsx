@@ -1003,7 +1003,7 @@ const UniversityEdit = ({
       <div className="sticky bottom-20 z-20 grid grid-cols-2 gap-3 rounded-ub-lg border border-ub-border bg-ub-surface-raised p-4 shadow-ub-md md:bottom-4">
         <Button
           onClick={handleBack}
-          icon={<ArrowLeft className="h-5 w-5" />}
+          iconPosition="start" icon={<ArrowLeft className="h-5 w-5" />}
           text="Back"
           variant="secondary"
           className="min-h-[44px]"

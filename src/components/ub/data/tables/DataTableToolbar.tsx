@@ -103,11 +103,11 @@ function ColumnsMenu({ options, hidden, onChange }: NonNullable<DataTableToolbar
         onClick={() => setOpen((o) => !o)}
         className={clsx(buttonBase, buttonSizes.sm, buttonVariants.secondary)}
       >
-        <Columns3 className="h-4 w-4" aria-hidden="true" />
         Columns
         <span className="ub-tabular text-ub-text-tertiary">
           {shown}/{options.length}
         </span>
+        <Columns3 className="h-4 w-4" aria-hidden="true" />
       </button>
       {open && (
         <div id={panelId} role="group" aria-label="Show columns" className={clsx(popover, "absolute end-0 top-full z-30 mt-2 w-60 p-3")}>

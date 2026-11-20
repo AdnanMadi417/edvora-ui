@@ -102,8 +102,8 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
           }}
           className="inline-flex h-8 items-center gap-1.5 rounded-ub-full px-3 text-ub-label-sm text-ub-text-link transition-colors duration-ub-fast hover:bg-ub-action-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
         >
-          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
           {copied ? "Copied" : "Copy"}
+          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
         </button>
       </div>
       <pre dir="ltr" className="overflow-x-auto bg-ub-surface-subtle p-4 text-ub-caption leading-5 text-ub-text-primary">

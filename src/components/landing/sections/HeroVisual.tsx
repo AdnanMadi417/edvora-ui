@@ -43,8 +43,8 @@ export default function HeroVisual() {
           onClick={() => setVideoOpen(true)}
           className="ub-glass absolute start-1/2 top-1/2 inline-flex h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-ub-full px-5 text-ub-label-md text-ub-text-primary transition-colors duration-ub-fast hover:bg-ub-navy-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ub-border-focus rtl:translate-x-1/2"
         >
-          <Play className="h-4 w-4" aria-hidden />
           {hero.showreel.label}
+          <Play className="h-4 w-4" aria-hidden />
         </button>
       </div>
 

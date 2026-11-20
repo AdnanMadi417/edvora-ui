@@ -28,8 +28,8 @@ export default function TableErrorRow({
               onClick={onRetry}
               className={`mt-4 ${buttonBase} ${buttonVariants.secondary} ${buttonSizes.md}`}
             >
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
               Try again
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
         </div>

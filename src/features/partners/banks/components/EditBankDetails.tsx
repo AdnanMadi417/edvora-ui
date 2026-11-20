@@ -204,7 +204,7 @@ export default function EditBankDetails({
         emptyAction={
           <Button
             onClick={handleBack}
-            icon={<ChevronLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ChevronLeft className="h-4 w-4" />}
             text="Back to banks"
             variant="secondary"
           />

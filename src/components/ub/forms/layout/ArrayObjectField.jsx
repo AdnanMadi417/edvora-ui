@@ -125,8 +125,8 @@ const ArrayObjectField = ({
             onClick={addRow}
             className={`${buttonBase} ${buttonVariants.secondary} ${buttonSizes.sm}`}
           >
-            <Plus aria-hidden="true" strokeWidth={2} className="h-4 w-4" />
             <span className="truncate">{addLabel}</span>
+            <Plus aria-hidden="true" strokeWidth={2} className="h-4 w-4" />
           </button>
         </div>
       </div>

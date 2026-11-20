@@ -86,7 +86,7 @@ export default function LanguageCenterDetails({
     <LinkBtn
       href={`${basePath}/language-centers`}
       label="Back to language centres"
-      icon={<ArrowLeft className="h-4 w-4" />}
+      iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
     />
   );
   if (loading || (universitiesLoading && center?.centre_type !== "independent"))

@@ -270,7 +270,7 @@ function DetailsStep({ formData, errors, update, requiredFieldKeys, qualificatio
               Education
             </h3>
             <TextButton
-              leadingIcon="plus"
+              trailingIcon="plus"
               disabled={!canAddEdu}
               onClick={() => update("student.previous_educations", [...s.previous_educations, { qualification: "", institution_name: "", start_date: "", end_date: "", grade: "" }])}
             >
@@ -454,7 +454,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
         </p>
         <div className="grid grid-cols-2 gap-2 sm:flex [&>button]:min-h-[44px]">
           {saveDraft && <Button variant="secondary" text="Save draft" icon={<Save className="h-4 w-4" aria-hidden="true" />} onClick={() => saveDraft()} disabled={submitting} className="col-span-2 sm:col-span-1" />}
-          {index > 0 ? <Button variant="secondary" text="Back" icon={<ArrowLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => move(back)} disabled={submitting} /> : <span />}
+          {index > 0 ? <Button variant="secondary" text="Back" iconPosition="start" icon={<ArrowLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => move(back)} disabled={submitting} /> : <span />}
           {last ? (
             <Button variant="primary" text="Submit application" icon={<Send className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => submit()} loading={submitting} />
           ) : (

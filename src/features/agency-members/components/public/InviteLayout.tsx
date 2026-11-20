@@ -42,8 +42,8 @@ export function SupportLink({ className }: { className?: string }) {
     <p className={clsx("text-ub-body-sm text-ub-text-secondary", className)}>
       Still stuck?{" "}
       <a href={SUPPORT_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={inviteTextLink}>
-        <MessageCircle className="h-4 w-4" aria-hidden="true" />
         Message Unibexs support
+        <MessageCircle className="h-4 w-4" aria-hidden="true" />
         <span className="sr-only"> on WhatsApp (opens in a new tab)</span>
       </a>
     </p>

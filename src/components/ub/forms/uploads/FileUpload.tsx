@@ -311,7 +311,7 @@ function FileRow({
         {item.status !== "uploading" && item.status !== "verified" && (
           <TextButton
             size="sm"
-            leadingIcon="upload"
+            trailingIcon="upload"
             className="mt-2 [@media(pointer:coarse)]:min-h-11"
             disabled={disabled}
             aria-describedby={item.reason ? reasonId : undefined}

@@ -152,7 +152,7 @@ export default function NewCoreForms() {
         </Variant>
         <Variant label="With icons">
           <div className="flex flex-wrap items-center gap-4">
-            <TextButton leadingIcon="download">Download receipt</TextButton>
+            <TextButton trailingIcon="download">Download receipt</TextButton>
             <TextButton trailingIcon="arrow-right" href="#core-forms-new">
               Open Application Tracker
             </TextButton>
@@ -163,7 +163,7 @@ export default function NewCoreForms() {
         </Variant>
         <Variant label="Disabled">
           <div className="flex flex-wrap items-center gap-4">
-            <TextButton disabled leadingIcon="edit">
+            <TextButton disabled trailingIcon="edit">
               Edit application
             </TextButton>
             <TextButton disabled href="#core-forms-new">

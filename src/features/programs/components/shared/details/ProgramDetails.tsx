@@ -190,8 +190,8 @@ export default function ProgramDetails({
                 }}
                 className={`${buttonBase} ${buttonSizes.md} ${buttonVariants.primary}`}
               >
-                <Send className="h-4 w-4" aria-hidden="true" />
                 Apply now
+                <Send className="h-4 w-4" aria-hidden="true" />
               </Link>
             )}
             {editPath && (

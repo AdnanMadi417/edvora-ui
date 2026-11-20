@@ -570,8 +570,8 @@ export default function DataTable<T>({
             onClick={clearSelection}
             className={`inline-flex h-8 items-center gap-1.5 rounded-ub-full px-3 text-ub-label-md text-ub-text-link hover:bg-ub-action-secondary-hover ${focusRing}`}
           >
-            <X aria-hidden="true" className="h-4 w-4" />
             Clear selection
+            <X aria-hidden="true" className="h-4 w-4" />
           </button>
         </div>
       )}

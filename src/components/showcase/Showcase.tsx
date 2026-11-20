@@ -145,8 +145,8 @@ export function CodeBlock({ label, code }: { label: string; code: string }) {
           aria-label={`Copy ${label.toLowerCase()}`}
           className="inline-flex h-7 items-center gap-1 rounded-ub-full px-2.5 text-ub-label-sm text-ub-text-link transition-colors duration-ub-fast hover:bg-ub-action-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
         >
-          {copied ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
           {copied ? "Copied" : "Copy"}
+          {copied ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
         </button>
       </div>
       <pre dir="ltr" className="overflow-x-auto rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-caption leading-5 text-ub-text-primary">

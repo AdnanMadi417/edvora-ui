@@ -6,6 +6,8 @@ type PillButtonProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   icon?: ReactNode;
+  /** Icons sit after the text; "start" only for Back / Previous, where the arrow points the way you go. */
+  iconPosition?: "start" | "end";
   text?: string;
   /** Design-system variant (brief §4.1). Defaults to "secondary" when no legacy colour props are passed. */
   variant?: ButtonVariant;
@@ -29,6 +31,7 @@ const PillButton: React.FC<PillButtonProps> = ({
   onClick,
   disabled,
   icon,
+  iconPosition = "end",
   text,
   variant,
   size = "lg",
@@ -58,8 +61,9 @@ const PillButton: React.FC<PillButtonProps> = ({
       title={title}
       className={`${buttonBase} ${buttonSizes[size]} ${colors} ${className || ""}`}
     >
-      {icon && <span className="flex shrink-0 items-center">{icon}</span>}
+      {icon && iconPosition === "start" && <span className="flex shrink-0 items-center">{icon}</span>}
       {text && <span className="truncate">{text}</span>}
+      {icon && iconPosition === "end" && <span className="flex shrink-0 items-center">{icon}</span>}
     </button>
   );
 };

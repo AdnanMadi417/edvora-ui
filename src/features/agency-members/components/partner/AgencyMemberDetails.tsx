@@ -241,8 +241,8 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-ub-border px-3 py-1.5 text-xs font-medium text-ub-text-secondary transition hover:bg-ub-surface-subtle"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
             Retry
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         }
       />

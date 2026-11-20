@@ -180,8 +180,8 @@ const SectionCard = forwardRef<HTMLElement, SectionCardProps>(
                       buttonVariants.secondary
                     )}
                   >
-                    <RotateCw className="h-4 w-4" aria-hidden="true" />
                     Try again
+                    <RotateCw className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>

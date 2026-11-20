@@ -41,7 +41,7 @@ export default function BankDetails({
             href={basePath}
             title="Back to banks"
             variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
           />
         }
       />

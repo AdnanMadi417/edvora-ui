@@ -36,7 +36,7 @@ export default function UniversityProfile({
           <LinkBtn
             href={basePath}
             label="Back to universities"
-            icon={<ArrowLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
           />
         }
       />

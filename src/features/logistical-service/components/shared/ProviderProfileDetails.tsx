@@ -79,7 +79,7 @@ export default function ProviderProfileDetails({
             href={basePath}
             title="Back to providers"
             variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
           />
         }
       />

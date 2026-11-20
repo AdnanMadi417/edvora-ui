@@ -31,8 +31,8 @@ export default function FilterButton({ onClick, count = 0, label = "Filters", ex
       title={name}
       className={`${buttonBase} ${buttonSizes.md} ${buttonVariants.secondary} relative shrink-0 max-sm:w-11 max-sm:px-0 ${className}`}
     >
-      <SlidersHorizontal aria-hidden="true" className="h-4 w-4 shrink-0" />
       <span className="sr-only sm:not-sr-only sm:truncate">{name}</span>
+      <SlidersHorizontal aria-hidden="true" className="h-4 w-4 shrink-0" />
       {count > 0 && (
         <span
           aria-hidden="true"

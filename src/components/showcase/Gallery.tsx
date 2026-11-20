@@ -82,8 +82,8 @@ export default function Gallery() {
                 aria-pressed={dir === "rtl"}
                 className={clsx(buttonBase, buttonVariants.secondary, buttonSizes.sm)}
               >
-                <Languages className="h-4 w-4" aria-hidden />
                 {dir === "ltr" ? "RTL" : "LTR"}
+                <Languages className="h-4 w-4" aria-hidden />
               </button>
               <ThemeSwitcher className="hidden w-64 md:grid" />
               <ThemeToggle className="md:hidden" />

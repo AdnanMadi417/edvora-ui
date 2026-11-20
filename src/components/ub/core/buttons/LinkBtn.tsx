@@ -9,6 +9,8 @@ type IconLinkBtnProps = {
   rel?: string;
   children?: ReactNode;
   icon: ReactNode;
+  /** Icons sit after the text; "start" only for Back / Previous, where the arrow points the way you go. */
+  iconPosition?: "start" | "end";
   label?: string;
   title?: string;
   className?: string;
@@ -31,6 +33,7 @@ const LinkBtn = ({
   rel,
   children,
   icon,
+  iconPosition = "end",
   label,
   title,
   className,
@@ -53,10 +56,10 @@ const LinkBtn = ({
       aria-label={label ? undefined : title}
       className={`${buttonBase} ${shape} ${colors} ${className || ''}`}
     >
-      {icon}
-
+      {(!label || iconPosition === "start") && icon}
       {label && <span className="whitespace-nowrap">{label}</span>}
       {children}
+      {label && iconPosition === "end" && icon}
     </Link>
   );
 };

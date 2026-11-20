@@ -61,8 +61,8 @@ export default function PartnerPublicProfile({ profile, spacious = false, embedd
       {href && (
         <StickyActionBar aboveBottomNav={false} aria-label="Contact the advisor">
           <a href={href} target="_blank" rel="noopener noreferrer" className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} flex-1`}>
-            <ContactIcon className="h-5 w-5" aria-hidden="true" />
             {draft.contact_label.trim() || DEFAULT_CONTACT_LABEL}
+            <ContactIcon className="h-5 w-5" aria-hidden="true" />
           </a>
         </StickyActionBar>
       )}

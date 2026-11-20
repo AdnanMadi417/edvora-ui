@@ -137,7 +137,7 @@ export default function EditUniversityForm({
           <LinkBtn
             href={listPath}
             label="Back to types"
-            icon={<ArrowLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
           />
         }
       />

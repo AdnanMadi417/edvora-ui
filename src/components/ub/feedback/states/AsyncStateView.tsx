@@ -55,8 +55,8 @@ export default function AsyncStateView({
         action={
           onRetry && (
             <button type="button" onClick={onRetry} className={`${buttonBase} ${buttonVariants.secondary} ${buttonSizes.md}`}>
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
               Try again
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
             </button>
           )
         }

@@ -29,7 +29,7 @@ export default function DocumentTypeDetails({ id }: { id: string }) {
         <LinkBtn
           href={base}
           label="Back to document types"
-          icon={<ArrowLeft className="h-4 w-4" />}
+          iconPosition="start" icon={<ArrowLeft className="h-4 w-4" />}
         />
       </div>
     );

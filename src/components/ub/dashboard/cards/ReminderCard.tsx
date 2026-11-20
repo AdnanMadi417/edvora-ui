@@ -43,13 +43,13 @@ export default function ReminderCard({ heading = "Next up", title, startsAt, loc
         <div className="mt-4">
           {cta.href ? (
             <Link href={cta.href} className={btn}>
-              {cta.icon}
               {cta.label}
+              {cta.icon}
             </Link>
           ) : (
             <button type="button" onClick={cta.onClick} className={btn}>
-              {cta.icon}
               {cta.label}
+              {cta.icon}
             </button>
           )}
         </div>

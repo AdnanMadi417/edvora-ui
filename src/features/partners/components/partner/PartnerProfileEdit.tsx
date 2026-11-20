@@ -470,7 +470,7 @@ export default function EditPartnerProfile() {
             type="button"
             onClick={() => router.push("/partner/profile")}
             disabled={isUpdating}
-            icon={<ChevronLeft className="h-4 w-4" />}
+            iconPosition="start" icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"
             variant="secondary"
             className="hover:bg-ub-surface-subtle"

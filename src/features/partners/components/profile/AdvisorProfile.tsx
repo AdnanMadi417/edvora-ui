@@ -107,7 +107,7 @@ function EditableList({ items, onChange, itemLabel, addLabel, placeholder }: { i
           <IconButton variant="tertiary" size="sm" aria-label={`Remove ${itemLabel.toLowerCase()} ${i + 1}`} icon={<Trash2 className="h-4 w-4" aria-hidden="true" />} onClick={() => onChange(items.filter((_, j) => j !== i))} />
         </div>
       ))}
-      <TextButton leadingIcon="plus" onClick={() => onChange([...items, ""])}>
+      <TextButton trailingIcon="plus" onClick={() => onChange([...items, ""])}>
         {addLabel}
       </TextButton>
     </div>
@@ -143,8 +143,8 @@ export default function AdvisorProfile({ profile, draft, editing = false, spacio
       onClick={(e) => !href && e.preventDefault()}
       className={clsx(buttonBase, buttonVariants.primary, buttonSizes.lg, "w-full", !href && "pointer-events-none opacity-60")}
     >
-      <ContactIcon className="h-5 w-5" aria-hidden="true" />
       {draft.contact_label.trim() || DEFAULT_CONTACT_LABEL}
+      <ContactIcon className="h-5 w-5" aria-hidden="true" />
       <span className="sr-only"> (opens in a new tab)</span>
     </a>
   );
@@ -340,7 +340,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, spacio
                   <Textarea label="Answer" value={f.answer} rows={2} onChange={(v) => onChange({ faqs: draft.faqs.map((x, j) => (j === i ? { ...x, answer: v } : x)) })} />
                 </div>
               ))}
-              <TextButton leadingIcon="plus" onClick={() => onChange({ faqs: [...draft.faqs, { question: "", answer: "" }] })}>
+              <TextButton trailingIcon="plus" onClick={() => onChange({ faqs: [...draft.faqs, { question: "", answer: "" }] })}>
                 Add question
               </TextButton>
             </div>

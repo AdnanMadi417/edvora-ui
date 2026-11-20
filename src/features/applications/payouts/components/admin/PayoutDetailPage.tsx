@@ -86,7 +86,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
           emptySubtitle="It may have been removed, or the link is out of date."
           emptyIcon={Wallet}
           emptyAction={
-            <Button variant="secondary" onClick={handleBack} icon={<ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} text="Back" />
+            <Button variant="secondary" onClick={handleBack} iconPosition="start" icon={<ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} text="Back" />
           }
         >
           <div className="flex items-center gap-4 border-b border-ub-border p-6">

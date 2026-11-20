@@ -202,7 +202,7 @@ export default function DataDisplay() {
 
         <Demo name="FadeIn" path="components/ub/core/motion/FadeIn.tsx">
           <button type="button" onClick={() => setReplay((r) => r + 1)} className="mb-4 inline-flex items-center gap-1.5 text-ub-label-md text-ub-text-link hover:underline">
-            <RefreshCw className="h-4 w-4" aria-hidden /> Replay
+            Replay <RefreshCw className="h-4 w-4" aria-hidden />
           </button>
           <div key={replay} className="grid gap-4 sm:grid-cols-4">
             {(["up", "left", "right", "none"] as const).map((d, i) => (

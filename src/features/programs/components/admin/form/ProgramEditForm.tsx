@@ -833,7 +833,7 @@ const EditKnowledgeHubProgramDetails = ({
             <Button
               onClick={handleBack}
               disabled={updateProgrLoading}
-              icon={<ChevronLeft className="h-5 w-5" />}
+              iconPosition="start" icon={<ChevronLeft className="h-5 w-5" />}
               text={"Back"}
               variant="secondary"
             />

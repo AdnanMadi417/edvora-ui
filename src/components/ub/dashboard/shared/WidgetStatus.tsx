@@ -68,8 +68,8 @@ export default function WidgetStatus({ state, skeleton = "lines", emptyMessage =
         </p>
         {onRetry && (
           <button type="button" onClick={onRetry} className={clsx(buttonBase, buttonSizes.sm, buttonVariants.secondary)}>
-            <RotateCw className="h-4 w-4" aria-hidden="true" />
             Try again
+            <RotateCw className="h-4 w-4" aria-hidden="true" />
           </button>
         )}
       </div>
