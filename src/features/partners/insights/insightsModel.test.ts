@@ -1,4 +1,4 @@
-import { countBy, followUps, growth, kpis, performance, regionOf, type InsightAdvisor } from "./insightsModel";
+import { countBy, followUps, growth, joinedInPeriod, kpis, performance, regionOf, type InsightAdvisor } from "./insightsModel";
 
 const NOW = Date.UTC(2026, 10, 20);
 const days = (n: number) => new Date(NOW - n * 86_400_000).toISOString();
@@ -25,6 +25,8 @@ const list = [
 it("counts total, new in the period and the period before, active and suspended", () => {
   expect(kpis(list, "30d", NOW)).toEqual({ total: 4, newInPeriod: 1, newBefore: 1, active: 3, inactive: 1 });
   expect(kpis(list, "all", NOW).newBefore).toBeNull();
+  // The tile's list: the same Advisors it counts, newest first.
+  expect(joinedInPeriod(list, "90d", NOW).map((a) => a.id)).toEqual(["1", "2"]);
 });
 
 it("maps countries to regions and counts by field, most first", () => {

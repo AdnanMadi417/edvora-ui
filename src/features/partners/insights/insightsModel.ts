@@ -49,7 +49,7 @@ export function kpis(advisors: InsightAdvisor[], period: InsightPeriod, now = Da
   const days = INSIGHT_PERIODS.find((p) => p.key === period)?.days ?? null;
   const created = (a: InsightAdvisor) => (a.created_at ? new Date(a.created_at).getTime() : NaN);
   const inRange = (from: number, to: number) => advisors.filter((a) => created(a) >= from && created(a) < to).length;
-  const newInPeriod = days === null ? advisors.length : inRange(now - days * DAY, now + DAY);
+  const newInPeriod = joinedInPeriod(advisors, period, now).length;
   const before = days === null ? null : inRange(now - 2 * days * DAY, now - days * DAY);
   return {
     total: advisors.length,
@@ -58,6 +58,14 @@ export function kpis(advisors: InsightAdvisor[], period: InsightPeriod, now = Da
     active: advisors.filter((a) => a.is_active).length,
     inactive: advisors.filter((a) => !a.is_active).length,
   };
+}
+
+/** Advisors who joined in the period, newest first (every Advisor for "all"). The New Advisors tile counts these. */
+export function joinedInPeriod(advisors: InsightAdvisor[], period: InsightPeriod, now = Date.now()) {
+  const days = INSIGHT_PERIODS.find((p) => p.key === period)?.days ?? null;
+  const created = (a: InsightAdvisor) => (a.created_at ? new Date(a.created_at).getTime() : NaN);
+  const joined = days === null ? advisors : advisors.filter((a) => created(a) >= now - days * DAY && created(a) < now + DAY);
+  return [...joined].sort((a, b) => (created(b) || 0) - (created(a) || 0));
 }
 
 /** Count by a field, most first; empty values become "Not recorded". */

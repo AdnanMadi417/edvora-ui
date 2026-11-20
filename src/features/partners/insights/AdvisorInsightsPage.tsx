@@ -11,6 +11,7 @@ import DeltaPill from "components/ub/dashboard/shared/DeltaPill";
 import PeopleList, { PeopleListItem } from "components/ub/dashboard/lists/PeopleList";
 import ListFooter from "components/ub/dashboard/lists/ListFooter";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
+import Drawer from "components/ub/feedback/dialogs/Drawer";
 import Tabs from "components/ub/navigation/controls/Tabs";
 import Combobox from "components/ub/forms/selection/Combobox";
 import { useAdvisorInsights } from "./useAdvisorInsights";
@@ -20,6 +21,7 @@ import {
   countBy,
   followUps,
   growth,
+  joinedInPeriod,
   kpis,
   performance,
   regionOf,
@@ -52,8 +54,10 @@ export default function AdvisorInsightsPage() {
   const [grain, setGrain] = useState<GrowthGrain>("monthly");
   const [perf, setPerf] = useState<PerformanceTab>("applications");
   const [showAll, setShowAll] = useState(false);
+  const [newOpen, setNewOpen] = useState(false);
 
   const k = useMemo(() => kpis(advisors, period), [advisors, period]);
+  const joined = useMemo(() => joinedInPeriod(advisors, period), [advisors, period]);
   const perfData = useMemo(() => performance(advisors, applications), [advisors, applications]);
   const follow = useMemo(() => followUps(advisors, perfData.counts), [advisors, perfData]);
   const series = useMemo(() => growth(advisors, grain), [advisors, grain]);
@@ -121,6 +125,11 @@ export default function AdvisorInsightsPage() {
           iconTone="success"
           delta={newDelta !== null ? { value: newDelta, comparedTo: "vs the period before" } : undefined}
           footer={{ text: periodLabel === "all time" ? "All time" : `Joined in the ${periodLabel}` }}
+          // The API can't filter Advisors by join date, so the list opens here.
+          onClick={() => setNewOpen(true)}
+          pressed={newOpen}
+          ariaLabel={`New Advisors: ${k.newInPeriod}. Show the list`}
+          disabled={!k.newInPeriod}
           state={tileState}
         />
         <StatTile label="Active" value={k.active.toLocaleString()} icon={CircleCheck} iconTone="success" footer={{ text: "Can sign in and apply" }} href={`${BASE}?status=active`} state={tileState} />
@@ -209,6 +218,34 @@ export default function AdvisorInsightsPage() {
           emptyMessage={perf === "applications" ? "No applications yet." : "No students have reached enrolment yet."}
         />
       </div>
+
+      <Drawer
+        open={newOpen}
+        onClose={() => setNewOpen(false)}
+        title={`New Advisors (${joined.length})`}
+        description={periodLabel === "all time" ? "Every Advisor, newest first." : `Joined in the ${periodLabel}, newest first.`}
+      >
+        <PeopleList label="New Advisors" count={joined.length}>
+          {joined.map((advisor) => (
+            <PeopleListItem
+              key={advisor.id}
+              name={advisor.name}
+              work={[
+                TYPE_LABEL[advisor.type] ?? advisor.type,
+                advisor.country,
+                advisor.created_at && `Joined ${new Date(advisor.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+              status={advisor.is_active ? "active" : "suspended"}
+              statusLabel={!advisor.is_verified ? "Awaiting review" : advisor.is_active ? "Active" : "Suspended"}
+              statusTone={!advisor.is_verified ? "warning" : advisor.is_active ? "success" : "danger"}
+              href={`${BASE}/${encodeURIComponent(advisor.id)}`}
+              hrefLabel="Open Advisor"
+            />
+          ))}
+        </PeopleList>
+      </Drawer>
 
       {/* 5. Follow-up */}
       <DashboardCard
