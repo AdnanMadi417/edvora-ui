@@ -39,7 +39,9 @@ it("toggles a stage filter on and off", async () => {
 it("links each stage when getHref is given, and the list layout drops the columns", () => {
   render(<PipelineFlow stages={stages} layout="list" getHref={(s) => `/partner/applications?stage=${s.id}`} />);
   expect(screen.getByRole("link", { name: /^Visa:/ })).toHaveAttribute("href", "/partner/applications?stage=visa");
-  expect(screen.getByRole("list")).toHaveAttribute("data-layout", "list");
+  // On narrow screens: one bar split by stage over a compact legend.
+  expect(screen.getByRole("list").closest("[data-layout]")).toHaveAttribute("data-layout", "list");
+  expect(screen.getByText("applications")).toBeInTheDocument();
 });
 
 it("reads ?stage= as a stage id, a stage code or 'commission'", () => {

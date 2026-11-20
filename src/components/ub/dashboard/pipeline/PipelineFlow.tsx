@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import { focusRing } from "components/ub/recipes";
 import StatTile from "components/ub/dashboard/cards/StatTile";
 import { useMediaQuery } from "hooks/useMediaQuery";
+import { CHART_PALETTE, CHART_OTHER } from "config/chartPalette";
+import { SEGMENT_CLASS, SEGMENT_ROW_CLASS } from "../charts/segments";
 
 export interface PipelineFlowStage {
   /** Your id for the stage, returned by onSelect. */
@@ -47,9 +49,9 @@ const COLS: Record<number, string> = {
 /**
  * Applications by stage, in workflow order. From 1024px each stage is a
  * StatTile (the same card as the home KPIs): stage name, count and a footer
- * with its share. On tablets, phones and narrow cards: a
- * vertical list with a share bar and the count on the end; never a squeezed
- * strip. No per-stage colours and no badges: the name and the count carry it.
+ * with its share. On tablets, phones and narrow cards: one simple chart, a
+ * single bar split by stage (the same stage colours as the home pipeline
+ * donut) over a compact legend of name, count and share.
  * With onSelect each stage toggles a filter; with getHref it opens a link.
  */
 export default function PipelineFlow({
@@ -99,52 +101,66 @@ export default function PipelineFlow({
       </ol>
     );
 
+  // Stages keep their workflow position's colour, as on the home donut.
+  const colorOf = (index: number) => CHART_PALETTE[index] ?? CHART_OTHER;
+  const interactive = Boolean(onSelect || getHref);
   return (
-    <ol aria-label={label} data-layout="list" className={clsx("grid gap-2", className)}>
-      {rows.map(({ s, share, selected, empty, name }) => {
-        const interactive = Boolean(onSelect || getHref);
-        const body: ReactNode = (
-          <>
-            <span className="min-w-0 flex-1">
-              <span title={s.label} className="block truncate text-ub-label-md text-ub-text-primary">
+    <div data-layout="list" className={clsx("min-w-0", className)}>
+      <p className="ub-tabular text-ub-caption text-ub-text-secondary">
+        <span className="text-ub-label-md text-ub-text-primary">{total.toLocaleString()}</span> {unit}
+      </p>
+      {/* One bar for the whole pipeline: each stage a segment, in workflow order. */}
+      <div aria-hidden="true" className={clsx("mt-2 h-2.5", SEGMENT_ROW_CLASS, total === 0 && "rounded-ub-xs bg-ub-chart-track")}>
+        {rows.map(({ s, selected }, index) =>
+          s.count > 0 ? (
+            <span
+              key={s.id}
+              className={clsx(SEGMENT_CLASS, selectedId && !selected && "opacity-40")}
+              style={{ flexGrow: s.count, flexBasis: 0, background: colorOf(index) }}
+            />
+          ) : null
+        )}
+      </div>
+      <ol aria-label={label} className="mt-2 grid">
+        {rows.map(({ s, share, selected, empty, name }, index) => {
+          const body: ReactNode = (
+            <>
+              <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: colorOf(index) }} />
+              <span title={s.label} className="min-w-0 flex-1 truncate text-ub-body-sm text-ub-text-primary">
                 {s.label}
               </span>
-              {/* The share as a bar under the name, in the one brand colour. */}
-              <span aria-hidden="true" className="mt-1.5 block h-1.5 overflow-hidden rounded-ub-full bg-ub-border">
-                <span className="block h-full rounded-ub-full bg-ub-action-primary" style={{ width: `${share}%` }} />
+              <span className={clsx("ub-tabular shrink-0 text-ub-label-md", empty ? "text-ub-text-tertiary" : "text-ub-text-primary")}>
+                {s.count.toLocaleString()}
               </span>
-            </span>
-            <span className="flex shrink-0 flex-col items-end gap-1">
-              <span className={clsx("ub-tabular text-ub-heading-sm", empty ? "text-ub-text-tertiary" : "text-ub-text-primary")}>{s.count.toLocaleString()}</span>
-              <span className="ub-tabular text-ub-caption text-ub-text-tertiary">{share}%</span>
-            </span>
-          </>
-        );
-        const cell = clsx(
-          "flex h-full min-h-14 w-full min-w-0 items-center gap-3 rounded-ub-lg border px-3 py-2.5 text-start",
-          "transition-colors duration-ub-base motion-reduce:transition-none",
-          selected ? "border-ub-border-focus bg-ub-selected ring-1 ring-inset ring-ub-border-focus" : "border-ub-border bg-ub-surface",
-          interactive && !selected && "hover:border-ub-border-hover hover:bg-ub-surface-subtle",
-          interactive && focusRing
-        );
-        return (
-          <li key={s.id} className="min-w-0">
-            {getHref ? (
-              <Link href={getHref(s)} aria-label={name} className={cell}>
-                {body}
-              </Link>
-            ) : onSelect ? (
-              <button type="button" aria-pressed={selected} aria-label={name} onClick={() => onSelect(selected ? null : s.id)} className={cell}>
-                {body}
-              </button>
-            ) : (
-              <div role="group" aria-label={name} className={cell}>
-                {body}
-              </div>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+              <span className="ub-tabular w-10 shrink-0 text-end text-ub-caption text-ub-text-tertiary">{share}%</span>
+            </>
+          );
+          const cell = clsx(
+            "-mx-2 flex min-h-11 w-[calc(100%+1rem)] min-w-0 items-center gap-3 rounded-ub-md px-2 text-start",
+            "transition-colors duration-ub-fast motion-reduce:transition-none",
+            selected && "bg-ub-selected",
+            interactive && !selected && "hover:bg-ub-surface-subtle",
+            interactive && focusRing
+          );
+          return (
+            <li key={s.id} className="min-w-0">
+              {getHref ? (
+                <Link href={getHref(s)} aria-label={name} className={cell}>
+                  {body}
+                </Link>
+              ) : onSelect ? (
+                <button type="button" aria-pressed={selected} aria-label={name} onClick={() => onSelect(selected ? null : s.id)} className={cell}>
+                  {body}
+                </button>
+              ) : (
+                <div role="group" aria-label={name} className={cell}>
+                  {body}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
