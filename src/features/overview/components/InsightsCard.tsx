@@ -4,7 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import CompositionCard from "components/ub/dashboard/cards/CompositionCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import RankedBars from "components/ub/dashboard/charts/RankedBars";
-import CategoryColumnChart from "components/ub/dashboard/charts/CategoryColumnChart";
+import AreaLineChart from "components/ub/dashboard/charts/AreaLineChart";
+import DeltaPill from "components/ub/dashboard/shared/DeltaPill";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import { CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
 import type { OverviewResource, OverviewRole } from "../model/types";
@@ -12,10 +13,10 @@ import type { OverviewResource, OverviewRole } from "../model/types";
 type InsightTab = "stage" | "level" | "trend" | "countries" | "advisors";
 type Period = "daily" | "weekly" | "monthly";
 
-const PERIODS: { key: Period; label: string; range: string }[] = [
-  { key: "daily", label: "Daily", range: "last 14 days" },
-  { key: "weekly", label: "Weekly", range: "last 12 weeks" },
-  { key: "monthly", label: "Monthly", range: "last 12 months" },
+const PERIODS: { key: Period; label: string; range: string; previous: string }[] = [
+  { key: "daily", label: "Daily", range: "last 14 days", previous: "vs the day before" },
+  { key: "weekly", label: "Weekly", range: "last 12 weeks", previous: "vs the week before" },
+  { key: "monthly", label: "Monthly", range: "last 12 months", previous: "vs the month before" },
 ];
 
 // One quiet line under the tabs saying what the numbers count.
@@ -77,7 +78,9 @@ export default function InsightsCard({
       <p className="mt-3 text-ub-caption text-ub-text-tertiary">{CAPTIONS[tab]}</p>
     </>
   );
+  // Only the body settles in on a tab change; title and tabs stay still.
   const common = { title: "Insights", controls, onRetry, as: "h2" as const };
+  const body = { className: "ub-fade-up" };
   const panel = (node: React.ReactNode) => <div {...tabPanelProps(id, tab)}>{node}</div>;
 
   if (tab === "level") {
@@ -85,6 +88,7 @@ export default function InsightsCard({
     return panel(
       <CompositionCard
         {...common}
+        bodyClassName={body.className}
         unit="applications"
         centerLabel="With a study level"
         items={res?.data?.studyLevels?.levels ?? []}
@@ -100,6 +104,7 @@ export default function InsightsCard({
     return panel(
       <CompositionCard
         {...common}
+        bodyClassName={body.className}
         unit="applications"
         centerLabel="Active applications"
         keepOrder
@@ -118,22 +123,27 @@ export default function InsightsCard({
 
   if (tab === "trend") {
     const res = resources.overTime;
-    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.trend} />);
+    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} bodyProps={body} state="empty" emptyMessage={NOT_YET.trend} />);
     const series = res?.data?.overTime?.[period] ?? [];
     const current = PERIODS.find((p) => p.key === period)!;
+    // Latest period vs the one before it; none when the one before was 0 (no meaningful %).
+    const last = series[series.length - 1]?.value ?? 0;
+    const before = series[series.length - 2]?.value ?? 0;
+    const delta = before > 0 ? Math.round(((last - before) / before) * 1000) / 10 : null;
     return panel(
-      <DashboardCard {...common} state={res?.state ?? "loading"} errorMessage={res?.error} skeleton="chart">
-        <div className="mb-4 flex justify-end">
+      <DashboardCard {...common} bodyProps={body} state={res?.state ?? "loading"} errorMessage={res?.error} skeleton="chart">
+        {/* Period on the start, the change vs the period before on the end. */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <Tabs<Period> aria-label="Period" variant="segmented" size="sm" tabs={PERIODS} active={period} onChange={setPeriod} />
+          {delta !== null && <DeltaPill value={delta} comparedTo={current.previous} />}
         </div>
         {series.some((b) => b.value) ? (
-          <CategoryColumnChart
-            data={series}
-            unit="applications"
+          <AreaLineChart
+            curve="linear"
+            markers
+            points={series}
             label={`Active applications by date submitted, ${current.range}`}
-            // The latest period that has applications, so the highlighted value is never a bare 0.
-            highlightKey={[...series].reverse().find((b) => b.value > 0)?.key}
-            compact={series.length > 12}
+            formatValue={(v) => `${v.toLocaleString()} ${v === 1 ? "application" : "applications"}`}
           />
         ) : (
           <p className="py-10 text-center text-ub-body-sm text-ub-text-secondary">No applications submitted in the {current.range}.</p>
@@ -144,11 +154,12 @@ export default function InsightsCard({
 
   if (tab === "countries") {
     const res = resources.topCountries;
-    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET.countries} />);
+    if (res?.state === "ready" && res.data?.unavailable) return panel(<DashboardCard {...common} bodyProps={body} state="empty" emptyMessage={NOT_YET.countries} />);
     const countries = res?.data?.byCountry ?? [];
     return panel(
       <DashboardCard
         {...common}
+        bodyProps={body}
         state={res?.state === "ready" && !countries.length ? "empty" : res?.state ?? "loading"}
         errorMessage={res?.error}
         emptyMessage="No active applications yet."
@@ -168,6 +179,7 @@ export default function InsightsCard({
     return panel(
       <DashboardCard
         {...common}
+        bodyProps={body}
         state={res?.state === "ready" && !items.length ? "empty" : res?.state ?? "loading"}
         errorMessage={res?.error}
         emptyMessage="No active applications yet."
@@ -178,5 +190,5 @@ export default function InsightsCard({
     );
   }
 
-  return panel(<DashboardCard {...common} state="empty" emptyMessage={NOT_YET[tab]} />);
+  return panel(<DashboardCard {...common} bodyProps={body} state="empty" emptyMessage={NOT_YET[tab]} />);
 }

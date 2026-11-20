@@ -40,11 +40,13 @@ it("draws the monthly and country views when the list sends the data", async () 
   const user = userEvent.setup();
   render(<InsightsCard role="admin" base="/admin" resources={resources} onRetry={jest.fn()} />);
   await user.click(screen.getByRole("tab", { name: "Over time" }));
-  expect(screen.getByRole("list", { name: /last 12 months/ })).toBeInTheDocument();
+  // A line over the period, and the latest period against the one before (Nov 6 vs Oct 4).
+  expect(screen.getByRole("group", { name: /last 12 months/ })).toBeInTheDocument();
+  expect(screen.getByText("+50%")).toBeInTheDocument();
   await user.click(screen.getByRole("tab", { name: "Weekly" }));
-  expect(screen.getByRole("listitem", { name: "17/11: 5 applications" })).toBeInTheDocument();
+  expect(screen.getByRole("table", { name: /last 12 weeks/ })).toHaveTextContent("17/11");
   await user.click(screen.getByRole("tab", { name: "Daily" }));
-  expect(screen.getByRole("list", { name: /last 14 days/ })).toBeInTheDocument();
+  expect(screen.getByRole("group", { name: /last 14 days/ })).toBeInTheDocument();
   await user.click(screen.getByRole("tab", { name: "Top countries" }));
   expect(screen.getByText("1. Nigeria: 6 applications, 60.0%")).toBeInTheDocument();
 });
