@@ -296,6 +296,9 @@ export default function DummyDashboard() {
               title="Applications by field of study"
               subtitle="What new applicants want to study · January to September 2026"
               unit="applications"
+              // The top five fields, then the rest in one row.
+              top={5}
+              restLabel={(n) => `Others (${n} fields)`}
               centerLabel="Applications with a field recorded"
               summary={{ value: 81101, label: "Applications", detail: "27,557 with a field + 53,544 not recorded" }}
               items={SAMPLE_FIELDS.map(([label, value]) => ({ key: label, label, value }))}

@@ -63,6 +63,10 @@ export interface CompositionCardProps {
   percentDigits?: number;
   /** Legend columns beside the donut: 2 for full-width pages, 1 in narrower columns (e.g. home). */
   legendColumns?: 1 | 2;
+  /** Ranked layout: the top N parts, then the rest in one "Others" row (default: every part). */
+  top?: number;
+  /** Label for that row, e.g. (n) => `Other fields (${n})`. */
+  restLabel?: (count: number) => string;
   formatValue?: (value: number) => string;
   actions?: ReactNode;
   /** Under the title, e.g. tabs that switch what the card shows. */
@@ -99,6 +103,8 @@ export default function CompositionCard({
   layout,
   percentDigits = 1,
   legendColumns = 2,
+  top,
+  restLabel,
   formatValue = num,
   actions,
   controls,
@@ -277,7 +283,8 @@ export default function CompositionCard({
             items={items}
             unit={unit}
             label={centerLabel}
-            top={Number.POSITIVE_INFINITY}
+            top={top ? top + 1 : Number.POSITIVE_INFINITY}
+            restLabel={restLabel}
             percentDigits={percentDigits}
             formatValue={formatValue}
           />
