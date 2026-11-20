@@ -267,9 +267,10 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
         </Alert>
       )}
       <div className={`grid grid-cols-2 gap-3 ${KPI_COLS[metrics.length] ?? "lg:grid-cols-4"}`}>{kpis}</div>
+      {/* Study level mix: its own full-width row under the KPIs. */}
+      {plans.some((plan) => plan.id === "studyLevels") && <StudyLevelCard resource={resources.studyLevels} onRetry={refresh} />}
       <div className="grid min-w-0 items-start gap-5 lg:grid-cols-3">
         <section aria-label="Work" className="flex min-w-0 flex-col gap-5 lg:col-span-2">
-          {plans.some((plan) => plan.id === "studyLevels") && <StudyLevelCard resource={resources.studyLevels} onRetry={refresh} />}
           {config.panels.map(panel)}
         </section>
         <aside aria-label="Context" className="flex min-w-0 flex-col gap-5">

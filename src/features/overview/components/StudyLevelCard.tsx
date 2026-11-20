@@ -12,8 +12,6 @@ export default function StudyLevelCard({ resource, onRetry }: { resource?: Overv
       subtitle="Active applications by the program's study level."
       unit="applications"
       centerLabel="With a study level"
-      // The home's work column is narrower than a full page: one legend column keeps names whole.
-      legendColumns={1}
       items={mix?.levels ?? []}
       state={resource?.state ?? "loading"}
       errorMessage={resource?.error}
