@@ -150,20 +150,20 @@ export function performance(advisors: InsightAdvisor[], applications: InsightApp
   return { applications: rank(apps), enrolled: rank(enrolled), counts: apps };
 }
 
-export type FollowUpReason = "Awaiting review" | "Suspended" | "No applications" | "No recent login";
+export type FollowUpReason = "Suspended" | "No applications" | "No recent login";
 
 /**
- * Advisors to follow up, one row each with the most urgent reason:
- * awaiting review, suspended, active with no applications, or no login in 60+ days.
+ * Advisors to follow up, one row each with the most urgent reason: suspended,
+ * active with no applications, or no login in 60+ days. Advisors awaiting
+ * review are left out: the home page's review list holds them.
  */
 export function followUps(advisors: InsightAdvisor[], appCounts: Map<string, number>, now = Date.now()) {
   const rows: { advisor: InsightAdvisor; reason: FollowUpReason; days: number | null }[] = [];
   for (const a of advisors) {
+    if (!a.is_verified) continue;
     const since = (iso: string | null) => (iso ? Math.max(0, Math.floor((now - new Date(iso).getTime()) / DAY)) : null);
     const login = since(a.last_login);
-    const reason: FollowUpReason | null = !a.is_verified
-      ? "Awaiting review"
-      : !a.is_active
+    const reason: FollowUpReason | null = !a.is_active
       ? "Suspended"
       : !appCounts.get(a.id)
       ? "No applications"
@@ -172,6 +172,6 @@ export function followUps(advisors: InsightAdvisor[], appCounts: Map<string, num
       : null;
     if (reason) rows.push({ advisor: a, reason, days: reason === "No recent login" ? login : since(a.created_at) });
   }
-  const order: FollowUpReason[] = ["Awaiting review", "Suspended", "No applications", "No recent login"];
+  const order: FollowUpReason[] = ["Suspended", "No applications", "No recent login"];
   return rows.sort((x, y) => order.indexOf(x.reason) - order.indexOf(y.reason) || (y.days ?? 0) - (x.days ?? 0));
 }

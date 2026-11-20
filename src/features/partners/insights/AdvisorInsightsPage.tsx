@@ -38,7 +38,7 @@ const GRAINS: { key: GrowthGrain; label: string; previous: string; range: string
   { key: "monthly", label: "Monthly", previous: "vs the month before", range: "last 12 months" },
   { key: "quarterly", label: "Quarterly", previous: "vs the quarter before", range: "last 8 quarters" },
 ];
-const FOLLOW_UP_TONE = { "Awaiting review": "warning", Suspended: "danger", "No applications": "warning", "No recent login": "neutral" } as const;
+const FOLLOW_UP_TONE = { Suspended: "danger", "No applications": "warning", "No recent login": "neutral" } as const;
 
 /**
  * Advisor insights (admin): who the Advisors are, where they are, how the
@@ -213,10 +213,10 @@ export default function AdvisorInsightsPage() {
       {/* 5. Follow-up */}
       <DashboardCard
         title="Advisors to follow up"
-        subtitle="Awaiting review, suspended, no applications yet, or no sign-in for 60 days."
+        subtitle="Suspended, no applications yet, or no sign-in for 60 days. Advisors awaiting review are on Home."
         as="h2"
         state={state === "ready" && !follow.length ? "empty" : state}
-        emptyMessage="Every Advisor is verified, active, applying and signing in."
+        emptyMessage="Every verified Advisor is active, applying and signing in."
         onRetry={retry}
         skeleton="list"
         footer={

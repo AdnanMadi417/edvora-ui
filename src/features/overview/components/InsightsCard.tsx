@@ -7,10 +7,11 @@ import RankedBars from "components/ub/dashboard/charts/RankedBars";
 import AreaLineChart from "components/ub/dashboard/charts/AreaLineChart";
 import DeltaPill from "components/ub/dashboard/shared/DeltaPill";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
-import { BookOpen, CalendarDays, Globe2, GraduationCap, Layers, Users } from "lucide-react";
+import { BookOpen, CalendarDays, Globe2, GraduationCap, Layers } from "lucide-react";
+import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import type { OverviewResource, OverviewRole } from "../model/types";
 
-type InsightTab = "stage" | "level" | "field" | "trend" | "countries" | "advisors";
+type InsightTab = "stage" | "level" | "field" | "trend" | "countries";
 type Period = "daily" | "weekly" | "monthly";
 
 const PERIODS: { key: Period; label: string; range: string; previous: string }[] = [
@@ -26,7 +27,6 @@ const CAPTIONS: Record<InsightTab, string> = {
   stage: "Active applications by their current stage, in workflow order.",
   trend: "Active applications by the date they were submitted.",
   countries: "Where active applicants come from.",
-  advisors: "Advisors with the most active applications.",
 };
 
 // Shown when the API doesn't send the field a chart needs (the mock API does, for testing).
@@ -38,7 +38,7 @@ const NOT_YET: Partial<Record<InsightTab, string>> = {
 /**
  * One full-width card on the home: different views of the active
  * applications, one tab each (study level, stage, month, country, Advisor).
- * Staff see Top Advisors; Advisors don't. The stage tab replaces the
+ * Admins get a link to Advisor insights (top Advisors live there). The stage tab replaces the
  * separate pipeline card, so stages show once.
  */
 export default function InsightsCard({
@@ -60,7 +60,6 @@ export default function InsightsCard({
     { key: "field" as const, label: "Field of study", icon: BookOpen },
     { key: "trend" as const, label: "Over time", icon: CalendarDays },
     { key: "countries" as const, label: "Top countries", icon: Globe2 },
-    ...(role === "partner" ? [] : [{ key: "advisors" as const, label: "Top Advisors", icon: Users }]),
   ];
   const [tab, setTab] = useState<InsightTab>("stage");
   const [period, setPeriod] = useState<Period>("monthly");
@@ -81,7 +80,9 @@ export default function InsightsCard({
     </>
   );
   // Only the body settles in on a tab change; title and tabs stay still.
-  const common = { title: "Insights", controls, onRetry, as: "h2" as const };
+  // Advisor rankings and demographics live once, on the admin Advisor insights page.
+  const actions = role === "admin" ? <CardLinkButton href="/admin/advisor-insights" label="Open Advisor insights" /> : undefined;
+  const common = { title: "Insights", controls, actions, onRetry, as: "h2" as const };
   const body = { className: "ub-fade-up" };
   const panel = (node: React.ReactNode) => <div {...tabPanelProps(id, tab)}>{node}</div>;
 
@@ -189,26 +190,6 @@ export default function InsightsCard({
         skeleton="list"
       >
         <RankedBars items={countries} unit="applications" label="Top countries" top={10} restLabel={(n) => `Other countries (${n})`} />
-      </DashboardCard>
-    );
-  }
-
-  if (tab === "advisors") {
-    const res = resources.topAdvisors;
-    const items = (res?.data?.byAdvisor ?? []).map((advisor) => ({
-      ...advisor,
-      href: `${base}/advisors/${encodeURIComponent(advisor.key)}`,
-    }));
-    return panel(
-      <DashboardCard
-        {...common}
-        bodyProps={body}
-        state={res?.state === "ready" && !items.length ? "empty" : res?.state ?? "loading"}
-        errorMessage={res?.error}
-        emptyMessage="No active applications yet."
-        skeleton="list"
-      >
-        <RankedBars items={items} unit="applications" label="Top Advisors" top={10} restLabel={(n) => `Other Advisors (${n})`} />
       </DashboardCard>
     );
   }

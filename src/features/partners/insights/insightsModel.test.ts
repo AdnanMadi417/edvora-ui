@@ -51,5 +51,6 @@ it("ranks performance and lists follow-ups by urgency", () => {
   expect(perf.applications[0]).toMatchObject({ key: "1", value: 2 });
   expect(perf.enrolled).toEqual([{ key: "1", label: "Advisor", value: 1 }]);
   const reasons = followUps(list, perf.counts, NOW).map((r) => `${r.advisor.id}:${r.reason}`);
-  expect(reasons).toEqual(["4:Awaiting review", "3:Suspended"]);
+  // Advisor 4 is awaiting review: that list is on Home, not here.
+  expect(reasons).toEqual(["3:Suspended"]);
 });
