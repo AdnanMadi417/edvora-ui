@@ -85,6 +85,14 @@ export interface PaymentMethod {
 
 export type WaitingOn = "us" | "university" | "nobody" | "disputed";
 
+/** How each state reads in the Finance Queue and its insights. */
+export const WAITING_ON_LABEL: Record<WaitingOn, string> = {
+  university: "Waiting on University",
+  us: "Waiting on Us",
+  nobody: "Settled",
+  disputed: "Disputed",
+};
+
 /** A row in the admin Finance Queue — one per `ApplicationCommission`. Three
  *  independent amounts: `commission_*` is the agreed figure (fixed at
  *  application creation), `received_*` is what the university actually sent

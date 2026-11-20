@@ -45,8 +45,9 @@ import {
   type RecordPayInRow,
 } from "features/applications/pay-ins";
 import { useCommissionQueue } from "../../hooks";
-import type { CommissionQueueItem, WaitingOn } from "../../types";
+import { WAITING_ON_LABEL, type CommissionQueueItem, type WaitingOn } from "../../types";
 import BatchPayout, { type BatchPayoutLine } from "./BatchPayout";
+import FinanceInsights from "../../insights/FinanceInsights";
 import FilterButton from "components/ub/core/buttons/FilterButton";
 
 const PAGE_SIZE = 20;
@@ -58,12 +59,6 @@ const WAITING_ON_VARIANT: Record<WaitingOn, StatusBadgeVariant> = {
   disputed: "danger",
 };
 
-const WAITING_ON_LABEL: Record<WaitingOn, string> = {
-  university: "Waiting on University",
-  us: "Waiting on Us",
-  nobody: "Settled",
-  disputed: "Disputed",
-};
 
 const WAITING_ON_OPTIONS = [
   { value: "university", label: "Waiting on university" },
@@ -360,6 +355,11 @@ export default function FinanceQueuePage() {
   };
 
   return (
+    <>
+    {/* Commission at a glance above the queue (finance). */}
+    <div className="mt-5">
+      <FinanceInsights />
+    </div>
     <section className="mx-auto mt-5 min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
       <header className="flex items-start gap-3 border-b border-ub-border p-4 sm:p-6">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg text-ub-tone-brand-text">
@@ -727,5 +727,6 @@ export default function FinanceQueuePage() {
         )}
       </Drawer>
     </section>
+    </>
   );
 }
