@@ -163,6 +163,7 @@ export default function InsightsCard({
           <AreaLineChart
             curve="linear"
             markers
+            wholeNumbers
             points={series}
             label={`Active applications by date submitted, ${current.range}`}
             formatValue={(v) => `${v.toLocaleString()} ${v === 1 ? "application" : "applications"}`}

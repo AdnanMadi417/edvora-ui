@@ -23,6 +23,8 @@ export interface AreaLineChartProps {
   curve?: "smooth" | "linear";
   /** A dot on every point (otherwise only the hovered one). */
   markers?: boolean;
+  /** Counts: the axis shows whole numbers only (no 2.5). */
+  wholeNumbers?: boolean;
   className?: string;
 }
 
@@ -49,14 +51,14 @@ function smooth(xy: [number, number][], floor: number): string {
  * colour, recessive gridlines, one axis. Hover, or focus and use the arrow
  * keys, for a crosshair and the value; a hidden table has every point.
  */
-export default function AreaLineChart({ points, label, formatValue = (v) => v.toLocaleString(), heightClass = "h-56", curve = "smooth", markers = false, className }: AreaLineChartProps) {
+export default function AreaLineChart({ points, label, formatValue = (v) => v.toLocaleString(), heightClass = "h-56", curve = "smooth", markers = false, wholeNumbers = false, className }: AreaLineChartProps) {
   const reduce = useReducedMotion();
   // New data replays the draw-in (e.g. switching Daily / Weekly / Monthly).
   const dataKey = points.map((p) => `${p.key}:${p.value}`).join("|");
   const gradient = useId().replace(/:/g, "");
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(0, ...points.map((p) => p.value));
-  const ticks = niceTicks(max);
+  const ticks = wholeNumbers ? niceTicks(max).filter((t) => Number.isInteger(t)) : niceTicks(max);
   const top = ticks[ticks.length - 1] || 1;
   const base = H - PAD;
   const x = (i: number) => (points.length <= 1 ? LEFT + (W - LEFT) / 2 : LEFT + PAD + (i / (points.length - 1)) * (W - LEFT - PAD * 2));

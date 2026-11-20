@@ -1,4 +1,4 @@
-import { Home } from "lucide-react";
+import { Home, ChartPie } from "lucide-react";
 import { IRoute } from "../types/navigation";
 import {
   ClipboardList,
@@ -49,6 +49,12 @@ const AdminRoutes: IRoute[] = [
     icon: Handshake,
     // "Bank Accounts" (admin-wide list, /admin/advisors/bank-accounts) is
     // unlinked for now; the page still exists. Banks moved to Settings.
+  },
+  {
+    name: "Advisor insights",
+    layout: "/admin",
+    path: "/advisor-insights",
+    icon: ChartPie,
   },
   {
     name: "Account managers",
